@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex, nofollow">
-  <title>日常軌跡 · 習慣追蹤器</title>
+  <title>日常軌跡 · 習慣追蹤與健康日誌</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
@@ -30,6 +29,7 @@
             sage: {
               50: '#F4F7F4',
               100: '#E4ECE3',
+              200: '#C8D8C7',
               300: '#A4BBA2',
               500: '#7E9A7B',
               600: '#648061',
@@ -37,6 +37,7 @@
             terracotta: {
               50: '#FBF5F2',
               100: '#F5E6DF',
+              200: '#E7C8BD',
               500: '#C77D63',
               600: '#A95E46',
             }
@@ -49,6 +50,7 @@
     };
   </script>
   <style>
+    /* 自訂捲軸樣式 */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -80,16 +82,20 @@
         </div>
       </div>
 
-      <!-- 右側動作區 -->
+      <!-- 右側動作按鈕區 -->
       <div class="flex items-center gap-2">
-        <button id="btn-open-category-modal" class="px-3 py-1.5 rounded-lg border border-sand-300 text-xs sm:text-sm font-medium text-sand-800 hover:bg-sand-100 hover:border-sand-600 transition flex items-center gap-1.5 shadow-sm">
+        <button id="btn-open-health-modal" type="button" class="px-3 py-1.5 rounded-lg border border-terracotta-500/40 bg-terracotta-50/70 text-xs sm:text-sm font-medium text-terracotta-600 hover:bg-terracotta-100 transition flex items-center gap-1.5 shadow-xs">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+          <span>記血壓/體重</span>
+        </button>
+        <button id="btn-open-category-modal" type="button" class="px-3 py-1.5 rounded-lg border border-sand-300 text-xs sm:text-sm font-medium text-sand-800 hover:bg-sand-100 hover:border-sand-600 transition flex items-center gap-1.5 shadow-sm">
           <i data-lucide="tag" class="w-3.5 h-3.5"></i>
           <span>分類管理</span>
         </button>
-        <button id="btn-open-data-modal" class="p-2 rounded-lg border border-sand-200 text-sand-600 hover:text-sand-900 hover:bg-sand-100 transition shadow-sm" title="備份與還原">
+        <button id="btn-open-data-modal" type="button" class="p-2 rounded-lg border border-sand-200 text-sand-600 hover:text-sand-900 hover:bg-sand-100 transition shadow-sm" title="備份與還原">
           <i data-lucide="database" class="w-4 h-4"></i>
         </button>
-        <button id="btn-open-habit-modal" class="px-3.5 py-1.5 rounded-lg bg-sand-900 text-white text-xs sm:text-sm font-medium hover:bg-sand-800 transition flex items-center gap-1.5 shadow-sm">
+        <button id="btn-open-habit-modal" type="button" class="px-3.5 py-1.5 rounded-lg bg-sand-900 text-white text-xs sm:text-sm font-medium hover:bg-sand-800 transition flex items-center gap-1.5 shadow-sm">
           <i data-lucide="plus" class="w-4 h-4"></i>
           <span>新增習慣</span>
         </button>
@@ -101,6 +107,7 @@
 
     <!-- 今日概況儀表板 -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- 達成度進度條 -->
       <div class="bg-white rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
         <div class="flex items-center justify-between text-sand-600 mb-2">
           <span class="text-xs font-medium tracking-wider uppercase">今日達成度</span>
@@ -117,29 +124,38 @@
         </div>
       </div>
 
+      <!-- 最新健康指標 (血壓與體重) -->
       <div class="bg-white rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
         <div class="flex items-center justify-between text-sand-600 mb-2">
-          <span class="text-xs font-medium tracking-wider uppercase">目前最長連續 (Streak)</span>
+          <span class="text-xs font-medium tracking-wider uppercase">最新健康指標</span>
+          <i data-lucide="heart-pulse" class="w-4 h-4 text-terracotta-500"></i>
+        </div>
+        <div id="stat-latest-health">
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-bold tracking-tight text-sand-900" id="stat-bp-val">--/--</span>
+            <span class="text-xs text-sand-600">mmHg</span>
+          </div>
+          <div class="text-xs text-sand-600 mt-2 flex items-center gap-2">
+            <span>體重: <strong class="text-sand-800" id="stat-weight-val">--</strong> kg</span>
+            <span class="text-sand-300">|</span>
+            <span id="stat-bp-tag" class="px-1.5 py-0.5 rounded text-[10px] bg-sand-100 text-sand-600">未記錄</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 連續打卡最長天數與箴言 -->
+      <div class="bg-gradient-to-br from-sand-100 to-sage-50 rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-sand-600 mb-2">
+          <span class="text-xs font-medium tracking-wider uppercase">連續節奏 (Streak)</span>
           <i data-lucide="flame" class="w-4 h-4 text-terracotta-500"></i>
         </div>
         <div>
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-bold tracking-tight text-sand-900" id="stat-longest-streak">0</span>
-            <span class="text-xs text-sand-600">天</span>
+            <span class="text-2xl font-bold tracking-tight text-sand-900" id="stat-longest-streak">0</span>
+            <span class="text-xs text-sand-600">天持續實踐</span>
           </div>
-          <p class="text-xs text-sand-600 mt-2">持續累積細小習慣，造就複利效應。</p>
+          <p class="text-xs text-sand-600 mt-2 font-normal">「規律生活不是束縛，而是給身體最安心的節奏。」</p>
         </div>
-      </div>
-
-      <div class="bg-gradient-to-br from-sand-100 to-sage-50 rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
-        <div class="flex items-center justify-between text-sand-600 mb-2">
-          <span class="text-xs font-medium tracking-wider uppercase">靜心日常</span>
-          <i data-lucide="sparkles" class="w-4 h-4 text-sage-600"></i>
-        </div>
-        <p class="text-sm text-sand-800 leading-relaxed font-normal">
-          「專注於當下的每一步，生活便在節奏中展開。」
-        </p>
-        <span class="text-[11px] text-sand-600 mt-2 block">Daily Mindful Routine</span>
       </div>
     </section>
 
@@ -148,9 +164,10 @@
       <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0" id="category-filter-bar"></div>
 
       <div class="flex items-center bg-sand-200/70 p-1 rounded-xl shrink-0 self-end sm:self-auto">
-        <button id="view-tab-today" class="px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition">今日打卡</button>
-        <button id="view-tab-grid" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">子彈網格</button>
-        <button id="view-tab-stats" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">年度熱力圖</button>
+        <button id="view-tab-today" type="button" class="px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition">今日打卡</button>
+        <button id="view-tab-grid" type="button" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">子彈網格</button>
+        <button id="view-tab-health" type="button" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">健康日誌</button>
+        <button id="view-tab-stats" type="button" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">年度熱力圖</button>
       </div>
     </section>
 
@@ -175,7 +192,6 @@
           <p class="text-xs text-sand-600 mt-0.5">點擊任意方塊即可直接補卡或取消</p>
         </div>
 
-        <!-- 週期翻頁切換控制區 -->
         <div class="flex items-center gap-1.5 self-start sm:self-auto">
           <button id="btn-grid-prev-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-sand-50 hover:bg-sand-100 border border-sand-200 text-sand-800 rounded-lg transition flex items-center gap-1 shadow-xs">
             <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
@@ -202,7 +218,46 @@
       </div>
     </section>
 
-    <!-- 視圖 3: 年度熱力圖與統計 -->
+    <!-- 視圖 3: 健康日誌列表 (血壓與體重) -->
+    <section id="view-health" class="hidden space-y-4">
+      <div class="flex items-center justify-between bg-white rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-sm">
+        <div>
+          <h2 class="text-sm font-semibold text-sand-900">血壓與體重歷史紀錄</h2>
+          <p class="text-xs text-sand-600 mt-0.5">掌握身體關鍵指標，觀察長期的變化趨勢</p>
+        </div>
+        <button id="btn-add-health-from-view" type="button" class="px-3.5 py-1.5 text-xs font-medium bg-terracotta-500 text-white rounded-xl hover:bg-terracotta-600 transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>新增一筆</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-sand-200/80 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-sand-50/80 border-b border-sand-200 text-sand-600 font-semibold">
+                <th class="py-3 px-4">日期</th>
+                <th class="py-3 px-3">時段</th>
+                <th class="py-3 px-3">收縮壓 (SYS)</th>
+                <th class="py-3 px-3">舒張壓 (DIA)</th>
+                <th class="py-3 px-3">脈搏 (BPM)</th>
+                <th class="py-3 px-3">狀態評估</th>
+                <th class="py-3 px-3">體重 (kg)</th>
+                <th class="py-3 px-4 min-w-[160px]">MEMO 備忘</th>
+                <th class="py-3 px-3 text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="health-logs-table-body" class="divide-y divide-sand-100"></tbody>
+          </table>
+        </div>
+        <div id="health-empty-state" class="hidden text-center py-12">
+          <i data-lucide="clipboard-pen" class="w-9 h-9 text-sand-400 mx-auto mb-2"></i>
+          <p class="text-xs text-sand-600">尚無血壓或體重紀錄，點擊右上角「記血壓/體重」開始！</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 視圖 4: 年度熱力圖與統計 -->
     <section id="view-stats" class="hidden space-y-6">
       <div class="bg-white rounded-2xl border border-sand-200/80 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-3">
@@ -235,7 +290,74 @@
 
   </main>
 
-  <!-- 1. 新增/編輯習慣彈窗 -->
+  <!-- ==================== 彈窗區 (MODALS) ==================== -->
+
+  <!-- A. 血壓與體重登記彈窗 -->
+  <div id="modal-health" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-md p-6">
+      <div class="flex items-center justify-between pb-3 border-b border-sand-100">
+        <div class="flex items-center gap-2">
+          <i data-lucide="activity" class="w-5 h-5 text-terracotta-500"></i>
+          <h3 id="modal-health-title" class="text-base font-semibold text-sand-900">記錄血壓與體重</h3>
+        </div>
+        <button id="btn-close-health-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-health" class="space-y-4 pt-4">
+        <input type="hidden" id="input-health-id" />
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-sand-800 mb-1">測量日期</label>
+            <input type="date" id="input-health-date" required class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-sand-800 mb-1">測量時段</label>
+            <select id="input-health-period" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition">
+              <option value="晨起">晨起</option>
+              <option value="晚間">晚間</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-sand-800 mb-1">收縮壓 (SYS / mmHg)</label>
+            <input type="number" id="input-health-sys" required placeholder="例如：118" min="50" max="250" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-sand-800 mb-1">舒張壓 (DIA / mmHg)</label>
+            <input type="number" id="input-health-dia" required placeholder="例如：76" min="30" max="160" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-sand-800 mb-1">體重 (kg)</label>
+            <input type="number" step="0.1" id="input-health-weight" placeholder="例如：65.5" min="20" max="250" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-sand-800 mb-1">脈搏 / 心率 (BPM, 選填)</label>
+            <input type="number" id="input-health-pulse" placeholder="例如：72" min="30" max="200" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-sand-800 mb-1">MEMO 備忘 (飲食、運動、心情等)</label>
+          <textarea id="input-health-memo" rows="2" placeholder="例如：晨跑後測量、昨晚睡眠良好、稍有疲倦感..." class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition resize-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button id="btn-cancel-health" type="button" class="px-4 py-2 text-sm text-sand-600 hover:bg-sand-100 rounded-xl transition">取消</button>
+          <button type="submit" class="px-5 py-2 text-sm font-medium bg-sand-900 text-white rounded-xl hover:bg-sand-800 transition shadow-sm">儲存紀錄</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- B. 新增/編輯習慣彈窗 -->
   <div id="modal-habit" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
     <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-md p-6 overflow-hidden">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
@@ -283,7 +405,7 @@
     </div>
   </div>
 
-  <!-- 2. 分類管理清單彈窗 -->
+  <!-- C. 分類管理清單彈窗 -->
   <div id="modal-category-manager" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
     <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-lg p-6 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
@@ -308,7 +430,7 @@
     </div>
   </div>
 
-  <!-- 3. 新增/編輯分類小彈窗 (z-[70]) -->
+  <!-- D. 新增/編輯分類小彈窗 (z-[70]) -->
   <div id="modal-category-edit" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-sand-900/50 backdrop-blur-sm hidden">
     <div class="bg-white rounded-2xl border border-sand-200 shadow-2xl w-full max-w-sm p-5">
       <div class="flex items-center justify-between pb-2 border-b border-sand-100 mb-3">
@@ -339,7 +461,7 @@
     </div>
   </div>
 
-  <!-- 4. 資料備份與還原彈窗 -->
+  <!-- E. 資料備份與還原彈窗 -->
   <div id="modal-data" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
     <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-md p-6">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
@@ -350,11 +472,11 @@
       </div>
 
       <div class="space-y-4 pt-4 text-xs text-sand-600 leading-relaxed">
-        <p>所有打卡紀錄與分類皆存放在瀏覽器端。更換裝置前，建議先匯出備份 JSON 檔案。</p>
+        <p>所有習慣打卡、血壓與體重紀錄皆存放在您的瀏覽器端。更換裝置前，建議先匯出備份 JSON 檔案。</p>
         
         <div class="p-3 bg-sand-50 rounded-xl border border-sand-200 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="font-medium text-sand-900">匯出完整備份 (JSON)</span>
+            <span class="font-medium text-sand-900">匯出完整備份 (含健康日誌)</span>
             <button id="btn-export-json" type="button" class="px-3 py-1.5 bg-white border border-sand-300 rounded-lg font-medium text-sand-800 hover:bg-sand-100 transition shadow-xs flex items-center gap-1">
               <i data-lucide="download" class="w-3.5 h-3.5"></i>
               <span>下載檔案</span>
@@ -372,7 +494,7 @@
 
         <div class="pt-2 border-t border-sand-100 flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-terracotta-600 hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-sand-400">日常軌跡 v1.4</span>
+          <span class="text-[11px] text-sand-400">日常軌跡 v1.6</span>
         </div>
       </div>
     </div>
@@ -388,7 +510,7 @@
       { color: '#6B705C', name: '冷杉苔蘚' }
     ];
 
-    const AVAILABLE_ICONS = ['check', 'book-open', 'footprints', 'cup-soda', 'moon', 'dumbbell', 'heart', 'feather', 'sun', 'camera'];
+    const AVAILABLE_ICONS = ['check', 'book-open', 'footprints', 'cup-soda', 'moon', 'dumbbell', 'heart', 'feather', 'sun', 'camera', 'activity'];
 
     const INITIAL_CATEGORIES = [
       { id: 'cat-health', name: '健康生活', color: '#7E9A7B' },
@@ -406,8 +528,9 @@
       categories: [],
       habits: [],
       logs: {},
+      healthLogs: [],
       activeCategory: 'all',
-      gridOffsetDays: 0 // 網格位移天數（以 14 天為單位，0 表示包含今天在內的最新 14 天）
+      gridOffsetDays: 0
     };
 
     function getStandardDateKey(dateObj = new Date()) {
@@ -424,19 +547,37 @@
       return `${parts[0]} 年 ${parseInt(parts[1], 10)} 月 ${parseInt(parts[2], 10)} 日 (週${weekDays[d.getDay()]})`;
     }
 
+    function getBloodPressureEvaluation(sys, dia) {
+      if (!sys || !dia) return { label: '未評估', colorClass: 'bg-sand-100 text-sand-600' };
+      if (sys < 120 && dia < 80) {
+        return { label: '理想標準', colorClass: 'bg-sage-100 text-sage-600' };
+      } else if (sys <= 129 && dia < 80) {
+        return { label: '正常偏高', colorClass: 'bg-sand-200 text-sand-800' };
+      } else if ((sys >= 130 && sys <= 139) || (dia >= 80 && dia <= 89)) {
+        return { label: '第一期高壓', colorClass: 'bg-terracotta-100 text-terracotta-600' };
+      } else {
+        return { label: '偏高留意', colorClass: 'bg-terracotta-200 text-terracotta-600 font-bold' };
+      }
+    }
+
     function loadState() {
       try {
         const catData = localStorage.getItem('routine_categories');
         const habitData = localStorage.getItem('routine_habits');
         const logData = localStorage.getItem('routine_logs');
+        const healthData = localStorage.getItem('routine_health_logs');
 
         state.categories = catData ? JSON.parse(catData) : INITIAL_CATEGORIES;
         state.habits = habitData ? JSON.parse(habitData) : INITIAL_HABITS;
         state.logs = logData ? JSON.parse(logData) : {};
+        state.healthLogs = healthData ? JSON.parse(healthData) : [
+          { id: 'hl-demo-1', date: getStandardDateKey(), period: '晨起', sys: 118, dia: 76, weight: 64.8, pulse: 68, memo: '晨起空腹測量，狀態平穩' }
+        ];
       } catch (e) {
         state.categories = INITIAL_CATEGORIES;
         state.habits = INITIAL_HABITS;
         state.logs = {};
+        state.healthLogs = [];
       }
     }
 
@@ -444,6 +585,7 @@
       localStorage.setItem('routine_categories', JSON.stringify(state.categories));
       localStorage.setItem('routine_habits', JSON.stringify(state.habits));
       localStorage.setItem('routine_logs', JSON.stringify(state.logs));
+      localStorage.setItem('routine_health_logs', JSON.stringify(state.healthLogs));
     }
 
     function calculateHabitStreak(habitId) {
@@ -509,6 +651,7 @@
       renderCategoryFilters();
       renderTodayHabits();
       renderBulletGrid();
+      renderHealthLogs();
       renderHeatmap();
       renderRankings();
       renderStatsOverview();
@@ -533,6 +676,28 @@
       document.getElementById('stat-completed-count').innerText = `${completed} / ${total} 已完成`;
       document.getElementById('stat-progress-bar').style.width = `${pct}%`;
       document.getElementById('stat-longest-streak').innerText = calculateOverallMaxStreak();
+      
+      if (state.healthLogs && state.healthLogs.length > 0) {
+        const sorted = [...state.healthLogs].sort((a, b) => {
+          const pA = a.period === '晚間' ? '2' : '1';
+          const pB = b.period === '晚間' ? '2' : '1';
+          return (b.date + pB).localeCompare(a.date + pA);
+        });
+        const latest = sorted[0];
+        document.getElementById('stat-bp-val').innerText = `${latest.sys}/${latest.dia}`;
+        document.getElementById('stat-weight-val').innerText = latest.weight ? latest.weight : '--';
+        
+        const evalRes = getBloodPressureEvaluation(latest.sys, latest.dia);
+        const tagEl = document.getElementById('stat-bp-tag');
+        tagEl.innerText = `${latest.period} · ${evalRes.label}`;
+        tagEl.className = `px-1.5 py-0.5 rounded text-[10px] ${evalRes.colorClass}`;
+      } else {
+        document.getElementById('stat-bp-val').innerText = '--/--';
+        document.getElementById('stat-weight-val').innerText = '--';
+        const tagEl = document.getElementById('stat-bp-tag');
+        tagEl.innerText = '未記錄';
+        tagEl.className = 'px-1.5 py-0.5 rounded text-[10px] bg-sand-100 text-sand-600';
+      }
     }
 
     function renderCategoryFilters() {
@@ -540,6 +705,7 @@
       container.innerHTML = '';
 
       const allBtn = document.createElement('button');
+      allBtn.type = 'button';
       allBtn.className = `px-3 py-1 rounded-full text-xs font-medium transition ${
         state.activeCategory === 'all'
           ? 'bg-sand-900 text-white shadow-xs'
@@ -554,6 +720,7 @@
 
       state.categories.forEach(cat => {
         const btn = document.createElement('button');
+        btn.type = 'button';
         const isActive = state.activeCategory === cat.id;
         btn.className = `px-3 py-1 rounded-full text-xs font-medium transition flex items-center gap-1.5 ${
           isActive
@@ -640,7 +807,6 @@
       });
     }
 
-    // 視圖 2: 子彈筆記網格視圖 (含偏移翻頁)
     function renderBulletGrid() {
       const container = document.getElementById('bullet-grid-table-container');
       const badge = document.getElementById('grid-date-range-badge');
@@ -649,7 +815,6 @@
       const todayKey = getStandardDateKey();
       const dates = [];
 
-      // 依據 offsetDays 計算 14 天區間
       for (let i = 13; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - state.gridOffsetDays - i);
@@ -661,7 +826,6 @@
         });
       }
 
-      // 更新區間標籤
       if (badge && dates.length > 0) {
         badge.innerText = `${dates[0].key} ~ ${dates[dates.length - 1].key}`;
       }
@@ -706,6 +870,78 @@
       tbodyHtml += '</tbody>';
       table.innerHTML = theadHtml + tbodyHtml;
       container.appendChild(table);
+    }
+
+    function renderHealthLogs() {
+      const tbody = document.getElementById('health-logs-table-body');
+      const emptyState = document.getElementById('health-empty-state');
+      tbody.innerHTML = '';
+
+      if (!state.healthLogs || state.healthLogs.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      const sorted = [...state.healthLogs].sort((a, b) => {
+        const pA = a.period === '晚間' ? '2' : '1';
+        const pB = b.period === '晚間' ? '2' : '1';
+        return (b.date + pB).localeCompare(a.date + pA);
+      });
+
+      sorted.forEach(log => {
+        const evalRes = getBloodPressureEvaluation(log.sys, log.dia);
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-sand-50/60 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-medium text-sand-800">${log.date}</td>
+          <td class="py-3 px-3">
+            <span class="px-2 py-0.5 rounded text-[11px] font-medium ${
+              log.period === '晨起' ? 'bg-sand-100 text-sand-800' : 'bg-sand-200 text-sand-900'
+            }">${log.period}</span>
+          </td>
+          <td class="py-3 px-3 font-semibold text-sand-900">${log.sys}</td>
+          <td class="py-3 px-3 font-semibold text-sand-900">${log.dia}</td>
+          <td class="py-3 px-3 text-sand-700">${log.pulse ? log.pulse : '--'}</td>
+          <td class="py-3 px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-medium ${evalRes.colorClass}">
+              ${evalRes.label}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-sand-800 font-medium">${log.weight ? log.weight + ' kg' : '--'}</td>
+          <td class="py-3 px-4 text-sand-600 max-w-[200px] truncate" title="${log.memo || ''}">
+            ${log.memo || '<span class="text-sand-300">--</span>'}
+          </td>
+          <td class="py-3 px-3 text-right">
+            <div class="inline-flex items-center gap-1">
+              <button type="button" class="btn-edit-hl p-1 text-sand-400 hover:text-sand-800 rounded hover:bg-sand-100 transition" data-id="${log.id}" title="編輯">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5 pointer-events-none"></i>
+              </button>
+              <button type="button" class="btn-delete-hl p-1 text-sand-400 hover:text-terracotta-600 rounded hover:bg-terracotta-50 transition" data-id="${log.id}" title="刪除">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i>
+              </button>
+            </div>
+          </td>
+        `;
+
+        // 綁定編輯
+        tr.querySelector('.btn-edit-hl').addEventListener('click', () => {
+          openHealthModal(log.id);
+        });
+
+        // 綁定刪除 (確保刪除保證生效)
+        tr.querySelector('.btn-delete-hl').addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetId = log.id;
+          if (confirm(`確定要刪除 ${log.date} (${log.period}) 的健康紀錄嗎？`)) {
+            state.healthLogs = state.healthLogs.filter(item => String(item.id) !== String(targetId));
+            saveState();
+            renderApp();
+          }
+        });
+
+        tbody.appendChild(tr);
+      });
     }
 
     function renderHeatmap() {
@@ -798,10 +1034,10 @@
           </div>
           <div class="flex items-center gap-1">
             <button onclick="editCategoryModal('${cat.id}')" type="button" class="p-1.5 text-sand-600 hover:text-sand-900 rounded-lg hover:bg-sand-200 transition" title="編輯分類">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              <i data-lucide="edit-3" class="w-3.5 h-3.5 pointer-events-none"></i>
             </button>
             <button onclick="deleteCategory('${cat.id}')" type="button" class="p-1.5 text-sand-400 hover:text-terracotta-600 rounded-lg hover:bg-terracotta-50 transition" title="刪除分類">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i>
             </button>
           </div>
         `;
@@ -821,6 +1057,36 @@
         }
         select.appendChild(opt);
       });
+    }
+
+    function openHealthModal(editId = null) {
+      const modal = document.getElementById('modal-health');
+      const title = document.getElementById('modal-health-title');
+      const form = document.getElementById('form-health');
+      form.reset();
+
+      if (editId) {
+        const log = state.healthLogs.find(l => l.id === editId);
+        if (log) {
+          title.innerText = '編輯健康紀錄';
+          document.getElementById('input-health-id').value = log.id;
+          document.getElementById('input-health-date').value = log.date;
+          document.getElementById('input-health-period').value = log.period;
+          document.getElementById('input-health-sys').value = log.sys;
+          document.getElementById('input-health-dia').value = log.dia;
+          document.getElementById('input-health-weight').value = log.weight !== null ? log.weight : '';
+          document.getElementById('input-health-pulse').value = log.pulse !== null ? log.pulse : '';
+          document.getElementById('input-health-memo').value = log.memo || '';
+        }
+      } else {
+        title.innerText = '記錄血壓與體重';
+        document.getElementById('input-health-id').value = '';
+        document.getElementById('input-health-date').value = getStandardDateKey();
+        const currentHour = new Date().getHours();
+        document.getElementById('input-health-period').value = currentHour < 12 ? '晨起' : '晚間';
+      }
+
+      modal.classList.remove('hidden');
     }
 
     function openCategoryEditModal(catId = null) {
@@ -920,7 +1186,7 @@
         btn.className = `w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition ${
           selectedIcon === ic ? 'bg-sand-900 text-white border-sand-900' : 'bg-sand-50 text-sand-600 border-sand-200 hover:bg-sand-100'
         }`;
-        btn.innerHTML = `<i data-lucide="${ic}" class="w-4 h-4"></i>`;
+        btn.innerHTML = `<i data-lucide="${ic}" class="w-4 h-4 pointer-events-none"></i>`;
         btn.onclick = () => {
           document.getElementById('input-habit-icon').value = ic;
           renderIconSelector(ic);
@@ -937,17 +1203,19 @@
 
       const tabToday = document.getElementById('view-tab-today');
       const tabGrid = document.getElementById('view-tab-grid');
+      const tabHealth = document.getElementById('view-tab-health');
       const tabStats = document.getElementById('view-tab-stats');
 
       const secToday = document.getElementById('view-today');
       const secGrid = document.getElementById('view-grid');
+      const secHealth = document.getElementById('view-health');
       const secStats = document.getElementById('view-stats');
 
       function switchTab(target) {
-        [tabToday, tabGrid, tabStats].forEach(t => {
+        [tabToday, tabGrid, tabHealth, tabStats].forEach(t => {
           t.className = 'px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition';
         });
-        [secToday, secGrid, secStats].forEach(s => s.classList.add('hidden'));
+        [secToday, secGrid, secHealth, secStats].forEach(s => s.classList.add('hidden'));
 
         if (target === 'today') {
           tabToday.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
@@ -955,6 +1223,9 @@
         } else if (target === 'grid') {
           tabGrid.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
           secGrid.classList.remove('hidden');
+        } else if (target === 'health') {
+          tabHealth.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
+          secHealth.classList.remove('hidden');
         } else if (target === 'stats') {
           tabStats.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
           secStats.classList.remove('hidden');
@@ -963,9 +1234,58 @@
 
       tabToday.onclick = () => switchTab('today');
       tabGrid.onclick = () => switchTab('grid');
+      tabHealth.onclick = () => switchTab('health');
       tabStats.onclick = () => switchTab('stats');
 
-      // 網格週期翻頁事件監聽
+      const modalHealth = document.getElementById('modal-health');
+      document.getElementById('btn-open-health-modal').onclick = () => openHealthModal();
+      document.getElementById('btn-add-health-from-view').onclick = () => openHealthModal();
+      document.getElementById('btn-close-health-modal').onclick = () => modalHealth.classList.add('hidden');
+      document.getElementById('btn-cancel-health').onclick = () => modalHealth.classList.add('hidden');
+
+      document.getElementById('form-health').onsubmit = (e) => {
+        e.preventDefault();
+        const id = document.getElementById('input-health-id').value;
+        const date = document.getElementById('input-health-date').value;
+        const period = document.getElementById('input-health-period').value;
+        const sys = parseInt(document.getElementById('input-health-sys').value, 10);
+        const dia = parseInt(document.getElementById('input-health-dia').value, 10);
+        const weightVal = document.getElementById('input-health-weight').value;
+        const pulseVal = document.getElementById('input-health-pulse').value;
+        const memo = document.getElementById('input-health-memo').value.trim();
+
+        const weight = weightVal ? parseFloat(weightVal) : null;
+        const pulse = pulseVal ? parseInt(pulseVal, 10) : null;
+
+        if (id) {
+          const item = state.healthLogs.find(l => String(l.id) === String(id));
+          if (item) {
+            item.date = date;
+            item.period = period;
+            item.sys = sys;
+            item.dia = dia;
+            item.weight = weight;
+            item.pulse = pulse;
+            item.memo = memo;
+          }
+        } else {
+          state.healthLogs.push({
+            id: 'hl-' + Date.now(),
+            date,
+            period,
+            sys,
+            dia,
+            weight,
+            pulse,
+            memo
+          });
+        }
+
+        saveState();
+        modalHealth.classList.add('hidden');
+        renderApp();
+      };
+
       document.getElementById('btn-grid-prev-period').onclick = () => {
         state.gridOffsetDays += 14;
         renderBulletGrid();
@@ -1091,11 +1411,12 @@
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '1.4',
+          routine_version: '1.6',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,
-          logs: state.logs
+          logs: state.logs,
+          healthLogs: state.healthLogs
         };
         const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -1118,9 +1439,10 @@
               state.categories = data.categories;
               state.habits = data.habits;
               state.logs = data.logs || {};
+              state.healthLogs = data.healthLogs || [];
               saveState();
               renderApp();
-              alert('備份資料已成功匯入！');
+              alert('包含血壓與體重在內的備份資料已成功匯入！');
               modalData.classList.add('hidden');
             } else {
               alert('無效的備份檔案格式。');
@@ -1133,10 +1455,13 @@
       };
 
       document.getElementById('btn-reset-demo').onclick = () => {
-        if (confirm('確定要載入預設範例資料嗎？這將會覆蓋現有項目。')) {
+        if (confirm('確定要載入預設範例資料嗎？這將會覆蓋現有習慣與紀錄。')) {
           state.categories = INITIAL_CATEGORIES;
           state.habits = INITIAL_HABITS;
           state.logs = {};
+          state.healthLogs = [
+            { id: 'hl-demo-1', date: getStandardDateKey(), period: '晨起', sys: 118, dia: 76, weight: 64.8, pulse: 68, memo: '晨起空腹測量，狀態平穩' }
+          ];
           saveState();
           renderApp();
           modalData.classList.add('hidden');

@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>日常軌跡 · 習慣追蹤與健康日誌</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>日常軌跡 · 習慣與健康追蹤器</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
@@ -29,7 +29,6 @@
             sage: {
               50: '#F4F7F4',
               100: '#E4ECE3',
-              200: '#C8D8C7',
               300: '#A4BBA2',
               500: '#7E9A7B',
               600: '#648061',
@@ -37,7 +36,6 @@
             terracotta: {
               50: '#FBF5F2',
               100: '#F5E6DF',
-              200: '#E7C8BD',
               500: '#C77D63',
               600: '#A95E46',
             }
@@ -50,10 +48,18 @@
     };
   </script>
   <style>
-    /* 自訂捲軸樣式 */
+    /* 隱藏水平滾動條但保持滾動功能 (適合手機滑動標籤) */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: #F5F2EB;
@@ -62,143 +68,156 @@
       background: #DCD4C3;
       border-radius: 9999px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #8C8370;
-    }
   </style>
 </head>
-<body class="bg-sand-50 text-sand-900 font-sans min-h-screen selection:bg-sage-100 selection:text-sage-600 pb-20">
+<body class="bg-sand-50 text-sand-900 font-sans min-h-screen selection:bg-sage-100 selection:text-sage-600 pb-24 antialiased">
 
-  <!-- 頂部導覽列 -->
-  <header class="sticky top-0 z-30 bg-sand-50/80 backdrop-blur-md border-b border-sand-200">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-sage-500 text-white flex items-center justify-center shadow-sm">
-          <i data-lucide="compass" class="w-5 h-5"></i>
+  <!-- 頂部導覽列 (針對手機寬度特別優化，杜絕文字擠壓換行) -->
+  <header class="sticky top-0 z-30 bg-sand-50/90 backdrop-blur-md border-b border-sand-200">
+    <div class="max-w-5xl mx-auto px-3.5 sm:px-6 h-15 sm:h-16 flex items-center justify-between gap-2">
+      <!-- 品牌與日期 -->
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-sage-500 text-white flex items-center justify-center shadow-xs shrink-0">
+          <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </div>
-        <div>
-          <h1 class="text-base sm:text-lg font-semibold tracking-wide text-sand-900">日常軌跡</h1>
-          <p class="text-xs text-sand-600" id="current-date-display">載入中...</p>
+        <div class="truncate">
+          <h1 class="text-sm sm:text-base font-semibold tracking-wide text-sand-900 truncate">日常軌跡</h1>
+          <p class="text-[11px] sm:text-xs text-sand-600 truncate" id="current-date-display">載入中...</p>
         </div>
       </div>
 
-      <!-- 右側動作按鈕區 -->
-      <div class="flex items-center gap-2">
-        <button id="btn-open-health-modal" type="button" class="px-3 py-1.5 rounded-lg border border-terracotta-500/40 bg-terracotta-50/70 text-xs sm:text-sm font-medium text-terracotta-600 hover:bg-terracotta-100 transition flex items-center gap-1.5 shadow-xs">
-          <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-          <span>記血壓/體重</span>
+      <!-- 右側動作區 (手機端精簡為緊湊按鈕，桌機展開全字樣) -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <!-- 記血壓/體重 -->
+        <button id="btn-open-health-modal" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-terracotta-500/30 bg-terracotta-50/80 text-terracotta-600 hover:bg-terracotta-100 transition flex items-center gap-1 text-xs font-medium whitespace-nowrap shadow-xs">
+          <i data-lucide="activity" class="w-3.5 h-3.5 shrink-0"></i>
+          <span>記血壓</span>
         </button>
-        <button id="btn-open-category-modal" type="button" class="px-3 py-1.5 rounded-lg border border-sand-300 text-xs sm:text-sm font-medium text-sand-800 hover:bg-sand-100 hover:border-sand-600 transition flex items-center gap-1.5 shadow-sm">
-          <i data-lucide="tag" class="w-3.5 h-3.5"></i>
-          <span>分類管理</span>
+
+        <!-- 分類管理 (手機上僅保留圖標按鈕，避免擠壓) -->
+        <button id="btn-open-category-modal" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-sand-300 text-sand-700 hover:bg-sand-100 transition flex items-center gap-1.5 text-xs font-medium whitespace-nowrap shadow-xs" title="分類管理">
+          <i data-lucide="tag" class="w-3.5 h-3.5 shrink-0"></i>
+          <span class="hidden sm:inline">分類管理</span>
         </button>
-        <button id="btn-open-data-modal" type="button" class="p-2 rounded-lg border border-sand-200 text-sand-600 hover:text-sand-900 hover:bg-sand-100 transition shadow-sm" title="備份與還原">
-          <i data-lucide="database" class="w-4 h-4"></i>
+
+        <!-- 資料備份 -->
+        <button id="btn-open-data-modal" class="p-1.5 sm:p-2 rounded-xl border border-sand-200 text-sand-600 hover:text-sand-900 hover:bg-sand-100 transition shadow-xs" title="備份與還原">
+          <i data-lucide="database" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
         </button>
-        <button id="btn-open-habit-modal" type="button" class="px-3.5 py-1.5 rounded-lg bg-sand-900 text-white text-xs sm:text-sm font-medium hover:bg-sand-800 transition flex items-center gap-1.5 shadow-sm">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>新增習慣</span>
+
+        <!-- 新增習慣 -->
+        <button id="btn-open-habit-modal" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-sand-900 text-white text-xs font-medium hover:bg-sand-800 transition flex items-center gap-1 whitespace-nowrap shadow-xs">
+          <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0"></i>
+          <span class="hidden xs:inline sm:inline">新增習慣</span>
+          <span class="inline xs:hidden sm:hidden">習慣</span>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-8">
+  <main class="max-w-5xl mx-auto px-3.5 sm:px-6 pt-4 sm:pt-6 space-y-6 sm:space-y-8">
 
-    <!-- 今日概況儀表板 -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- 達成度進度條 -->
-      <div class="bg-white rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
+    <!-- 今日概況儀表板 (手機單欄，桌機三欄) -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+      <!-- 今日達成度 -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-xs flex flex-col justify-between">
         <div class="flex items-center justify-between text-sand-600 mb-2">
           <span class="text-xs font-medium tracking-wider uppercase">今日達成度</span>
           <i data-lucide="check-circle-2" class="w-4 h-4 text-sage-500"></i>
         </div>
         <div>
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-bold tracking-tight text-sand-900" id="stat-progress-pct">0%</span>
+            <span class="text-2xl sm:text-3xl font-bold tracking-tight text-sand-900" id="stat-progress-pct">0%</span>
             <span class="text-xs text-sand-600" id="stat-completed-count">0 / 0 已完成</span>
           </div>
-          <div class="w-full bg-sand-100 h-2 rounded-full mt-3 overflow-hidden">
+          <div class="w-full bg-sand-100 h-2 rounded-full mt-2.5 overflow-hidden">
             <div id="stat-progress-bar" class="bg-sage-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
         </div>
       </div>
 
-      <!-- 最新健康指標 (血壓與體重) -->
-      <div class="bg-white rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
+      <!-- 最新健康指標 -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-xs flex flex-col justify-between">
         <div class="flex items-center justify-between text-sand-600 mb-2">
           <span class="text-xs font-medium tracking-wider uppercase">最新健康指標</span>
           <i data-lucide="heart-pulse" class="w-4 h-4 text-terracotta-500"></i>
         </div>
-        <div id="stat-latest-health">
+        <div>
           <div class="flex items-baseline gap-2">
-            <span class="text-2xl font-bold tracking-tight text-sand-900" id="stat-bp-val">--/--</span>
+            <span class="text-2xl sm:text-3xl font-bold tracking-tight text-sand-900" id="stat-bp-val">--/--</span>
             <span class="text-xs text-sand-600">mmHg</span>
           </div>
-          <div class="text-xs text-sand-600 mt-2 flex items-center gap-2">
+          <div class="text-xs text-sand-600 mt-2 flex items-center gap-2 flex-wrap">
             <span>體重: <strong class="text-sand-800" id="stat-weight-val">--</strong> kg</span>
             <span class="text-sand-300">|</span>
-            <span id="stat-bp-tag" class="px-1.5 py-0.5 rounded text-[10px] bg-sand-100 text-sand-600">未記錄</span>
+            <span id="stat-bp-tag" class="px-2 py-0.5 rounded text-[10px] bg-sand-100 text-sand-600">未記錄</span>
           </div>
         </div>
       </div>
 
-      <!-- 連續打卡最長天數與箴言 -->
-      <div class="bg-gradient-to-br from-sand-100 to-sage-50 rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
+      <!-- 激勵箴言 / Streak -->
+      <div class="bg-gradient-to-br from-sand-100/90 to-sage-50/70 rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-xs flex flex-col justify-between">
         <div class="flex items-center justify-between text-sand-600 mb-2">
-          <span class="text-xs font-medium tracking-wider uppercase">連續節奏 (Streak)</span>
+          <span class="text-xs font-medium tracking-wider uppercase">連續節奏 (STREAK)</span>
           <i data-lucide="flame" class="w-4 h-4 text-terracotta-500"></i>
         </div>
         <div>
-          <div class="flex items-baseline gap-2">
-            <span class="text-2xl font-bold tracking-tight text-sand-900" id="stat-longest-streak">0</span>
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-2xl sm:text-3xl font-bold tracking-tight text-sand-900" id="stat-longest-streak">0</span>
             <span class="text-xs text-sand-600">天持續實踐</span>
           </div>
-          <p class="text-xs text-sand-600 mt-2 font-normal">「規律生活不是束縛，而是給身體最安心的節奏。」</p>
+          <p class="text-xs text-sand-700 leading-relaxed mt-1 line-clamp-2">
+            「規律生活不是束縛，而是給身體最安心的節奏。」
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- 檢視切換與分類過濾 -->
-    <section class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-sand-200 pb-4">
-      <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0" id="category-filter-bar"></div>
+    <!-- 檢視切換與分類過濾列 (手機橫向滑動，不折行) -->
+    <section class="space-y-3">
+      <!-- 標籤分類篩選列 (支援平滑橫滑，保證文字一律水平排列) -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full" id="category-filter-bar">
+        <!-- 動態渲染各分類膠囊 -->
+      </div>
 
-      <div class="flex items-center bg-sand-200/70 p-1 rounded-xl shrink-0 self-end sm:self-auto">
-        <button id="view-tab-today" type="button" class="px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition">今日打卡</button>
-        <button id="view-tab-grid" type="button" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">子彈網格</button>
-        <button id="view-tab-health" type="button" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">健康日誌</button>
-        <button id="view-tab-stats" type="button" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">年度熱力圖</button>
+      <!-- 視圖切換列 (手機橫排全寬均勻分佈) -->
+      <div class="flex items-center bg-sand-200/60 p-1 rounded-xl w-full sm:w-fit overflow-x-auto no-scrollbar">
+        <button id="view-tab-today" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-xs transition whitespace-nowrap text-center">今日打卡</button>
+        <button id="view-tab-grid" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition whitespace-nowrap text-center">子彈網格</button>
+        <button id="view-tab-health" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition whitespace-nowrap text-center">健康日誌</button>
+        <button id="view-tab-stats" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition whitespace-nowrap text-center">年度熱力圖</button>
       </div>
     </section>
 
-    <!-- 視圖 1: 今日打卡 -->
+    <!-- 視圖 1: 今日打卡 (卡片清單) -->
     <section id="view-today" class="space-y-3">
-      <div id="today-habits-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+      <div id="today-habits-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
       <div id="today-empty-state" class="hidden text-center py-16 bg-white/60 rounded-2xl border border-dashed border-sand-300">
-        <i data-lucide="coffee" class="w-10 h-10 text-sand-400 mx-auto mb-3"></i>
+        <i data-lucide="coffee" class="w-9 h-9 text-sand-400 mx-auto mb-2.5"></i>
         <h3 class="text-sm font-medium text-sand-800">目前尚無習慣項目</h3>
-        <p class="text-xs text-sand-600 mt-1">點擊上方「新增習慣」開始紀錄吧！</p>
+        <p class="text-xs text-sand-600 mt-1">點擊右上角「新增習慣」開始紀錄吧！</p>
       </div>
     </section>
 
     <!-- 視圖 2: 子彈筆記網格視圖 (含 14 天翻頁) -->
-    <section id="view-grid" class="hidden bg-white rounded-2xl border border-sand-200/80 p-5 shadow-sm space-y-4">
+    <section id="view-grid" class="hidden bg-white rounded-2xl border border-sand-200/80 p-4 sm:p-5 shadow-xs space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div class="flex items-center gap-2">
-            <h2 class="text-sm font-semibold text-sand-900">子彈打卡網格 (14 天週期)</h2>
-            <span id="grid-date-range-badge" class="text-[11px] px-2 py-0.5 rounded-md bg-sand-100 text-sand-800 font-medium font-mono">載入中...</span>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h2 class="text-sm font-semibold text-sand-900">子彈打卡網格 (14 天)</h2>
+            <span id="grid-date-range-badge" class="text-[11px] px-2 py-0.5 rounded-md bg-sand-100 text-sand-800 font-mono">載入中...</span>
           </div>
-          <p class="text-xs text-sand-600 mt-0.5">點擊任意方塊即可直接補卡或取消</p>
+          <p class="text-xs text-sand-600 mt-0.5">點擊方塊可直接補卡或取消</p>
         </div>
 
+        <!-- 週期翻頁切換控制區 -->
         <div class="flex items-center gap-1.5 self-start sm:self-auto">
           <button id="btn-grid-prev-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-sand-50 hover:bg-sand-100 border border-sand-200 text-sand-800 rounded-lg transition flex items-center gap-1 shadow-xs">
             <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
             <span>上兩週</span>
           </button>
           <button id="btn-grid-today" type="button" class="px-2.5 py-1 text-xs font-medium bg-sand-50 hover:bg-sand-100 border border-sand-200 text-sand-800 rounded-lg transition shadow-xs">
-            回到今天
+            今天
           </button>
           <button id="btn-grid-next-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-sand-50 hover:bg-sand-100 border border-sand-200 text-sand-800 rounded-lg transition flex items-center gap-1 shadow-xs">
             <span>下兩週</span>
@@ -207,43 +226,42 @@
         </div>
       </div>
 
-      <div class="overflow-x-auto">
-        <div class="min-w-[660px]" id="bullet-grid-table-container"></div>
+      <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div class="min-w-[620px]" id="bullet-grid-table-container"></div>
       </div>
 
-      <div class="flex items-center justify-end gap-3 pt-1 border-t border-sand-100 text-[11px] text-sand-600">
-        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-sage-500"></span>已打卡</span>
-        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-sand-200"></span>未打卡</span>
-        <span class="inline-flex items-center gap-1"><span class="text-sage-600 font-bold">綠色日期</span>為今日</span>
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-sand-100 text-[11px] text-sand-600 flex-wrap">
+        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-sage-500"></span>已打卡</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-sand-200"></span>未打卡</span>
+        <span class="inline-flex items-center gap-1"><span class="text-sage-600 font-bold">綠色</span>為今日</span>
       </div>
     </section>
 
-    <!-- 視圖 3: 健康日誌列表 (血壓與體重) -->
+    <!-- 視圖 3: 健康日誌列表 -->
     <section id="view-health" class="hidden space-y-4">
-      <div class="flex items-center justify-between bg-white rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-sm">
+      <div class="flex items-center justify-between bg-white rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-xs">
         <div>
           <h2 class="text-sm font-semibold text-sand-900">血壓與體重歷史紀錄</h2>
-          <p class="text-xs text-sand-600 mt-0.5">掌握身體關鍵指標，觀察長期的變化趨勢</p>
+          <p class="text-xs text-sand-600 mt-0.5">掌握身體關鍵指標與長期變化趨勢</p>
         </div>
-        <button id="btn-add-health-from-view" type="button" class="px-3.5 py-1.5 text-xs font-medium bg-terracotta-500 text-white rounded-xl hover:bg-terracotta-600 transition flex items-center gap-1.5 shadow-sm">
+        <button id="btn-add-health-from-view" type="button" class="px-3 py-1.5 text-xs font-medium bg-terracotta-500 text-white rounded-xl hover:bg-terracotta-600 transition flex items-center gap-1 shadow-xs shrink-0">
           <i data-lucide="plus" class="w-3.5 h-3.5"></i>
           <span>新增一筆</span>
         </button>
       </div>
 
-      <div class="bg-white rounded-2xl border border-sand-200/80 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs">
+      <div class="bg-white rounded-2xl border border-sand-200/80 shadow-xs overflow-hidden">
+        <div class="overflow-x-auto -mx-0">
+          <table class="w-full text-left border-collapse text-xs min-w-[580px]">
             <thead>
               <tr class="bg-sand-50/80 border-b border-sand-200 text-sand-600 font-semibold">
-                <th class="py-3 px-4">日期</th>
-                <th class="py-3 px-3">時段</th>
-                <th class="py-3 px-3">收縮壓 (SYS)</th>
-                <th class="py-3 px-3">舒張壓 (DIA)</th>
-                <th class="py-3 px-3">脈搏 (BPM)</th>
-                <th class="py-3 px-3">狀態評估</th>
-                <th class="py-3 px-3">體重 (kg)</th>
-                <th class="py-3 px-4 min-w-[160px]">MEMO 備忘</th>
+                <th class="py-3 px-3 sm:px-4">日期</th>
+                <th class="py-3 px-2 sm:px-3">時段</th>
+                <th class="py-3 px-2 sm:px-3">收縮壓 (SYS)</th>
+                <th class="py-3 px-2 sm:px-3">舒張壓 (DIA)</th>
+                <th class="py-3 px-2 sm:px-3">狀態評估</th>
+                <th class="py-3 px-2 sm:px-3">體重 (kg)</th>
+                <th class="py-3 px-3 sm:px-4 min-w-[140px]">MEMO 備忘</th>
                 <th class="py-3 px-3 text-right">操作</th>
               </tr>
             </thead>
@@ -251,38 +269,38 @@
           </table>
         </div>
         <div id="health-empty-state" class="hidden text-center py-12">
-          <i data-lucide="clipboard-pen" class="w-9 h-9 text-sand-400 mx-auto mb-2"></i>
-          <p class="text-xs text-sand-600">尚無血壓或體重紀錄，點擊右上角「記血壓/體重」開始！</p>
+          <i data-lucide="clipboard-pen" class="w-8 h-8 text-sand-400 mx-auto mb-2"></i>
+          <p class="text-xs text-sand-600">尚無血壓或體重紀錄，點擊右上角「記血壓」開始！</p>
         </div>
       </div>
     </section>
 
     <!-- 視圖 4: 年度熱力圖與統計 -->
     <section id="view-stats" class="hidden space-y-6">
-      <div class="bg-white rounded-2xl border border-sand-200/80 p-5 shadow-sm">
+      <div class="bg-white rounded-2xl border border-sand-200/80 p-4 sm:p-5 shadow-xs">
         <div class="flex items-center justify-between mb-3">
           <div>
             <h2 class="text-sm font-semibold text-sand-900">年度習慣實踐熱力圖</h2>
-            <p class="text-xs text-sand-600">展示每日習慣完成密度（即時連動更新）</p>
+            <p class="text-xs text-sand-600">展示每日習慣完成密度（即時連動）</p>
           </div>
           <div class="text-xs text-sand-600 flex items-center gap-1">
             <span>少</span>
             <div class="flex gap-1">
-              <span class="w-2.5 h-2.5 rounded-sm bg-sand-100"></span>
-              <span class="w-2.5 h-2.5 rounded-sm bg-sage-100"></span>
-              <span class="w-2.5 h-2.5 rounded-sm bg-sage-300"></span>
-              <span class="w-2.5 h-2.5 rounded-sm bg-sage-500"></span>
-              <span class="w-2.5 h-2.5 rounded-sm bg-sage-600"></span>
+              <span class="w-2.5 h-2.5 rounded-xs bg-sand-100"></span>
+              <span class="w-2.5 h-2.5 rounded-xs bg-sage-100"></span>
+              <span class="w-2.5 h-2.5 rounded-xs bg-sage-300"></span>
+              <span class="w-2.5 h-2.5 rounded-xs bg-sage-500"></span>
+              <span class="w-2.5 h-2.5 rounded-xs bg-sage-600"></span>
             </div>
             <span>多</span>
           </div>
         </div>
-        <div class="overflow-x-auto py-2">
-          <div id="heatmap-container" class="flex gap-1.5 min-w-[700px]"></div>
+        <div class="overflow-x-auto py-2 -mx-2 px-2">
+          <div id="heatmap-container" class="flex gap-1.5 min-w-[680px]"></div>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl border border-sand-200/80 p-5 shadow-sm">
+      <div class="bg-white rounded-2xl border border-sand-200/80 p-4 sm:p-5 shadow-xs">
         <h2 class="text-sm font-semibold text-sand-900 mb-4">各習慣總打卡統計</h2>
         <div id="habit-rankings-container" class="space-y-3"></div>
       </div>
@@ -290,66 +308,69 @@
 
   </main>
 
-  <!-- ==================== 彈窗區 (MODALS) ==================== -->
+  <!-- ==================== 彈窗區 (MODALS 手機適應防溢出) ==================== -->
 
-  <!-- A. 血壓與體重登記彈窗 -->
-  <div id="modal-health" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
-    <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-md p-6">
+  <!-- 1. 血壓與體重登記彈窗 (優化間距與防鍵盤遮擋) -->
+  <div id="modal-health" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-sand-900/50 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-sand-200 shadow-2xl w-full max-w-md p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
         <div class="flex items-center gap-2">
           <i data-lucide="activity" class="w-5 h-5 text-terracotta-500"></i>
           <h3 id="modal-health-title" class="text-base font-semibold text-sand-900">記錄血壓與體重</h3>
         </div>
-        <button id="btn-close-health-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
+        <button id="btn-close-health-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1.5 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <form id="form-health" class="space-y-4 pt-4">
+      <form id="form-health" class="space-y-3.5 pt-3.5">
         <input type="hidden" id="input-health-id" />
 
-        <div class="grid grid-cols-2 gap-3">
+        <!-- 日期與時段 (修正雙欄寬度，確保中文字完全容納) -->
+        <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
           <div>
             <label class="block text-xs font-medium text-sand-800 mb-1">測量日期</label>
-            <input type="date" id="input-health-date" required class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
+            <input type="date" id="input-health-date" required class="w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
           </div>
           <div>
             <label class="block text-xs font-medium text-sand-800 mb-1">測量時段</label>
-            <select id="input-health-period" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition">
+            <select id="input-health-period" class="w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition">
               <option value="晨起">晨起</option>
               <option value="晚間">晚間</option>
             </select>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <!-- 收縮壓與舒張壓 -->
+        <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
           <div>
-            <label class="block text-xs font-medium text-sand-800 mb-1">收縮壓 (SYS / mmHg)</label>
+            <label class="block text-xs font-medium text-sand-800 mb-1">收縮壓 (SYS)</label>
             <input type="number" id="input-health-sys" required placeholder="例如：118" min="50" max="250" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-sand-800 mb-1">舒張壓 (DIA / mmHg)</label>
+            <label class="block text-xs font-medium text-sand-800 mb-1">舒張壓 (DIA)</label>
             <input type="number" id="input-health-dia" required placeholder="例如：76" min="30" max="160" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <!-- 體重與心率 -->
+        <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
           <div>
             <label class="block text-xs font-medium text-sand-800 mb-1">體重 (kg)</label>
             <input type="number" step="0.1" id="input-health-weight" placeholder="例如：65.5" min="20" max="250" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-sand-800 mb-1">脈搏 / 心率 (BPM, 選填)</label>
+            <label class="block text-xs font-medium text-sand-800 mb-1">脈搏/心率 (BPM)</label>
             <input type="number" id="input-health-pulse" placeholder="例如：72" min="30" max="200" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
           </div>
         </div>
 
         <div>
           <label class="block text-xs font-medium text-sand-800 mb-1">MEMO 備忘 (飲食、運動、心情等)</label>
-          <textarea id="input-health-memo" rows="2" placeholder="例如：晨跑後測量、昨晚睡眠良好、稍有疲倦感..." class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition resize-none"></textarea>
+          <textarea id="input-health-memo" rows="2" placeholder="例如：晨跑後測量、睡眠充足、少鹽飲食..." class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition resize-none"></textarea>
         </div>
 
-        <div class="pt-2 flex items-center justify-end gap-2">
+        <div class="pt-2 pb-1 flex items-center justify-end gap-2">
           <button id="btn-cancel-health" type="button" class="px-4 py-2 text-sm text-sand-600 hover:bg-sand-100 rounded-xl transition">取消</button>
           <button type="submit" class="px-5 py-2 text-sm font-medium bg-sand-900 text-white rounded-xl hover:bg-sand-800 transition shadow-sm">儲存紀錄</button>
         </div>
@@ -357,31 +378,31 @@
     </div>
   </div>
 
-  <!-- B. 新增/編輯習慣彈窗 -->
-  <div id="modal-habit" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
-    <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-md p-6 overflow-hidden">
+  <!-- 2. 新增/編輯習慣彈窗 -->
+  <div id="modal-habit" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-sand-900/50 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-sand-200 shadow-2xl w-full max-w-md p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
         <h3 id="modal-habit-title" class="text-base font-semibold text-sand-900">建立新習慣</h3>
-        <button id="btn-close-habit-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
+        <button id="btn-close-habit-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1.5 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <form id="form-habit" class="space-y-4 pt-4">
+      <form id="form-habit" class="space-y-3.5 pt-3.5">
         <input type="hidden" id="input-habit-id" />
 
         <div>
-          <label class="block text-xs font-medium text-sand-800 mb-1.5">習慣名稱</label>
-          <input type="text" id="input-habit-title" required placeholder="例如：晨間超慢跑 20 分鐘" class="w-full px-3.5 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500/20 focus:border-sage-500 transition" />
+          <label class="block text-xs font-medium text-sand-800 mb-1">習慣名稱</label>
+          <input type="text" id="input-habit-title" required placeholder="例如：每日超慢跑 20 分鐘" class="w-full px-3.5 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500/20 focus:border-sage-500 transition" />
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-sand-800 mb-1.5">習慣簡述或動機 (選填)</label>
-          <input type="text" id="input-habit-desc" placeholder="例如：保持身體活力" class="w-full px-3.5 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500/20 focus:border-sage-500 transition" />
+          <label class="block text-xs font-medium text-sand-800 mb-1">簡述或動機 (選填)</label>
+          <input type="text" id="input-habit-desc" placeholder="例如：保持身體活力與心肺耐力" class="w-full px-3.5 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500/20 focus:border-sage-500 transition" />
         </div>
 
         <div>
-          <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center justify-between mb-1">
             <label class="text-xs font-medium text-sand-800">習慣分類</label>
             <button id="btn-trigger-quick-category" type="button" class="text-xs text-sage-600 hover:text-sage-700 font-medium flex items-center gap-1">
               <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
@@ -393,11 +414,11 @@
 
         <div>
           <label class="block text-xs font-medium text-sand-800 mb-1.5">代表圖標</label>
-          <div class="flex items-center gap-2 overflow-x-auto pb-1" id="icon-selector-container"></div>
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1" id="icon-selector-container"></div>
           <input type="hidden" id="input-habit-icon" value="check" />
         </div>
 
-        <div class="pt-2 flex items-center justify-end gap-2">
+        <div class="pt-2 pb-1 flex items-center justify-end gap-2">
           <button id="btn-cancel-habit" type="button" class="px-4 py-2 text-sm text-sand-600 hover:bg-sand-100 rounded-xl transition">取消</button>
           <button type="submit" class="px-5 py-2 text-sm font-medium bg-sand-900 text-white rounded-xl hover:bg-sand-800 transition shadow-sm">儲存</button>
         </div>
@@ -405,32 +426,32 @@
     </div>
   </div>
 
-  <!-- C. 分類管理清單彈窗 -->
-  <div id="modal-category-manager" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
-    <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-lg p-6 max-h-[90vh] flex flex-col">
+  <!-- 3. 分類管理清單彈窗 -->
+  <div id="modal-category-manager" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-sand-900/50 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-sand-200 shadow-2xl w-full max-w-lg p-5 sm:p-6 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
         <div class="flex items-center gap-2">
           <i data-lucide="tag" class="w-5 h-5 text-sage-600"></i>
           <h3 class="text-base font-semibold text-sand-900">分類管理</h3>
         </div>
-        <button id="btn-close-category-manager" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
+        <button id="btn-close-category-manager" type="button" class="text-sand-600 hover:text-sand-900 p-1.5 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div class="flex-1 overflow-y-auto py-4 space-y-2.5" id="category-manager-list"></div>
+      <div class="flex-1 overflow-y-auto py-3.5 space-y-2.5" id="category-manager-list"></div>
 
       <div class="pt-3 border-t border-sand-100 flex justify-between items-center">
         <span class="text-xs text-sand-600">管理現有分類與色彩</span>
-        <button id="btn-open-create-category" type="button" class="px-3.5 py-1.5 text-xs font-medium bg-sage-500 text-white rounded-xl hover:bg-sage-600 transition flex items-center gap-1.5 shadow-sm">
+        <button id="btn-open-create-category" type="button" class="px-3.5 py-1.5 text-xs font-medium bg-sage-500 text-white rounded-xl hover:bg-sage-600 transition flex items-center gap-1.5 shadow-xs">
           <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-          <span>新增新分類</span>
+          <span>新增分類</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- D. 新增/編輯分類小彈窗 (z-[70]) -->
+  <!-- 4. 新增/編輯分類小彈窗 (z-[70]) -->
   <div id="modal-category-edit" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-sand-900/50 backdrop-blur-sm hidden">
     <div class="bg-white rounded-2xl border border-sand-200 shadow-2xl w-full max-w-sm p-5">
       <div class="flex items-center justify-between pb-2 border-b border-sand-100 mb-3">
@@ -461,9 +482,9 @@
     </div>
   </div>
 
-  <!-- E. 資料備份與還原彈窗 -->
-  <div id="modal-data" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
-    <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-md p-6">
+  <!-- 5. 資料備份與還原彈窗 -->
+  <div id="modal-data" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/50 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl border border-sand-200 shadow-2xl w-full max-w-md p-6">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
         <h3 class="text-base font-semibold text-sand-900">資料管理與備份</h3>
         <button id="btn-close-data-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
@@ -472,11 +493,11 @@
       </div>
 
       <div class="space-y-4 pt-4 text-xs text-sand-600 leading-relaxed">
-        <p>所有習慣打卡、血壓與體重紀錄皆存放在您的瀏覽器端。更換裝置前，建議先匯出備份 JSON 檔案。</p>
+        <p>所有習慣打卡、血壓與體重紀錄皆存放在您的瀏覽器端。更換裝置前，建議先下載備份 JSON 檔案。</p>
         
         <div class="p-3 bg-sand-50 rounded-xl border border-sand-200 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="font-medium text-sand-900">匯出完整備份 (含健康日誌)</span>
+            <span class="font-medium text-sand-900">匯出完整備份 (JSON)</span>
             <button id="btn-export-json" type="button" class="px-3 py-1.5 bg-white border border-sand-300 rounded-lg font-medium text-sand-800 hover:bg-sand-100 transition shadow-xs flex items-center gap-1">
               <i data-lucide="download" class="w-3.5 h-3.5"></i>
               <span>下載檔案</span>
@@ -494,7 +515,7 @@
 
         <div class="pt-2 border-t border-sand-100 flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-terracotta-600 hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-sand-400">日常軌跡 v1.6</span>
+          <span class="text-[11px] text-sand-400">日常軌跡 v1.6 (RWD優化版)</span>
         </div>
       </div>
     </div>
@@ -570,9 +591,7 @@
         state.categories = catData ? JSON.parse(catData) : INITIAL_CATEGORIES;
         state.habits = habitData ? JSON.parse(habitData) : INITIAL_HABITS;
         state.logs = logData ? JSON.parse(logData) : {};
-        state.healthLogs = healthData ? JSON.parse(healthData) : [
-          { id: 'hl-demo-1', date: getStandardDateKey(), period: '晨起', sys: 118, dia: 76, weight: 64.8, pulse: 68, memo: '晨起空腹測量，狀態平穩' }
-        ];
+        state.healthLogs = healthData ? JSON.parse(healthData) : [];
       } catch (e) {
         state.categories = INITIAL_CATEGORIES;
         state.habits = INITIAL_HABITS;
@@ -636,7 +655,7 @@
 
       if (!wasDone && dateKey === getStandardDateKey() && typeof confetti === 'function') {
         confetti({
-          particleCount: 28,
+          particleCount: 26,
           spread: 45,
           origin: { y: 0.8 },
           colors: ['#7E9A7B', '#C77D63', '#6A89A7', '#DCD4C3']
@@ -675,28 +694,20 @@
       document.getElementById('stat-progress-pct').innerText = `${pct}%`;
       document.getElementById('stat-completed-count').innerText = `${completed} / ${total} 已完成`;
       document.getElementById('stat-progress-bar').style.width = `${pct}%`;
-      document.getElementById('stat-longest-streak').innerText = calculateOverallMaxStreak();
       
       if (state.healthLogs && state.healthLogs.length > 0) {
-        const sorted = [...state.healthLogs].sort((a, b) => {
-          const pA = a.period === '晚間' ? '2' : '1';
-          const pB = b.period === '晚間' ? '2' : '1';
-          return (b.date + pB).localeCompare(a.date + pA);
-        });
-        const latest = sorted[0];
+        const latest = [...state.healthLogs].sort((a, b) => (b.date + (b.period === '晚間' ? '2' : '1')).localeCompare(a.date + (a.period === '晚間' ? '2' : '1')))[0];
         document.getElementById('stat-bp-val').innerText = `${latest.sys}/${latest.dia}`;
         document.getElementById('stat-weight-val').innerText = latest.weight ? latest.weight : '--';
         
         const evalRes = getBloodPressureEvaluation(latest.sys, latest.dia);
         const tagEl = document.getElementById('stat-bp-tag');
         tagEl.innerText = `${latest.period} · ${evalRes.label}`;
-        tagEl.className = `px-1.5 py-0.5 rounded text-[10px] ${evalRes.colorClass}`;
+        tagEl.className = `px-2 py-0.5 rounded text-[10px] ${evalRes.colorClass}`;
       } else {
         document.getElementById('stat-bp-val').innerText = '--/--';
         document.getElementById('stat-weight-val').innerText = '--';
-        const tagEl = document.getElementById('stat-bp-tag');
-        tagEl.innerText = '未記錄';
-        tagEl.className = 'px-1.5 py-0.5 rounded text-[10px] bg-sand-100 text-sand-600';
+        document.getElementById('stat-bp-tag').innerText = '尚未記錄';
       }
     }
 
@@ -705,8 +716,7 @@
       container.innerHTML = '';
 
       const allBtn = document.createElement('button');
-      allBtn.type = 'button';
-      allBtn.className = `px-3 py-1 rounded-full text-xs font-medium transition ${
+      allBtn.className = `px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap shrink-0 ${
         state.activeCategory === 'all'
           ? 'bg-sand-900 text-white shadow-xs'
           : 'bg-sand-100 text-sand-600 hover:bg-sand-200'
@@ -720,9 +730,8 @@
 
       state.categories.forEach(cat => {
         const btn = document.createElement('button');
-        btn.type = 'button';
         const isActive = state.activeCategory === cat.id;
-        btn.className = `px-3 py-1 rounded-full text-xs font-medium transition flex items-center gap-1.5 ${
+        btn.className = `px-3.5 py-1.5 rounded-full text-xs font-medium transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
           isActive
             ? 'bg-sand-900 text-white shadow-xs'
             : 'bg-white border border-sand-200 text-sand-700 hover:bg-sand-100'
@@ -761,40 +770,38 @@
         const streak = calculateHabitStreak(habit.id);
 
         const card = document.createElement('div');
-        card.className = `group bg-white rounded-2xl p-4 border transition-all duration-300 shadow-xs flex items-center justify-between ${
+        card.className = `group bg-white rounded-2xl p-3.5 sm:p-4 border transition-all duration-300 shadow-xs flex items-center justify-between ${
           isDone ? 'border-sage-500/40 bg-sage-50/20' : 'border-sand-200 hover:border-sand-300'
         }`;
 
         card.innerHTML = `
-          <div class="flex items-center gap-3.5 min-w-0">
-            <button type="button" class="btn-check-habit w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+          <div class="flex items-center gap-3 min-w-0">
+            <button type="button" class="btn-check-habit w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all shrink-0 ${
               isDone
-                ? 'bg-sage-500 text-white shadow-sm'
+                ? 'bg-sage-500 text-white shadow-xs'
                 : 'bg-sand-100 text-sand-400 hover:bg-sand-200 hover:text-sand-600'
             }" data-id="${habit.id}">
-              <i data-lucide="${isDone ? 'check' : habit.icon || 'circle'}" class="w-5 h-5 pointer-events-none"></i>
+              <i data-lucide="${isDone ? 'check' : habit.icon || 'circle'}" class="w-4 h-4 sm:w-5 sm:h-5 pointer-events-none"></i>
             </button>
             <div class="truncate">
-              <div class="flex items-center gap-2">
-                <h4 class="text-sm font-semibold truncate ${isDone ? 'line-through text-sand-400' : 'text-sand-900'}">${habit.title}</h4>
-                <span class="text-[10px] px-2 py-0.5 rounded-md font-medium shrink-0" style="background-color: ${category.color}15; color: ${category.color}">
+              <div class="flex items-center gap-1.5">
+                <h4 class="text-xs sm:text-sm font-semibold truncate ${isDone ? 'line-through text-sand-400' : 'text-sand-900'}">${habit.title}</h4>
+                <span class="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0" style="background-color: ${category.color}15; color: ${category.color}">
                   ${category.name}
                 </span>
               </div>
-              <p class="text-xs text-sand-600 truncate mt-0.5">${habit.desc || '保持日常節奏'}</p>
+              <p class="text-[11px] text-sand-600 truncate mt-0.5">${habit.desc || '保持日常節奏'}</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-2 pl-2">
-            <span class="text-[11px] font-medium px-2 py-1 bg-sand-100 text-sand-700 rounded-lg flex items-center gap-1 shrink-0" title="連續打卡天數">
+          <div class="flex items-center gap-1.5 pl-2 shrink-0">
+            <span class="text-[10px] sm:text-[11px] font-medium px-2 py-0.5 bg-sand-100 text-sand-700 rounded-lg flex items-center gap-1" title="連續天數">
               <i data-lucide="flame" class="w-3 h-3 text-terracotta-500"></i>
               <span>${streak}天</span>
             </span>
-            <div class="opacity-0 group-hover:opacity-100 transition flex items-center">
-              <button onclick="openEditHabitModal('${habit.id}')" type="button" class="p-1.5 text-sand-400 hover:text-sand-800 rounded-lg transition" title="編輯習慣">
-                <i data-lucide="more-horizontal" class="w-4 h-4"></i>
-              </button>
-            </div>
+            <button onclick="openEditHabitModal('${habit.id}')" type="button" class="p-1 text-sand-400 hover:text-sand-800 rounded-lg transition" title="編輯習慣">
+              <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+            </button>
           </div>
         `;
 
@@ -850,13 +857,13 @@
 
       filtered.forEach(habit => {
         tbodyHtml += `<tr class="border-b border-sand-100 hover:bg-sand-50/50 transition">`;
-        tbodyHtml += `<td class="py-2.5 px-3 text-xs font-medium text-sand-800 max-w-[180px] truncate">${habit.title}</td>`;
+        tbodyHtml += `<td class="py-2.5 px-3 text-xs font-medium text-sand-800 max-w-[150px] truncate">${habit.title}</td>`;
 
         dates.forEach(d => {
           const isDone = !!(state.logs[d.key] && state.logs[d.key][habit.id]);
           tbodyHtml += `
             <td class="py-2 px-1 text-center ${d.isToday ? 'bg-sage-50/20' : ''}">
-              <button onclick="toggleHabitLog('${habit.id}', '${d.key}')" type="button" class="w-5 h-5 rounded-md inline-flex items-center justify-center transition ${
+              <button onclick="toggleHabitLog('${habit.id}', '${d.key}')" type="button" class="w-5 h-5 rounded-xs inline-flex items-center justify-center transition ${
                 isDone ? 'bg-sage-500 text-white' : 'bg-sand-100 hover:bg-sand-200 text-transparent'
               }">
                 <i data-lucide="check" class="w-3 h-3 pointer-events-none"></i>
@@ -884,9 +891,7 @@
       emptyState.classList.add('hidden');
 
       const sorted = [...state.healthLogs].sort((a, b) => {
-        const pA = a.period === '晚間' ? '2' : '1';
-        const pB = b.period === '晚間' ? '2' : '1';
-        return (b.date + pB).localeCompare(a.date + pA);
+        return (b.date + (b.period === '晚間' ? '2' : '1')).localeCompare(a.date + (a.period === '晚間' ? '2' : '1'));
       });
 
       sorted.forEach(log => {
@@ -894,52 +899,34 @@
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-sand-50/60 transition';
         tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-medium text-sand-800">${log.date}</td>
-          <td class="py-3 px-3">
-            <span class="px-2 py-0.5 rounded text-[11px] font-medium ${
+          <td class="py-3 px-3 sm:px-4 font-mono font-medium text-sand-800">${log.date}</td>
+          <td class="py-3 px-2 sm:px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-medium ${
               log.period === '晨起' ? 'bg-sand-100 text-sand-800' : 'bg-sand-200 text-sand-900'
             }">${log.period}</span>
           </td>
-          <td class="py-3 px-3 font-semibold text-sand-900">${log.sys}</td>
-          <td class="py-3 px-3 font-semibold text-sand-900">${log.dia}</td>
-          <td class="py-3 px-3 text-sand-700">${log.pulse ? log.pulse : '--'}</td>
-          <td class="py-3 px-3">
-            <span class="px-2 py-0.5 rounded text-[10px] font-medium ${evalRes.colorClass}">
+          <td class="py-3 px-2 sm:px-3 font-semibold text-sand-900">${log.sys}</td>
+          <td class="py-3 px-2 sm:px-3 font-semibold text-sand-900">${log.dia}</td>
+          <td class="py-3 px-2 sm:px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-medium whitespace-nowrap ${evalRes.colorClass}">
               ${evalRes.label}
             </span>
           </td>
-          <td class="py-3 px-3 text-sand-800 font-medium">${log.weight ? log.weight + ' kg' : '--'}</td>
-          <td class="py-3 px-4 text-sand-600 max-w-[200px] truncate" title="${log.memo || ''}">
+          <td class="py-3 px-2 sm:px-3 text-sand-800 font-medium">${log.weight ? log.weight + ' kg' : '--'}</td>
+          <td class="py-3 px-3 sm:px-4 text-sand-600 max-w-[180px] truncate" title="${log.memo || ''}">
             ${log.memo || '<span class="text-sand-300">--</span>'}
           </td>
           <td class="py-3 px-3 text-right">
             <div class="inline-flex items-center gap-1">
-              <button type="button" class="btn-edit-hl p-1 text-sand-400 hover:text-sand-800 rounded hover:bg-sand-100 transition" data-id="${log.id}" title="編輯">
-                <i data-lucide="edit-3" class="w-3.5 h-3.5 pointer-events-none"></i>
+              <button onclick="editHealthLog('${log.id}')" type="button" class="p-1 text-sand-400 hover:text-sand-800 rounded hover:bg-sand-100 transition" title="編輯">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
               </button>
-              <button type="button" class="btn-delete-hl p-1 text-sand-400 hover:text-terracotta-600 rounded hover:bg-terracotta-50 transition" data-id="${log.id}" title="刪除">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i>
+              <button onclick="deleteHealthLog('${log.id}')" type="button" class="p-1 text-sand-400 hover:text-terracotta-600 rounded hover:bg-terracotta-50 transition" title="刪除">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </td>
         `;
-
-        // 綁定編輯
-        tr.querySelector('.btn-edit-hl').addEventListener('click', () => {
-          openHealthModal(log.id);
-        });
-
-        // 綁定刪除 (確保刪除保證生效)
-        tr.querySelector('.btn-delete-hl').addEventListener('click', (e) => {
-          e.stopPropagation();
-          const targetId = log.id;
-          if (confirm(`確定要刪除 ${log.date} (${log.period}) 的健康紀錄嗎？`)) {
-            state.healthLogs = state.healthLogs.filter(item => String(item.id) !== String(targetId));
-            saveState();
-            renderApp();
-          }
-        });
-
         tbody.appendChild(tr);
       });
     }
@@ -1007,10 +994,10 @@
         row.className = 'flex items-center justify-between text-xs py-1.5 border-b border-sand-100 last:border-none';
         row.innerHTML = `
           <div class="flex items-center gap-2 truncate">
-            <span class="w-2 h-2 rounded-full" style="background-color: ${cat.color}"></span>
+            <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${cat.color}"></span>
             <span class="font-medium text-sand-800 truncate">${habit.title}</span>
           </div>
-          <span class="text-sand-600 font-semibold shrink-0">累計打卡 ${count} 次</span>
+          <span class="text-sand-600 font-semibold shrink-0">累計 ${count} 次</span>
         `;
         container.appendChild(row);
       });
@@ -1026,7 +1013,7 @@
         item.className = 'flex items-center justify-between p-3 rounded-xl bg-sand-50 border border-sand-200/80';
         item.innerHTML = `
           <div class="flex items-center gap-3">
-            <span class="w-3.5 h-3.5 rounded-full" style="background-color: ${cat.color}"></span>
+            <span class="w-3.5 h-3.5 rounded-full shrink-0" style="background-color: ${cat.color}"></span>
             <div>
               <span class="text-xs font-semibold text-sand-900">${cat.name}</span>
               <span class="text-[11px] text-sand-600 block">關聯習慣數：${habitCount} 項</span>
@@ -1034,10 +1021,10 @@
           </div>
           <div class="flex items-center gap-1">
             <button onclick="editCategoryModal('${cat.id}')" type="button" class="p-1.5 text-sand-600 hover:text-sand-900 rounded-lg hover:bg-sand-200 transition" title="編輯分類">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5 pointer-events-none"></i>
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
             </button>
             <button onclick="deleteCategory('${cat.id}')" type="button" class="p-1.5 text-sand-400 hover:text-terracotta-600 rounded-lg hover:bg-terracotta-50 transition" title="刪除分類">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i>
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
         `;
@@ -1074,8 +1061,8 @@
           document.getElementById('input-health-period').value = log.period;
           document.getElementById('input-health-sys').value = log.sys;
           document.getElementById('input-health-dia').value = log.dia;
-          document.getElementById('input-health-weight').value = log.weight !== null ? log.weight : '';
-          document.getElementById('input-health-pulse').value = log.pulse !== null ? log.pulse : '';
+          document.getElementById('input-health-weight').value = log.weight || '';
+          document.getElementById('input-health-pulse').value = log.pulse || '';
           document.getElementById('input-health-memo').value = log.memo || '';
         }
       } else {
@@ -1088,6 +1075,18 @@
 
       modal.classList.remove('hidden');
     }
+
+    window.editHealthLog = function(id) {
+      openHealthModal(id);
+    };
+
+    window.deleteHealthLog = function(id) {
+      if (confirm('確定要刪除這筆健康紀錄嗎？')) {
+        state.healthLogs = state.healthLogs.filter(l => l.id !== id);
+        saveState();
+        renderApp();
+      }
+    };
 
     function openCategoryEditModal(catId = null) {
       const modal = document.getElementById('modal-category-edit');
@@ -1186,7 +1185,7 @@
         btn.className = `w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition ${
           selectedIcon === ic ? 'bg-sand-900 text-white border-sand-900' : 'bg-sand-50 text-sand-600 border-sand-200 hover:bg-sand-100'
         }`;
-        btn.innerHTML = `<i data-lucide="${ic}" class="w-4 h-4 pointer-events-none"></i>`;
+        btn.innerHTML = `<i data-lucide="${ic}" class="w-4 h-4"></i>`;
         btn.onclick = () => {
           document.getElementById('input-habit-icon').value = ic;
           renderIconSelector(ic);
@@ -1213,21 +1212,21 @@
 
       function switchTab(target) {
         [tabToday, tabGrid, tabHealth, tabStats].forEach(t => {
-          t.className = 'px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition';
+          t.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition whitespace-nowrap text-center';
         });
         [secToday, secGrid, secHealth, secStats].forEach(s => s.classList.add('hidden'));
 
         if (target === 'today') {
-          tabToday.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
+          tabToday.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-xs transition whitespace-nowrap text-center';
           secToday.classList.remove('hidden');
         } else if (target === 'grid') {
-          tabGrid.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
+          tabGrid.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-xs transition whitespace-nowrap text-center';
           secGrid.classList.remove('hidden');
         } else if (target === 'health') {
-          tabHealth.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
+          tabHealth.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-xs transition whitespace-nowrap text-center';
           secHealth.classList.remove('hidden');
         } else if (target === 'stats') {
-          tabStats.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
+          tabStats.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-xs transition whitespace-nowrap text-center';
           secStats.classList.remove('hidden');
         }
       }
@@ -1258,7 +1257,7 @@
         const pulse = pulseVal ? parseInt(pulseVal, 10) : null;
 
         if (id) {
-          const item = state.healthLogs.find(l => String(l.id) === String(id));
+          const item = state.healthLogs.find(l => l.id === id);
           if (item) {
             item.date = date;
             item.period = period;

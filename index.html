@@ -11,6 +11,10 @@
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
+  <!-- Firebase App & Firestore SDKs (Compat 版，支援直接在單一靜態 HTML 運作) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -67,7 +71,6 @@
       background: #DCD4C3;
       border-radius: 9999px;
     }
-    /* 修正 iOS 原生日期輸入框的外觀與寬度 */
     input[type="date"] {
       -webkit-appearance: none;
       appearance: none;
@@ -80,13 +83,19 @@
   <!-- 頂部導覽列 -->
   <header class="sticky top-0 z-30 bg-sand-50/90 backdrop-blur-md border-b border-sand-200">
     <div class="max-w-5xl mx-auto px-3.5 sm:px-6 h-15 sm:h-16 flex items-center justify-between gap-2">
-      <!-- 品牌與日期 -->
+      <!-- 品牌與日期與雲端狀態 -->
       <div class="flex items-center gap-2 sm:gap-3 min-w-0">
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-sage-500 text-white flex items-center justify-center shadow-xs shrink-0">
           <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </div>
         <div class="truncate">
-          <h1 class="text-sm sm:text-base font-semibold tracking-wide text-sand-900 truncate">日常軌跡</h1>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-sm sm:text-base font-semibold tracking-wide text-sand-900 truncate">日常軌跡</h1>
+            <span id="sync-status-indicator" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] bg-sand-200/60 text-sand-600 font-medium shrink-0" title="雲端同步狀態">
+              <span id="sync-status-dot" class="w-1.5 h-1.5 rounded-full bg-sand-400"></span>
+              <span id="sync-status-text" class="hidden xs:inline">連線中</span>
+            </span>
+          </div>
           <p class="text-[11px] sm:text-xs text-sand-600 truncate" id="current-date-display">載入中...</p>
         </div>
       </div>
@@ -303,7 +312,7 @@
 
   <!-- ==================== 彈窗區 ==================== -->
 
-  <!-- 1. 血壓與體重登記彈窗 (優化排版：日期整行、時段採按鈕切換，徹底防止重疊) -->
+  <!-- 1. 血壓與體重登記彈窗 -->
   <div id="modal-health" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-sand-900/50 backdrop-blur-sm hidden">
     <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-sand-200 shadow-2xl w-full max-w-md p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
@@ -320,13 +329,11 @@
         <input type="hidden" id="input-health-id" />
         <input type="hidden" id="input-health-period" value="晨起" />
 
-        <!-- 測量日期 (單獨整行，徹底解決 iOS 文字溢出問題) -->
         <div>
           <label class="block text-xs font-medium text-sand-800 mb-1">測量日期</label>
           <input type="date" id="input-health-date" required class="w-full px-3.5 py-2.5 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition text-sand-900" />
         </div>
 
-        <!-- 測量時段 (改為高質感膠囊按鈕，更直覺且省空間) -->
         <div>
           <label class="block text-xs font-medium text-sand-800 mb-1.5">測量時段</label>
           <div class="grid grid-cols-2 gap-2 bg-sand-100 p-1 rounded-xl">
@@ -341,7 +348,6 @@
           </div>
         </div>
 
-        <!-- 收縮壓與舒張壓 (SYS / DIA) -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-sand-800 mb-1">收縮壓 (SYS)</label>
@@ -353,7 +359,6 @@
           </div>
         </div>
 
-        <!-- 體重與心率 -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-sand-800 mb-1">體重 (kg)</label>
@@ -486,14 +491,14 @@
   <div id="modal-data" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/50 backdrop-blur-sm hidden">
     <div class="bg-white rounded-2xl border border-sand-200 shadow-2xl w-full max-w-md p-6">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
-        <h3 class="text-base font-semibold text-sand-900">資料管理與備份</h3>
+        <h3 class="text-base font-semibold text-sand-900">資料管理與雲端備份</h3>
         <button id="btn-close-data-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <div class="space-y-4 pt-4 text-xs text-sand-600 leading-relaxed">
-        <p>所有習慣打卡、血壓與體重紀錄皆存放在您的瀏覽器端。更換裝置前，建議先下載備份 JSON 檔案。</p>
+        <p>您的所有紀錄目前正透過 Google Firebase 在所有裝置間自動同步。更換設備或定期保存時，仍建議下載一份 JSON 備份檔。</p>
         
         <div class="p-3 bg-sand-50 rounded-xl border border-sand-200 space-y-3">
           <div class="flex items-center justify-between">
@@ -504,7 +509,7 @@
             </button>
           </div>
           <div class="border-t border-sand-200/60 pt-3 flex items-center justify-between">
-            <span class="font-medium text-sand-900">匯入備份檔案</span>
+            <span class="font-medium text-sand-900">匯入備份檔案 (上傳至雲端)</span>
             <label class="px-3 py-1.5 bg-white border border-sand-300 rounded-lg font-medium text-sand-800 hover:bg-sand-100 transition shadow-xs cursor-pointer flex items-center gap-1">
               <i data-lucide="upload" class="w-3.5 h-3.5"></i>
               <span>選擇檔案</span>
@@ -515,13 +520,53 @@
 
         <div class="pt-2 border-t border-sand-100 flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-terracotta-600 hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-sand-400">日常軌跡 v1.7 (RWD修復版)</span>
+          <span class="text-[11px] text-sand-400">日常軌跡 v2.0 (雲端同步版)</span>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    // ==================== FIREBASE 核心初始化 ====================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrTGccqgJm2rtqKzx4teLHuPYMGi-hlYQ",
+      authDomain: "habit-tracker-tony.firebaseapp.com",
+      projectId: "habit-tracker-tony",
+      storageBucket: "habit-tracker-tony.firebasestorage.app",
+      messagingSenderId: "872039917946",
+      appId: "1:872039917946:web:cd202065cddc142a094ec3",
+      measurementId: "G-CYNLKFF59N"
+    };
+
+    let db = null;
+    let syncDocRef = null;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      // 在 Firestore 的 'user_data' 集合下固定存放您的紀錄 'tony_main'
+      syncDocRef = db.collection('user_data').doc('tony_main');
+    } catch (e) {
+      console.warn('Firebase 初始化提示：', e);
+    }
+
+    function setSyncStatus(status, text) {
+      const dot = document.getElementById('sync-status-dot');
+      const label = document.getElementById('sync-status-text');
+      if (!dot || !label) return;
+
+      if (status === 'synced') {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse';
+        label.innerText = text || '已同步雲端';
+      } else if (status === 'syncing') {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping';
+        label.innerText = text || '同步中...';
+      } else {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-sand-400';
+        label.innerText = text || '離線模式';
+      }
+    }
+
+    // ==================== 基礎資料設定 ====================
     const PALETTE = [
       { color: '#7E9A7B', name: '鼠尾草綠' },
       { color: '#C77D63', name: '陶土粉橘' },
@@ -581,7 +626,8 @@
       }
     }
 
-    function loadState() {
+    // ==================== 本地與雲端雙軌同步 ====================
+    function loadStateFromLocal() {
       try {
         const catData = localStorage.getItem('routine_categories');
         const habitData = localStorage.getItem('routine_habits');
@@ -600,13 +646,61 @@
       }
     }
 
-    function saveState() {
+    function saveState(skipCloud = false) {
+      // 1. 先安全存入本地 localStorage
       localStorage.setItem('routine_categories', JSON.stringify(state.categories));
       localStorage.setItem('routine_habits', JSON.stringify(state.habits));
       localStorage.setItem('routine_logs', JSON.stringify(state.logs));
       localStorage.setItem('routine_health_logs', JSON.stringify(state.healthLogs));
+
+      // 2. 雲端同步
+      if (!skipCloud && syncDocRef) {
+        setSyncStatus('syncing', '正在儲存...');
+        syncDocRef.set({
+          categories: state.categories,
+          habits: state.habits,
+          logs: state.logs,
+          healthLogs: state.healthLogs,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true })
+        .then(() => {
+          setSyncStatus('synced', '已同步雲端');
+        })
+        .catch(err => {
+          console.warn('雲端同步失敗（將保留於本機）：', err);
+          setSyncStatus('error', '本機儲存');
+        });
+      }
     }
 
+    // 啟動 Firebase 實時監聽 (手機打卡，電腦立即無感更新)
+    function setupFirebaseListener() {
+      if (!syncDocRef) return;
+      setSyncStatus('syncing', '連線雲端中...');
+
+      syncDocRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          state.categories = data.categories || INITIAL_CATEGORIES;
+          state.habits = data.habits || INITIAL_HABITS;
+          state.logs = data.logs || {};
+          state.healthLogs = data.healthLogs || [];
+
+          // 同步保存到當前裝置的 localStorage
+          saveState(true);
+          renderApp();
+          setSyncStatus('synced', '已同步雲端');
+        } else {
+          // 若雲端尚無紀錄，則上傳當前本地的初始資料
+          saveState(false);
+        }
+      }, (err) => {
+        console.warn('Firebase 監聽錯誤：', err);
+        setSyncStatus('error', '本機模式');
+      });
+    }
+
+    // ==================== 統計與圖表 ====================
     function calculateHabitStreak(habitId) {
       let streak = 0;
       let checkDate = new Date();
@@ -1046,7 +1140,6 @@
       });
     }
 
-    // --- 健康日誌時段切換控制 (晨起 / 晚間) ---
     function setHealthPeriod(period) {
       document.getElementById('input-health-period').value = period;
       const btnMorning = document.getElementById('btn-period-morning');
@@ -1211,9 +1304,14 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadState();
+      // 1. 先讀取本地既有資料快速上屏
+      loadStateFromLocal();
+      renderApp();
 
       document.getElementById('current-date-display').innerText = formatDateDisplay(getStandardDateKey());
+
+      // 2. 啟動 Firebase 雲端監聽與雙向即時同步
+      setupFirebaseListener();
 
       const tabToday = document.getElementById('view-tab-today');
       const tabGrid = document.getElementById('view-tab-grid');
@@ -1251,11 +1349,9 @@
       tabHealth.onclick = () => switchTab('health');
       tabStats.onclick = () => switchTab('stats');
 
-      // 時段切換按鈕事件
       document.getElementById('btn-period-morning').onclick = () => setHealthPeriod('晨起');
       document.getElementById('btn-period-evening').onclick = () => setHealthPeriod('晚間');
 
-      // 彈窗監聽
       const modalHealth = document.getElementById('modal-health');
       document.getElementById('btn-open-health-modal').onclick = () => openHealthModal();
       document.getElementById('btn-add-health-from-view').onclick = () => openHealthModal();
@@ -1430,7 +1526,7 @@
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '1.7',
+          routine_version: '2.0',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,
@@ -1459,9 +1555,9 @@
               state.habits = data.habits;
               state.logs = data.logs || {};
               state.healthLogs = data.healthLogs || [];
-              saveState();
+              saveState(); // 同時儲存本機並立即同步上傳雲端
               renderApp();
-              alert('包含血壓與體重在內的備份資料已成功匯入！');
+              alert('備份資料已成功匯入並同步至雲端！');
               modalData.classList.add('hidden');
             } else {
               alert('無效的備份檔案格式。');
@@ -1474,7 +1570,7 @@
       };
 
       document.getElementById('btn-reset-demo').onclick = () => {
-        if (confirm('確定要載入預設範例資料嗎？這將會覆蓋現有習慣與紀錄。')) {
+        if (confirm('確定要載入預設範例資料嗎？這將會覆蓋現有紀錄並同步更新至雲端。')) {
           state.categories = INITIAL_CATEGORIES;
           state.habits = INITIAL_HABITS;
           state.logs = {};

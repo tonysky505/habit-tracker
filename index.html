@@ -48,7 +48,6 @@
     };
   </script>
   <style>
-    /* 隱藏水平滾動條但保持滾動功能 (適合手機滑動標籤) */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -68,11 +67,17 @@
       background: #DCD4C3;
       border-radius: 9999px;
     }
+    /* 修正 iOS 原生日期輸入框的外觀與寬度 */
+    input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      min-height: 2.5rem;
+    }
   </style>
 </head>
 <body class="bg-sand-50 text-sand-900 font-sans min-h-screen selection:bg-sage-100 selection:text-sage-600 pb-24 antialiased">
 
-  <!-- 頂部導覽列 (針對手機寬度特別優化，杜絕文字擠壓換行) -->
+  <!-- 頂部導覽列 -->
   <header class="sticky top-0 z-30 bg-sand-50/90 backdrop-blur-md border-b border-sand-200">
     <div class="max-w-5xl mx-auto px-3.5 sm:px-6 h-15 sm:h-16 flex items-center justify-between gap-2">
       <!-- 品牌與日期 -->
@@ -86,26 +91,22 @@
         </div>
       </div>
 
-      <!-- 右側動作區 (手機端精簡為緊湊按鈕，桌機展開全字樣) -->
+      <!-- 右側動作區 -->
       <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <!-- 記血壓/體重 -->
         <button id="btn-open-health-modal" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-terracotta-500/30 bg-terracotta-50/80 text-terracotta-600 hover:bg-terracotta-100 transition flex items-center gap-1 text-xs font-medium whitespace-nowrap shadow-xs">
           <i data-lucide="activity" class="w-3.5 h-3.5 shrink-0"></i>
           <span>記血壓</span>
         </button>
 
-        <!-- 分類管理 (手機上僅保留圖標按鈕，避免擠壓) -->
         <button id="btn-open-category-modal" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-sand-300 text-sand-700 hover:bg-sand-100 transition flex items-center gap-1.5 text-xs font-medium whitespace-nowrap shadow-xs" title="分類管理">
           <i data-lucide="tag" class="w-3.5 h-3.5 shrink-0"></i>
           <span class="hidden sm:inline">分類管理</span>
         </button>
 
-        <!-- 資料備份 -->
         <button id="btn-open-data-modal" class="p-1.5 sm:p-2 rounded-xl border border-sand-200 text-sand-600 hover:text-sand-900 hover:bg-sand-100 transition shadow-xs" title="備份與還原">
           <i data-lucide="database" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
         </button>
 
-        <!-- 新增習慣 -->
         <button id="btn-open-habit-modal" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-sand-900 text-white text-xs font-medium hover:bg-sand-800 transition flex items-center gap-1 whitespace-nowrap shadow-xs">
           <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0"></i>
           <span class="hidden xs:inline sm:inline">新增習慣</span>
@@ -117,9 +118,8 @@
 
   <main class="max-w-5xl mx-auto px-3.5 sm:px-6 pt-4 sm:pt-6 space-y-6 sm:space-y-8">
 
-    <!-- 今日概況儀表板 (手機單欄，桌機三欄) -->
+    <!-- 今日概況儀表板 -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-      <!-- 今日達成度 -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-xs flex flex-col justify-between">
         <div class="flex items-center justify-between text-sand-600 mb-2">
           <span class="text-xs font-medium tracking-wider uppercase">今日達成度</span>
@@ -136,7 +136,6 @@
         </div>
       </div>
 
-      <!-- 最新健康指標 -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-xs flex flex-col justify-between">
         <div class="flex items-center justify-between text-sand-600 mb-2">
           <span class="text-xs font-medium tracking-wider uppercase">最新健康指標</span>
@@ -155,7 +154,6 @@
         </div>
       </div>
 
-      <!-- 激勵箴言 / Streak -->
       <div class="bg-gradient-to-br from-sand-100/90 to-sage-50/70 rounded-2xl p-4 sm:p-5 border border-sand-200/80 shadow-xs flex flex-col justify-between">
         <div class="flex items-center justify-between text-sand-600 mb-2">
           <span class="text-xs font-medium tracking-wider uppercase">連續節奏 (STREAK)</span>
@@ -173,14 +171,10 @@
       </div>
     </section>
 
-    <!-- 檢視切換與分類過濾列 (手機橫向滑動，不折行) -->
+    <!-- 檢視切換與分類過濾列 -->
     <section class="space-y-3">
-      <!-- 標籤分類篩選列 (支援平滑橫滑，保證文字一律水平排列) -->
-      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full" id="category-filter-bar">
-        <!-- 動態渲染各分類膠囊 -->
-      </div>
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full" id="category-filter-bar"></div>
 
-      <!-- 視圖切換列 (手機橫排全寬均勻分佈) -->
       <div class="flex items-center bg-sand-200/60 p-1 rounded-xl w-full sm:w-fit overflow-x-auto no-scrollbar">
         <button id="view-tab-today" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-xs transition whitespace-nowrap text-center">今日打卡</button>
         <button id="view-tab-grid" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition whitespace-nowrap text-center">子彈網格</button>
@@ -189,7 +183,7 @@
       </div>
     </section>
 
-    <!-- 視圖 1: 今日打卡 (卡片清單) -->
+    <!-- 視圖 1: 今日打卡 -->
     <section id="view-today" class="space-y-3">
       <div id="today-habits-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
       <div id="today-empty-state" class="hidden text-center py-16 bg-white/60 rounded-2xl border border-dashed border-sand-300">
@@ -199,7 +193,7 @@
       </div>
     </section>
 
-    <!-- 視圖 2: 子彈筆記網格視圖 (含 14 天翻頁) -->
+    <!-- 視圖 2: 子彈筆記網格視圖 -->
     <section id="view-grid" class="hidden bg-white rounded-2xl border border-sand-200/80 p-4 sm:p-5 shadow-xs space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -210,7 +204,6 @@
           <p class="text-xs text-sand-600 mt-0.5">點擊方塊可直接補卡或取消</p>
         </div>
 
-        <!-- 週期翻頁切換控制區 -->
         <div class="flex items-center gap-1.5 self-start sm:self-auto">
           <button id="btn-grid-prev-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-sand-50 hover:bg-sand-100 border border-sand-200 text-sand-800 rounded-lg transition flex items-center gap-1 shadow-xs">
             <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
@@ -308,9 +301,9 @@
 
   </main>
 
-  <!-- ==================== 彈窗區 (MODALS 手機適應防溢出) ==================== -->
+  <!-- ==================== 彈窗區 ==================== -->
 
-  <!-- 1. 血壓與體重登記彈窗 (優化間距與防鍵盤遮擋) -->
+  <!-- 1. 血壓與體重登記彈窗 (優化排版：日期整行、時段採按鈕切換，徹底防止重疊) -->
   <div id="modal-health" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-sand-900/50 backdrop-blur-sm hidden">
     <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-sand-200 shadow-2xl w-full max-w-md p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-sand-100">
@@ -323,26 +316,33 @@
         </button>
       </div>
 
-      <form id="form-health" class="space-y-3.5 pt-3.5">
+      <form id="form-health" class="space-y-4 pt-3.5">
         <input type="hidden" id="input-health-id" />
+        <input type="hidden" id="input-health-period" value="晨起" />
 
-        <!-- 日期與時段 (修正雙欄寬度，確保中文字完全容納) -->
-        <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
-          <div>
-            <label class="block text-xs font-medium text-sand-800 mb-1">測量日期</label>
-            <input type="date" id="input-health-date" required class="w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-sand-800 mb-1">測量時段</label>
-            <select id="input-health-period" class="w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition">
-              <option value="晨起">晨起</option>
-              <option value="晚間">晚間</option>
-            </select>
+        <!-- 測量日期 (單獨整行，徹底解決 iOS 文字溢出問題) -->
+        <div>
+          <label class="block text-xs font-medium text-sand-800 mb-1">測量日期</label>
+          <input type="date" id="input-health-date" required class="w-full px-3.5 py-2.5 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition text-sand-900" />
+        </div>
+
+        <!-- 測量時段 (改為高質感膠囊按鈕，更直覺且省空間) -->
+        <div>
+          <label class="block text-xs font-medium text-sand-800 mb-1.5">測量時段</label>
+          <div class="grid grid-cols-2 gap-2 bg-sand-100 p-1 rounded-xl">
+            <button type="button" id="btn-period-morning" class="py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 bg-white text-sand-900 shadow-xs">
+              <i data-lucide="sun" class="w-3.5 h-3.5 text-terracotta-500"></i>
+              <span>晨起</span>
+            </button>
+            <button type="button" id="btn-period-evening" class="py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 text-sand-600 hover:text-sand-900">
+              <i data-lucide="moon" class="w-3.5 h-3.5 text-sage-600"></i>
+              <span>晚間</span>
+            </button>
           </div>
         </div>
 
-        <!-- 收縮壓與舒張壓 -->
-        <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+        <!-- 收縮壓與舒張壓 (SYS / DIA) -->
+        <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-sand-800 mb-1">收縮壓 (SYS)</label>
             <input type="number" id="input-health-sys" required placeholder="例如：118" min="50" max="250" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
@@ -354,7 +354,7 @@
         </div>
 
         <!-- 體重與心率 -->
-        <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+        <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-sand-800 mb-1">體重 (kg)</label>
             <input type="number" step="0.1" id="input-health-weight" placeholder="例如：65.5" min="20" max="250" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition" />
@@ -515,7 +515,7 @@
 
         <div class="pt-2 border-t border-sand-100 flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-terracotta-600 hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-sand-400">日常軌跡 v1.6 (RWD優化版)</span>
+          <span class="text-[11px] text-sand-400">日常軌跡 v1.7 (RWD修復版)</span>
         </div>
       </div>
     </div>
@@ -1046,6 +1046,21 @@
       });
     }
 
+    // --- 健康日誌時段切換控制 (晨起 / 晚間) ---
+    function setHealthPeriod(period) {
+      document.getElementById('input-health-period').value = period;
+      const btnMorning = document.getElementById('btn-period-morning');
+      const btnEvening = document.getElementById('btn-period-evening');
+
+      if (period === '晨起') {
+        btnMorning.className = 'py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 bg-white text-sand-900 shadow-xs';
+        btnEvening.className = 'py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 text-sand-600 hover:text-sand-900';
+      } else {
+        btnEvening.className = 'py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 bg-white text-sand-900 shadow-xs';
+        btnMorning.className = 'py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 text-sand-600 hover:text-sand-900';
+      }
+    }
+
     function openHealthModal(editId = null) {
       const modal = document.getElementById('modal-health');
       const title = document.getElementById('modal-health-title');
@@ -1058,7 +1073,7 @@
           title.innerText = '編輯健康紀錄';
           document.getElementById('input-health-id').value = log.id;
           document.getElementById('input-health-date').value = log.date;
-          document.getElementById('input-health-period').value = log.period;
+          setHealthPeriod(log.period || '晨起');
           document.getElementById('input-health-sys').value = log.sys;
           document.getElementById('input-health-dia').value = log.dia;
           document.getElementById('input-health-weight').value = log.weight || '';
@@ -1070,7 +1085,7 @@
         document.getElementById('input-health-id').value = '';
         document.getElementById('input-health-date').value = getStandardDateKey();
         const currentHour = new Date().getHours();
-        document.getElementById('input-health-period').value = currentHour < 12 ? '晨起' : '晚間';
+        setHealthPeriod(currentHour < 12 ? '晨起' : '晚間');
       }
 
       modal.classList.remove('hidden');
@@ -1236,6 +1251,11 @@
       tabHealth.onclick = () => switchTab('health');
       tabStats.onclick = () => switchTab('stats');
 
+      // 時段切換按鈕事件
+      document.getElementById('btn-period-morning').onclick = () => setHealthPeriod('晨起');
+      document.getElementById('btn-period-evening').onclick = () => setHealthPeriod('晚間');
+
+      // 彈窗監聽
       const modalHealth = document.getElementById('modal-health');
       document.getElementById('btn-open-health-modal').onclick = () => openHealthModal();
       document.getElementById('btn-add-health-from-view').onclick = () => openHealthModal();
@@ -1410,7 +1430,7 @@
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '1.6',
+          routine_version: '1.7',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,

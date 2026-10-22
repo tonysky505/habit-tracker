@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>日常軌跡 · 習慣追蹤器</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            sand: {
+              50: '#FBF9F5',
+              100: '#F5F2EB',
+              200: '#EAE4D8',
+              300: '#DCD4C3',
+              600: '#8C8370',
+              800: '#4A453A',
+              900: '#2E2B25',
+            },
+            sage: {
+              50: '#F4F7F4',
+              100: '#E4ECE3',
+              300: '#A4BBA2',
+              500: '#7E9A7B',
+              600: '#648061',
+            },
+            terracotta: {
+              50: '#FBF5F2',
+              100: '#F5E6DF',
+              500: '#C77D63',
+              600: '#A95E46',
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Noto Sans TC"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F5F2EB;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #DCD4C3;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8C8370;
+    }
+  </style>
+</head>
+<body class="bg-sand-50 text-sand-900 font-sans min-h-screen selection:bg-sage-100 selection:text-sage-600 pb-20">
+
+  <!-- 頂部導覽列 -->
+  <header class="sticky top-0 z-30 bg-sand-50/80 backdrop-blur-md border-b border-sand-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-sage-500 text-white flex items-center justify-center shadow-sm">
+          <i data-lucide="compass" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-semibold tracking-wide text-sand-900">日常軌跡</h1>
+          <p class="text-xs text-sand-600" id="current-date-display">載入中...</p>
+        </div>
+      </div>
+
+      <!-- 右側動作區 -->
+      <div class="flex items-center gap-2">
+        <button id="btn-open-category-modal" class="px-3 py-1.5 rounded-lg border border-sand-300 text-xs sm:text-sm font-medium text-sand-800 hover:bg-sand-100 hover:border-sand-600 transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+          <span>分類管理</span>
+        </button>
+        <button id="btn-open-data-modal" class="p-2 rounded-lg border border-sand-200 text-sand-600 hover:text-sand-900 hover:bg-sand-100 transition shadow-sm" title="備份與還原">
+          <i data-lucide="database" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-open-habit-modal" class="px-3.5 py-1.5 rounded-lg bg-sand-900 text-white text-xs sm:text-sm font-medium hover:bg-sand-800 transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>新增習慣</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-8">
+
+    <!-- 今日概況儀表板 -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-sand-600 mb-2">
+          <span class="text-xs font-medium tracking-wider uppercase">今日達成度</span>
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-sage-500"></i>
+        </div>
+        <div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-bold tracking-tight text-sand-900" id="stat-progress-pct">0%</span>
+            <span class="text-xs text-sand-600" id="stat-completed-count">0 / 0 已完成</span>
+          </div>
+          <div class="w-full bg-sand-100 h-2 rounded-full mt-3 overflow-hidden">
+            <div id="stat-progress-bar" class="bg-sage-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-sand-600 mb-2">
+          <span class="text-xs font-medium tracking-wider uppercase">目前最長連續 (Streak)</span>
+          <i data-lucide="flame" class="w-4 h-4 text-terracotta-500"></i>
+        </div>
+        <div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-bold tracking-tight text-sand-900" id="stat-longest-streak">0</span>
+            <span class="text-xs text-sand-600">天</span>
+          </div>
+          <p class="text-xs text-sand-600 mt-2">持續累積細小習慣，造就複利效應。</p>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-sand-100 to-sage-50 rounded-2xl p-5 border border-sand-200/80 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-sand-600 mb-2">
+          <span class="text-xs font-medium tracking-wider uppercase">靜心日常</span>
+          <i data-lucide="sparkles" class="w-4 h-4 text-sage-600"></i>
+        </div>
+        <p class="text-sm text-sand-800 leading-relaxed font-normal">
+          「專注於當下的每一步，生活便在節奏中展開。」
+        </p>
+        <span class="text-[11px] text-sand-600 mt-2 block">Daily Mindful Routine</span>
+      </div>
+    </section>
+
+    <!-- 檢視切換與分類過濾 -->
+    <section class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-sand-200 pb-4">
+      <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0" id="category-filter-bar"></div>
+
+      <div class="flex items-center bg-sand-200/70 p-1 rounded-xl shrink-0 self-end sm:self-auto">
+        <button id="view-tab-today" class="px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition">今日打卡</button>
+        <button id="view-tab-grid" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">子彈網格</button>
+        <button id="view-tab-stats" class="px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition">年度熱力圖</button>
+      </div>
+    </section>
+
+    <!-- 視圖 1: 今日打卡 -->
+    <section id="view-today" class="space-y-3">
+      <div id="today-habits-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+      <div id="today-empty-state" class="hidden text-center py-16 bg-white/60 rounded-2xl border border-dashed border-sand-300">
+        <i data-lucide="coffee" class="w-10 h-10 text-sand-400 mx-auto mb-3"></i>
+        <h3 class="text-sm font-medium text-sand-800">目前尚無習慣項目</h3>
+        <p class="text-xs text-sand-600 mt-1">點擊上方「新增習慣」開始紀錄吧！</p>
+      </div>
+    </section>
+
+    <!-- 視圖 2: 子彈筆記網格視圖 (含 14 天翻頁) -->
+    <section id="view-grid" class="hidden bg-white rounded-2xl border border-sand-200/80 p-5 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-semibold text-sand-900">子彈打卡網格 (14 天週期)</h2>
+            <span id="grid-date-range-badge" class="text-[11px] px-2 py-0.5 rounded-md bg-sand-100 text-sand-800 font-medium font-mono">載入中...</span>
+          </div>
+          <p class="text-xs text-sand-600 mt-0.5">點擊任意方塊即可直接補卡或取消</p>
+        </div>
+
+        <!-- 週期翻頁切換控制區 -->
+        <div class="flex items-center gap-1.5 self-start sm:self-auto">
+          <button id="btn-grid-prev-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-sand-50 hover:bg-sand-100 border border-sand-200 text-sand-800 rounded-lg transition flex items-center gap-1 shadow-xs">
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+            <span>上兩週</span>
+          </button>
+          <button id="btn-grid-today" type="button" class="px-2.5 py-1 text-xs font-medium bg-sand-50 hover:bg-sand-100 border border-sand-200 text-sand-800 rounded-lg transition shadow-xs">
+            回到今天
+          </button>
+          <button id="btn-grid-next-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-sand-50 hover:bg-sand-100 border border-sand-200 text-sand-800 rounded-lg transition flex items-center gap-1 shadow-xs">
+            <span>下兩週</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <div class="min-w-[660px]" id="bullet-grid-table-container"></div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-1 border-t border-sand-100 text-[11px] text-sand-600">
+        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-sage-500"></span>已打卡</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-sand-200"></span>未打卡</span>
+        <span class="inline-flex items-center gap-1"><span class="text-sage-600 font-bold">綠色日期</span>為今日</span>
+      </div>
+    </section>
+
+    <!-- 視圖 3: 年度熱力圖與統計 -->
+    <section id="view-stats" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-sand-200/80 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h2 class="text-sm font-semibold text-sand-900">年度習慣實踐熱力圖</h2>
+            <p class="text-xs text-sand-600">展示每日習慣完成密度（即時連動更新）</p>
+          </div>
+          <div class="text-xs text-sand-600 flex items-center gap-1">
+            <span>少</span>
+            <div class="flex gap-1">
+              <span class="w-2.5 h-2.5 rounded-sm bg-sand-100"></span>
+              <span class="w-2.5 h-2.5 rounded-sm bg-sage-100"></span>
+              <span class="w-2.5 h-2.5 rounded-sm bg-sage-300"></span>
+              <span class="w-2.5 h-2.5 rounded-sm bg-sage-500"></span>
+              <span class="w-2.5 h-2.5 rounded-sm bg-sage-600"></span>
+            </div>
+            <span>多</span>
+          </div>
+        </div>
+        <div class="overflow-x-auto py-2">
+          <div id="heatmap-container" class="flex gap-1.5 min-w-[700px]"></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-sand-200/80 p-5 shadow-sm">
+        <h2 class="text-sm font-semibold text-sand-900 mb-4">各習慣總打卡統計</h2>
+        <div id="habit-rankings-container" class="space-y-3"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 1. 新增/編輯習慣彈窗 -->
+  <div id="modal-habit" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-md p-6 overflow-hidden">
+      <div class="flex items-center justify-between pb-3 border-b border-sand-100">
+        <h3 id="modal-habit-title" class="text-base font-semibold text-sand-900">建立新習慣</h3>
+        <button id="btn-close-habit-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-habit" class="space-y-4 pt-4">
+        <input type="hidden" id="input-habit-id" />
+
+        <div>
+          <label class="block text-xs font-medium text-sand-800 mb-1.5">習慣名稱</label>
+          <input type="text" id="input-habit-title" required placeholder="例如：晨間超慢跑 20 分鐘" class="w-full px-3.5 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500/20 focus:border-sage-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-sand-800 mb-1.5">習慣簡述或動機 (選填)</label>
+          <input type="text" id="input-habit-desc" placeholder="例如：保持身體活力" class="w-full px-3.5 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500/20 focus:border-sage-500 transition" />
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-medium text-sand-800">習慣分類</label>
+            <button id="btn-trigger-quick-category" type="button" class="text-xs text-sage-600 hover:text-sage-700 font-medium flex items-center gap-1">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+              <span>+ 新增自訂分類</span>
+            </button>
+          </div>
+          <select id="select-habit-category" class="w-full px-3.5 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500/20 focus:border-sage-500 transition"></select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-sand-800 mb-1.5">代表圖標</label>
+          <div class="flex items-center gap-2 overflow-x-auto pb-1" id="icon-selector-container"></div>
+          <input type="hidden" id="input-habit-icon" value="check" />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button id="btn-cancel-habit" type="button" class="px-4 py-2 text-sm text-sand-600 hover:bg-sand-100 rounded-xl transition">取消</button>
+          <button type="submit" class="px-5 py-2 text-sm font-medium bg-sand-900 text-white rounded-xl hover:bg-sand-800 transition shadow-sm">儲存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. 分類管理清單彈窗 -->
+  <div id="modal-category-manager" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-lg p-6 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-sand-100">
+        <div class="flex items-center gap-2">
+          <i data-lucide="tag" class="w-5 h-5 text-sage-600"></i>
+          <h3 class="text-base font-semibold text-sand-900">分類管理</h3>
+        </div>
+        <button id="btn-close-category-manager" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-4 space-y-2.5" id="category-manager-list"></div>
+
+      <div class="pt-3 border-t border-sand-100 flex justify-between items-center">
+        <span class="text-xs text-sand-600">管理現有分類與色彩</span>
+        <button id="btn-open-create-category" type="button" class="px-3.5 py-1.5 text-xs font-medium bg-sage-500 text-white rounded-xl hover:bg-sage-600 transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>新增新分類</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 新增/編輯分類小彈窗 (z-[70]) -->
+  <div id="modal-category-edit" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-sand-900/50 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl border border-sand-200 shadow-2xl w-full max-w-sm p-5">
+      <div class="flex items-center justify-between pb-2 border-b border-sand-100 mb-3">
+        <h4 id="category-edit-title" class="text-sm font-semibold text-sand-900">建立自訂分類</h4>
+        <button id="btn-close-category-edit" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="form-category-edit" class="space-y-4">
+        <input type="hidden" id="input-category-id" />
+        <div>
+          <label class="block text-xs font-medium text-sand-800 mb-1">分類名稱</label>
+          <input type="text" id="input-category-name" required placeholder="例如：生活作息、日文研習" class="w-full px-3 py-2 text-sm bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500/20 focus:border-sage-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-sand-800 mb-1.5">莫蘭迪色票</label>
+          <div class="grid grid-cols-6 gap-2" id="category-color-palette"></div>
+          <input type="hidden" id="input-category-color" value="#7E9A7B" />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button id="btn-cancel-category-edit" type="button" class="px-3 py-1.5 text-xs text-sand-600 hover:bg-sand-100 rounded-lg transition">取消</button>
+          <button type="submit" class="px-4 py-1.5 text-xs font-medium bg-sand-900 text-white rounded-lg hover:bg-sand-800 transition">確定儲存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. 資料備份與還原彈窗 -->
+  <div id="modal-data" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sand-900/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl border border-sand-200 shadow-xl w-full max-w-md p-6">
+      <div class="flex items-center justify-between pb-3 border-b border-sand-100">
+        <h3 class="text-base font-semibold text-sand-900">資料管理與備份</h3>
+        <button id="btn-close-data-modal" type="button" class="text-sand-600 hover:text-sand-900 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 pt-4 text-xs text-sand-600 leading-relaxed">
+        <p>所有打卡紀錄與分類皆存放在瀏覽器端。更換裝置前，建議先匯出備份 JSON 檔案。</p>
+        
+        <div class="p-3 bg-sand-50 rounded-xl border border-sand-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-sand-900">匯出完整備份 (JSON)</span>
+            <button id="btn-export-json" type="button" class="px-3 py-1.5 bg-white border border-sand-300 rounded-lg font-medium text-sand-800 hover:bg-sand-100 transition shadow-xs flex items-center gap-1">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>下載檔案</span>
+            </button>
+          </div>
+          <div class="border-t border-sand-200/60 pt-3 flex items-center justify-between">
+            <span class="font-medium text-sand-900">匯入備份檔案</span>
+            <label class="px-3 py-1.5 bg-white border border-sand-300 rounded-lg font-medium text-sand-800 hover:bg-sand-100 transition shadow-xs cursor-pointer flex items-center gap-1">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              <span>選擇檔案</span>
+              <input type="file" id="input-import-json" accept=".json" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-sand-100 flex justify-between items-center">
+          <button id="btn-reset-demo" type="button" class="text-[11px] text-terracotta-600 hover:underline">載入範例生活習慣</button>
+          <span class="text-[11px] text-sand-400">日常軌跡 v1.4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PALETTE = [
+      { color: '#7E9A7B', name: '鼠尾草綠' },
+      { color: '#C77D63', name: '陶土粉橘' },
+      { color: '#6A89A7', name: '霧靄灰藍' },
+      { color: '#B39268', name: '琥珀沙黃' },
+      { color: '#8E7C93', name: '藕粉灰紫' },
+      { color: '#6B705C', name: '冷杉苔蘚' }
+    ];
+
+    const AVAILABLE_ICONS = ['check', 'book-open', 'footprints', 'cup-soda', 'moon', 'dumbbell', 'heart', 'feather', 'sun', 'camera'];
+
+    const INITIAL_CATEGORIES = [
+      { id: 'cat-health', name: '健康生活', color: '#7E9A7B' },
+      { id: 'cat-mind', name: '閱讀專注', color: '#6A89A7' },
+      { id: 'cat-rest', name: '規律作息', color: '#C77D63' }
+    ];
+
+    const INITIAL_HABITS = [
+      { id: 'h-1', title: '每日超慢跑 20-30 分鐘', desc: '低心率有氧，喚醒身體活力', categoryId: 'cat-health', icon: 'footprints', createdAt: '2026-01-01' },
+      { id: 'h-2', title: '閱讀或文字書寫 30 分鐘', desc: '保持專注力與思考餘裕', categoryId: 'cat-mind', icon: 'book-open', createdAt: '2026-01-01' },
+      { id: 'h-3', title: '23:15 放下手機與放鬆備睡', desc: '遠離藍光刺激，維持規律作息', categoryId: 'cat-rest', icon: 'moon', createdAt: '2026-01-01' }
+    ];
+
+    let state = {
+      categories: [],
+      habits: [],
+      logs: {},
+      activeCategory: 'all',
+      gridOffsetDays: 0 // 網格位移天數（以 14 天為單位，0 表示包含今天在內的最新 14 天）
+    };
+
+    function getStandardDateKey(dateObj = new Date()) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function formatDateDisplay(dateStr) {
+      const parts = dateStr.split('-');
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+      return `${parts[0]} 年 ${parseInt(parts[1], 10)} 月 ${parseInt(parts[2], 10)} 日 (週${weekDays[d.getDay()]})`;
+    }
+
+    function loadState() {
+      try {
+        const catData = localStorage.getItem('routine_categories');
+        const habitData = localStorage.getItem('routine_habits');
+        const logData = localStorage.getItem('routine_logs');
+
+        state.categories = catData ? JSON.parse(catData) : INITIAL_CATEGORIES;
+        state.habits = habitData ? JSON.parse(habitData) : INITIAL_HABITS;
+        state.logs = logData ? JSON.parse(logData) : {};
+      } catch (e) {
+        state.categories = INITIAL_CATEGORIES;
+        state.habits = INITIAL_HABITS;
+        state.logs = {};
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem('routine_categories', JSON.stringify(state.categories));
+      localStorage.setItem('routine_habits', JSON.stringify(state.habits));
+      localStorage.setItem('routine_logs', JSON.stringify(state.logs));
+    }
+
+    function calculateHabitStreak(habitId) {
+      let streak = 0;
+      let checkDate = new Date();
+      const todayKey = getStandardDateKey(checkDate);
+
+      if (state.logs[todayKey] && state.logs[todayKey][habitId]) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        checkDate.setDate(checkDate.getDate() - 1);
+      }
+
+      while (true) {
+        const key = getStandardDateKey(checkDate);
+        if (state.logs[key] && state.logs[key][habitId]) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+      return streak;
+    }
+
+    function calculateOverallMaxStreak() {
+      if (state.habits.length === 0) return 0;
+      let max = 0;
+      state.habits.forEach(h => {
+        const s = calculateHabitStreak(h.id);
+        if (s > max) max = s;
+      });
+      return max;
+    }
+
+    window.toggleHabitLog = function(habitId, dateKey) {
+      if (!state.logs[dateKey]) {
+        state.logs[dateKey] = {};
+      }
+
+      const wasDone = !!state.logs[dateKey][habitId];
+      if (wasDone) {
+        delete state.logs[dateKey][habitId];
+      } else {
+        state.logs[dateKey][habitId] = true;
+      }
+
+      if (!wasDone && dateKey === getStandardDateKey() && typeof confetti === 'function') {
+        confetti({
+          particleCount: 28,
+          spread: 45,
+          origin: { y: 0.8 },
+          colors: ['#7E9A7B', '#C77D63', '#6A89A7', '#DCD4C3']
+        });
+      }
+
+      saveState();
+      renderApp();
+    };
+
+    function renderApp() {
+      renderCategoryFilters();
+      renderTodayHabits();
+      renderBulletGrid();
+      renderHeatmap();
+      renderRankings();
+      renderStatsOverview();
+      renderCategoryManagerList();
+      populateHabitCategorySelect();
+
+      lucide.createIcons();
+    }
+
+    function renderStatsOverview() {
+      const today = getStandardDateKey();
+      const todayLogs = state.logs[today] || {};
+      const total = state.habits.length;
+      let completed = 0;
+
+      state.habits.forEach(h => {
+        if (todayLogs[h.id]) completed++;
+      });
+
+      const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+      document.getElementById('stat-progress-pct').innerText = `${pct}%`;
+      document.getElementById('stat-completed-count').innerText = `${completed} / ${total} 已完成`;
+      document.getElementById('stat-progress-bar').style.width = `${pct}%`;
+      document.getElementById('stat-longest-streak').innerText = calculateOverallMaxStreak();
+    }
+
+    function renderCategoryFilters() {
+      const container = document.getElementById('category-filter-bar');
+      container.innerHTML = '';
+
+      const allBtn = document.createElement('button');
+      allBtn.className = `px-3 py-1 rounded-full text-xs font-medium transition ${
+        state.activeCategory === 'all'
+          ? 'bg-sand-900 text-white shadow-xs'
+          : 'bg-sand-100 text-sand-600 hover:bg-sand-200'
+      }`;
+      allBtn.innerText = '全部習慣';
+      allBtn.onclick = () => {
+        state.activeCategory = 'all';
+        renderApp();
+      };
+      container.appendChild(allBtn);
+
+      state.categories.forEach(cat => {
+        const btn = document.createElement('button');
+        const isActive = state.activeCategory === cat.id;
+        btn.className = `px-3 py-1 rounded-full text-xs font-medium transition flex items-center gap-1.5 ${
+          isActive
+            ? 'bg-sand-900 text-white shadow-xs'
+            : 'bg-white border border-sand-200 text-sand-700 hover:bg-sand-100'
+        }`;
+        btn.innerHTML = `
+          <span class="w-2 h-2 rounded-full" style="background-color: ${cat.color}"></span>
+          <span>${cat.name}</span>
+        `;
+        btn.onclick = () => {
+          state.activeCategory = cat.id;
+          renderApp();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function renderTodayHabits() {
+      const container = document.getElementById('today-habits-container');
+      const emptyState = document.getElementById('today-empty-state');
+      container.innerHTML = '';
+
+      const filtered = state.habits.filter(h => state.activeCategory === 'all' || h.categoryId === state.activeCategory);
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      const today = getStandardDateKey();
+      const todayLogs = state.logs[today] || {};
+
+      filtered.forEach(habit => {
+        const isDone = !!todayLogs[habit.id];
+        const category = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#7E9A7B' };
+        const streak = calculateHabitStreak(habit.id);
+
+        const card = document.createElement('div');
+        card.className = `group bg-white rounded-2xl p-4 border transition-all duration-300 shadow-xs flex items-center justify-between ${
+          isDone ? 'border-sage-500/40 bg-sage-50/20' : 'border-sand-200 hover:border-sand-300'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3.5 min-w-0">
+            <button type="button" class="btn-check-habit w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+              isDone
+                ? 'bg-sage-500 text-white shadow-sm'
+                : 'bg-sand-100 text-sand-400 hover:bg-sand-200 hover:text-sand-600'
+            }" data-id="${habit.id}">
+              <i data-lucide="${isDone ? 'check' : habit.icon || 'circle'}" class="w-5 h-5 pointer-events-none"></i>
+            </button>
+            <div class="truncate">
+              <div class="flex items-center gap-2">
+                <h4 class="text-sm font-semibold truncate ${isDone ? 'line-through text-sand-400' : 'text-sand-900'}">${habit.title}</h4>
+                <span class="text-[10px] px-2 py-0.5 rounded-md font-medium shrink-0" style="background-color: ${category.color}15; color: ${category.color}">
+                  ${category.name}
+                </span>
+              </div>
+              <p class="text-xs text-sand-600 truncate mt-0.5">${habit.desc || '保持日常節奏'}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 pl-2">
+            <span class="text-[11px] font-medium px-2 py-1 bg-sand-100 text-sand-700 rounded-lg flex items-center gap-1 shrink-0" title="連續打卡天數">
+              <i data-lucide="flame" class="w-3 h-3 text-terracotta-500"></i>
+              <span>${streak}天</span>
+            </span>
+            <div class="opacity-0 group-hover:opacity-100 transition flex items-center">
+              <button onclick="openEditHabitModal('${habit.id}')" type="button" class="p-1.5 text-sand-400 hover:text-sand-800 rounded-lg transition" title="編輯習慣">
+                <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `;
+
+        card.querySelector('.btn-check-habit').addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleHabitLog(habit.id, today);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // 視圖 2: 子彈筆記網格視圖 (含偏移翻頁)
+    function renderBulletGrid() {
+      const container = document.getElementById('bullet-grid-table-container');
+      const badge = document.getElementById('grid-date-range-badge');
+      container.innerHTML = '';
+
+      const todayKey = getStandardDateKey();
+      const dates = [];
+
+      // 依據 offsetDays 計算 14 天區間
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - state.gridOffsetDays - i);
+        const key = getStandardDateKey(d);
+        dates.push({
+          key,
+          label: `${d.getMonth() + 1}/${d.getDate()}`,
+          isToday: key === todayKey
+        });
+      }
+
+      // 更新區間標籤
+      if (badge && dates.length > 0) {
+        badge.innerText = `${dates[0].key} ~ ${dates[dates.length - 1].key}`;
+      }
+
+      const table = document.createElement('table');
+      table.className = 'w-full text-left border-collapse';
+
+      let theadHtml = `
+        <thead>
+          <tr class="border-b border-sand-200">
+            <th class="py-2.5 px-3 text-xs font-semibold text-sand-800">習慣項目</th>
+      `;
+      dates.forEach(d => {
+        theadHtml += `<th class="py-2 px-1 text-center text-[11px] font-medium ${
+          d.isToday ? 'text-sage-600 font-bold bg-sage-50/50 rounded-t' : 'text-sand-600'
+        }">${d.label}</th>`;
+      });
+      theadHtml += `</tr></thead>`;
+
+      let tbodyHtml = '<tbody>';
+      const filtered = state.habits.filter(h => state.activeCategory === 'all' || h.categoryId === state.activeCategory);
+
+      filtered.forEach(habit => {
+        tbodyHtml += `<tr class="border-b border-sand-100 hover:bg-sand-50/50 transition">`;
+        tbodyHtml += `<td class="py-2.5 px-3 text-xs font-medium text-sand-800 max-w-[180px] truncate">${habit.title}</td>`;
+
+        dates.forEach(d => {
+          const isDone = !!(state.logs[d.key] && state.logs[d.key][habit.id]);
+          tbodyHtml += `
+            <td class="py-2 px-1 text-center ${d.isToday ? 'bg-sage-50/20' : ''}">
+              <button onclick="toggleHabitLog('${habit.id}', '${d.key}')" type="button" class="w-5 h-5 rounded-md inline-flex items-center justify-center transition ${
+                isDone ? 'bg-sage-500 text-white' : 'bg-sand-100 hover:bg-sand-200 text-transparent'
+              }">
+                <i data-lucide="check" class="w-3 h-3 pointer-events-none"></i>
+              </button>
+            </td>
+          `;
+        });
+        tbodyHtml += `</tr>`;
+      });
+
+      tbodyHtml += '</tbody>';
+      table.innerHTML = theadHtml + tbodyHtml;
+      container.appendChild(table);
+    }
+
+    function renderHeatmap() {
+      const container = document.getElementById('heatmap-container');
+      container.innerHTML = '';
+
+      const totalDays = 119;
+      const days = [];
+      for (let i = totalDays - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        days.push(getStandardDateKey(d));
+      }
+
+      let currentCol = document.createElement('div');
+      currentCol.className = 'flex flex-col gap-1';
+
+      days.forEach((key, idx) => {
+        const logForDay = state.logs[key] || {};
+        const doneCount = Object.values(logForDay).filter(Boolean).length;
+        const total = state.habits.length || 1;
+        const ratio = doneCount / total;
+
+        let bgClass = 'bg-sand-100';
+        if (doneCount > 0) {
+          if (ratio <= 0.25) bgClass = 'bg-sage-100';
+          else if (ratio <= 0.5) bgClass = 'bg-sage-300';
+          else if (ratio <= 0.75) bgClass = 'bg-sage-500';
+          else bgClass = 'bg-sage-600';
+        }
+
+        const box = document.createElement('div');
+        box.className = `w-3 h-3 rounded-xs ${bgClass} transition-colors cursor-pointer`;
+        box.title = `${key}: 完成 ${doneCount} 個習慣`;
+        currentCol.appendChild(box);
+
+        if ((idx + 1) % 7 === 0 || idx === days.length - 1) {
+          container.appendChild(currentCol);
+          currentCol = document.createElement('div');
+          currentCol.className = 'flex flex-col gap-1';
+        }
+      });
+    }
+
+    function renderRankings() {
+      const container = document.getElementById('habit-rankings-container');
+      container.innerHTML = '';
+
+      if (state.habits.length === 0) {
+        container.innerHTML = '<p class="text-xs text-sand-400">尚無習慣資料</p>';
+        return;
+      }
+
+      state.habits.forEach(habit => {
+        let count = 0;
+        Object.keys(state.logs).forEach(date => {
+          if (state.logs[date] && state.logs[date][habit.id]) count++;
+        });
+
+        const cat = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#7E9A7B' };
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between text-xs py-1.5 border-b border-sand-100 last:border-none';
+        row.innerHTML = `
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-2 h-2 rounded-full" style="background-color: ${cat.color}"></span>
+            <span class="font-medium text-sand-800 truncate">${habit.title}</span>
+          </div>
+          <span class="text-sand-600 font-semibold shrink-0">累計打卡 ${count} 次</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderCategoryManagerList() {
+      const list = document.getElementById('category-manager-list');
+      list.innerHTML = '';
+
+      state.categories.forEach(cat => {
+        const habitCount = state.habits.filter(h => h.categoryId === cat.id).length;
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-3 rounded-xl bg-sand-50 border border-sand-200/80';
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-3.5 h-3.5 rounded-full" style="background-color: ${cat.color}"></span>
+            <div>
+              <span class="text-xs font-semibold text-sand-900">${cat.name}</span>
+              <span class="text-[11px] text-sand-600 block">關聯習慣數：${habitCount} 項</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="editCategoryModal('${cat.id}')" type="button" class="p-1.5 text-sand-600 hover:text-sand-900 rounded-lg hover:bg-sand-200 transition" title="編輯分類">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="deleteCategory('${cat.id}')" type="button" class="p-1.5 text-sand-400 hover:text-terracotta-600 rounded-lg hover:bg-terracotta-50 transition" title="刪除分類">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function populateHabitCategorySelect(selectedId = null) {
+      const select = document.getElementById('select-habit-category');
+      select.innerHTML = '';
+      state.categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.innerText = cat.name;
+        if (selectedId && cat.id === selectedId) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+    }
+
+    function openCategoryEditModal(catId = null) {
+      const modal = document.getElementById('modal-category-edit');
+      const title = document.getElementById('category-edit-title');
+      const inputId = document.getElementById('input-category-id');
+      const inputName = document.getElementById('input-category-name');
+      const inputColor = document.getElementById('input-category-color');
+
+      if (catId) {
+        const cat = state.categories.find(c => c.id === catId);
+        if (cat) {
+          title.innerText = '編輯分類';
+          inputId.value = cat.id;
+          inputName.value = cat.name;
+          inputColor.value = cat.color;
+        }
+      } else {
+        title.innerText = '建立自訂分類';
+        inputId.value = '';
+        inputName.value = '';
+        inputColor.value = PALETTE[0].color;
+      }
+
+      renderPaletteOptions(inputColor.value);
+      modal.classList.remove('hidden');
+      inputName.focus();
+    }
+
+    window.editCategoryModal = function(id) {
+      openCategoryEditModal(id);
+    };
+
+    window.deleteCategory = function(catId) {
+      if (state.categories.length <= 1) {
+        alert('請至少保留一個分類！');
+        return;
+      }
+      if (confirm('確定要刪除此分類嗎？屬於該分類的習慣將自動轉移至其他分類。')) {
+        state.categories = state.categories.filter(c => c.id !== catId);
+        const fallbackId = state.categories[0].id;
+        state.habits.forEach(h => {
+          if (h.categoryId === catId) h.categoryId = fallbackId;
+        });
+        if (state.activeCategory === catId) state.activeCategory = 'all';
+        saveState();
+        renderApp();
+      }
+    };
+
+    function renderPaletteOptions(selectedColor) {
+      const container = document.getElementById('category-color-palette');
+      container.innerHTML = '';
+      PALETTE.forEach(p => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `w-7 h-7 rounded-lg flex items-center justify-center transition border ${
+          selectedColor === p.color ? 'ring-2 ring-sand-900 border-white' : 'border-transparent'
+        }`;
+        btn.style.backgroundColor = p.color;
+        btn.onclick = () => {
+          document.getElementById('input-category-color').value = p.color;
+          renderPaletteOptions(p.color);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    window.openEditHabitModal = function(habitId) {
+      const modal = document.getElementById('modal-habit');
+      const title = document.getElementById('modal-habit-title');
+      const inputId = document.getElementById('input-habit-id');
+      const inputTitle = document.getElementById('input-habit-title');
+      const inputDesc = document.getElementById('input-habit-desc');
+      const inputIcon = document.getElementById('input-habit-icon');
+
+      const habit = state.habits.find(h => h.id === habitId);
+      if (!habit) return;
+
+      title.innerText = '編輯習慣';
+      inputId.value = habit.id;
+      inputTitle.value = habit.title;
+      inputDesc.value = habit.desc || '';
+      populateHabitCategorySelect(habit.categoryId);
+      inputIcon.value = habit.icon || 'check';
+      renderIconSelector(habit.icon || 'check');
+
+      modal.classList.remove('hidden');
+    };
+
+    function renderIconSelector(selectedIcon) {
+      const container = document.getElementById('icon-selector-container');
+      container.innerHTML = '';
+      AVAILABLE_ICONS.forEach(ic => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition ${
+          selectedIcon === ic ? 'bg-sand-900 text-white border-sand-900' : 'bg-sand-50 text-sand-600 border-sand-200 hover:bg-sand-100'
+        }`;
+        btn.innerHTML = `<i data-lucide="${ic}" class="w-4 h-4"></i>`;
+        btn.onclick = () => {
+          document.getElementById('input-habit-icon').value = ic;
+          renderIconSelector(ic);
+          lucide.createIcons();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadState();
+
+      document.getElementById('current-date-display').innerText = formatDateDisplay(getStandardDateKey());
+
+      const tabToday = document.getElementById('view-tab-today');
+      const tabGrid = document.getElementById('view-tab-grid');
+      const tabStats = document.getElementById('view-tab-stats');
+
+      const secToday = document.getElementById('view-today');
+      const secGrid = document.getElementById('view-grid');
+      const secStats = document.getElementById('view-stats');
+
+      function switchTab(target) {
+        [tabToday, tabGrid, tabStats].forEach(t => {
+          t.className = 'px-3 py-1 text-xs font-medium rounded-lg text-sand-600 hover:text-sand-900 transition';
+        });
+        [secToday, secGrid, secStats].forEach(s => s.classList.add('hidden'));
+
+        if (target === 'today') {
+          tabToday.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
+          secToday.classList.remove('hidden');
+        } else if (target === 'grid') {
+          tabGrid.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
+          secGrid.classList.remove('hidden');
+        } else if (target === 'stats') {
+          tabStats.className = 'px-3 py-1 text-xs font-medium rounded-lg bg-white text-sand-900 shadow-sm transition';
+          secStats.classList.remove('hidden');
+        }
+      }
+
+      tabToday.onclick = () => switchTab('today');
+      tabGrid.onclick = () => switchTab('grid');
+      tabStats.onclick = () => switchTab('stats');
+
+      // 網格週期翻頁事件監聽
+      document.getElementById('btn-grid-prev-period').onclick = () => {
+        state.gridOffsetDays += 14;
+        renderBulletGrid();
+        lucide.createIcons();
+      };
+
+      document.getElementById('btn-grid-next-period').onclick = () => {
+        if (state.gridOffsetDays >= 14) {
+          state.gridOffsetDays -= 14;
+        } else {
+          state.gridOffsetDays = 0;
+        }
+        renderBulletGrid();
+        lucide.createIcons();
+      };
+
+      document.getElementById('btn-grid-today').onclick = () => {
+        state.gridOffsetDays = 0;
+        renderBulletGrid();
+        lucide.createIcons();
+      };
+
+      const modalHabit = document.getElementById('modal-habit');
+      document.getElementById('btn-open-habit-modal').onclick = () => {
+        document.getElementById('modal-habit-title').innerText = '建立新習慣';
+        document.getElementById('form-habit').reset();
+        document.getElementById('input-habit-id').value = '';
+        populateHabitCategorySelect();
+        renderIconSelector('check');
+        modalHabit.classList.remove('hidden');
+        lucide.createIcons();
+      };
+      document.getElementById('btn-close-habit-modal').onclick = () => modalHabit.classList.add('hidden');
+      document.getElementById('btn-cancel-habit').onclick = () => modalHabit.classList.add('hidden');
+
+      const modalCatManager = document.getElementById('modal-category-manager');
+      document.getElementById('btn-open-category-modal').onclick = () => {
+        renderCategoryManagerList();
+        modalCatManager.classList.remove('hidden');
+        lucide.createIcons();
+      };
+      document.getElementById('btn-close-category-manager').onclick = () => modalCatManager.classList.add('hidden');
+
+      const btnQuickCat = document.getElementById('btn-trigger-quick-category');
+      btnQuickCat.addEventListener('click', (e) => {
+        e.preventDefault();
+        openCategoryEditModal();
+      });
+
+      const btnOpenCreateCat = document.getElementById('btn-open-create-category');
+      btnOpenCreateCat.addEventListener('click', (e) => {
+        e.preventDefault();
+        openCategoryEditModal();
+      });
+
+      const modalCatEdit = document.getElementById('modal-category-edit');
+      document.getElementById('btn-close-category-edit').onclick = () => modalCatEdit.classList.add('hidden');
+      document.getElementById('btn-cancel-category-edit').onclick = () => modalCatEdit.classList.add('hidden');
+
+      document.getElementById('form-category-edit').onsubmit = (e) => {
+        e.preventDefault();
+        const id = document.getElementById('input-category-id').value;
+        const name = document.getElementById('input-category-name').value.trim();
+        const color = document.getElementById('input-category-color').value;
+
+        if (!name) return;
+
+        let targetId = id;
+        if (id) {
+          const cat = state.categories.find(c => c.id === id);
+          if (cat) {
+            cat.name = name;
+            cat.color = color;
+          }
+        } else {
+          targetId = 'cat-' + Date.now();
+          state.categories.push({ id: targetId, name, color });
+        }
+
+        saveState();
+        modalCatEdit.classList.add('hidden');
+        populateHabitCategorySelect(targetId);
+        renderApp();
+      };
+
+      document.getElementById('form-habit').onsubmit = (e) => {
+        e.preventDefault();
+        const id = document.getElementById('input-habit-id').value;
+        const title = document.getElementById('input-habit-title').value.trim();
+        const desc = document.getElementById('input-habit-desc').value.trim();
+        const categoryId = document.getElementById('select-habit-category').value;
+        const icon = document.getElementById('input-habit-icon').value || 'check';
+
+        if (!title) return;
+
+        if (id) {
+          const habit = state.habits.find(h => h.id === id);
+          if (habit) {
+            habit.title = title;
+            habit.desc = desc;
+            habit.categoryId = categoryId;
+            habit.icon = icon;
+          }
+        } else {
+          state.habits.push({
+            id: 'h-' + Date.now(),
+            title,
+            desc,
+            categoryId,
+            icon,
+            createdAt: getStandardDateKey()
+          });
+        }
+
+        saveState();
+        modalHabit.classList.add('hidden');
+        renderApp();
+      };
+
+      const modalData = document.getElementById('modal-data');
+      document.getElementById('btn-open-data-modal').onclick = () => modalData.classList.remove('hidden');
+      document.getElementById('btn-close-data-modal').onclick = () => modalData.classList.add('hidden');
+
+      document.getElementById('btn-export-json').onclick = () => {
+        const exportObj = {
+          routine_version: '1.4',
+          export_date: new Date().toISOString(),
+          categories: state.categories,
+          habits: state.habits,
+          logs: state.logs
+        };
+        const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `routine_backup_${getStandardDateKey()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      document.getElementById('input-import-json').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            if (data.habits && data.categories) {
+              state.categories = data.categories;
+              state.habits = data.habits;
+              state.logs = data.logs || {};
+              saveState();
+              renderApp();
+              alert('備份資料已成功匯入！');
+              modalData.classList.add('hidden');
+            } else {
+              alert('無效的備份檔案格式。');
+            }
+          } catch (err) {
+            alert('檔案解析失敗，請確認是否為標準 JSON 檔案。');
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      document.getElementById('btn-reset-demo').onclick = () => {
+        if (confirm('確定要載入預設範例資料嗎？這將會覆蓋現有項目。')) {
+          state.categories = INITIAL_CATEGORIES;
+          state.habits = INITIAL_HABITS;
+          state.logs = {};
+          saveState();
+          renderApp();
+          modalData.classList.add('hidden');
+        }
+      };
+
+      renderApp();
+    });
+  </script>
+</body>
+</html>

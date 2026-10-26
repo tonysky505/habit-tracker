@@ -23,14 +23,14 @@
         extend: {
           colors: {
             scholar: {
-              paper: '#F1F6F9',       /* 極淡冷灰藍底色 */
-              navy: '#212A3E',        /* 深石板墨藍 */
-              gold: '#394867',        /* 海軍藍鋼（主要強調色） */
-              silver: '#9BA4B5',      /* 霧霾灰藍 */
-              border: '#E1E7EE',      /* 柔和冷灰邊框 */
+              paper: '#F3F4ED',       /* 極淺暖灰白底色 */
+              navy: '#424642',        /* 深炭墨灰（主文字與重點底色） */
+              gold: '#C06014',        /* 復古琥珀陶褐（核心強調亮色） */
+              silver: '#536162',      /* 石板青灰 */
+              border: '#E2E4DA',      /* 柔和溫潤邊框 */
               card: '#FFFFFF',        /* 純白卡片底色 */
-              textMuted: '#64748B',   /* 次要文字色 */
-              hover: '#E5EBF2'        /* 懸浮與淺底背景 */
+              textMuted: '#6B736B',   /* 次要文字色 */
+              hover: '#EAECE3'        /* 懸浮與淺色背景 */
             }
           },
           fontFamily: {
@@ -54,14 +54,14 @@
       height: 5px;
     }
     ::-webkit-scrollbar-track {
-      background: #F1F6F9;
+      background: #F3F4ED;
     }
     ::-webkit-scrollbar-thumb {
-      background: #9BA4B5;
+      background: #536162;
       border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #394867;
+      background: #424642;
     }
     input[type="date"] {
       -webkit-appearance: none;
@@ -77,12 +77,12 @@
     <div class="max-w-5xl mx-auto px-3.5 sm:px-6 h-15 sm:h-16 flex items-center justify-between gap-2">
       <div class="flex items-center gap-2 sm:gap-3 min-w-0">
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-scholar-navy text-scholar-paper flex items-center justify-center shadow-xs shrink-0">
-          <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5 text-scholar-paper"></i>
+          <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5 text-scholar-gold"></i>
         </div>
         <div class="truncate">
           <div class="flex items-center gap-1.5">
             <h1 class="text-sm sm:text-base font-semibold tracking-wide text-scholar-navy truncate">日常軌跡</h1>
-            <span id="sync-status-indicator" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] bg-scholar-silver/20 text-scholar-navy font-medium shrink-0" title="雲端同步狀態">
+            <span id="sync-status-indicator" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] bg-scholar-silver/15 text-scholar-navy font-medium shrink-0" title="雲端同步狀態">
               <span id="sync-status-dot" class="w-1.5 h-1.5 rounded-full bg-scholar-silver"></span>
               <span id="sync-status-text" class="hidden xs:inline">連線中</span>
             </span>
@@ -99,7 +99,7 @@
             <span class="hidden sm:inline">分類管理</span>
           </button>
           <button id="btn-open-habit-modal" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-scholar-navy text-scholar-paper text-xs font-medium hover:bg-scholar-navy/90 transition flex items-center gap-1 whitespace-nowrap shadow-xs">
-            <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0 text-scholar-paper"></i>
+            <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0 text-scholar-gold"></i>
             <span>新增習慣</span>
           </button>
         </div>
@@ -141,7 +141,7 @@
           <span>習慣實踐</span>
         </button>
         <button id="main-tab-health" class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 text-scholar-textMuted hover:text-scholar-navy">
-          <i data-lucide="heart-pulse" class="w-4 h-4 text-scholar-silver"></i>
+          <i data-lucide="heart-pulse" class="w-4 h-4 text-scholar-gold"></i>
           <span>健康與用藥</span>
         </button>
       </div>
@@ -195,8 +195,8 @@
 
       <section id="view-today" class="space-y-3">
         <div id="today-habits-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-        <div id="today-empty-state" class="hidden text-center py-16 bg-scholar-card/80 rounded-2xl border border-dashed border-scholar-silver">
-          <i data-lucide="coffee" class="w-9 h-9 text-scholar-silver mx-auto mb-2.5"></i>
+        <div id="today-empty-state" class="hidden text-center py-16 bg-scholar-card/80 rounded-2xl border border-dashed border-scholar-silver/40">
+          <i data-lucide="coffee" class="w-9 h-9 text-scholar-silver/60 mx-auto mb-2.5"></i>
           <h3 class="text-sm font-medium text-scholar-navy">目前尚無習慣項目</h3>
           <p class="text-xs text-scholar-textMuted mt-1">點擊右上角「新增習慣」開始建立生活軌跡！</p>
         </div>
@@ -233,8 +233,8 @@
 
         <div class="flex items-center justify-end gap-3 pt-2 border-t border-scholar-border/70 text-[11px] text-scholar-textMuted flex-wrap">
           <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold"></span>已打卡</span>
-          <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/40"></span>未打卡</span>
-          <span class="inline-flex items-center gap-1"><span class="text-scholar-navy font-bold">海軍藍標籤</span>為今日</span>
+          <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/30"></span>未打卡</span>
+          <span class="inline-flex items-center gap-1"><span class="text-scholar-gold font-bold">琥珀色</span>為今日</span>
         </div>
       </section>
 
@@ -249,9 +249,9 @@
               <span>少</span>
               <div class="flex gap-1">
                 <span class="w-2.5 h-2.5 rounded-xs bg-scholar-paper border border-scholar-border/50"></span>
-                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/30"></span>
-                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/70"></span>
-                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/60"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/25"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/40"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/70"></span>
                 <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold"></span>
               </div>
               <span>多</span>
@@ -402,7 +402,7 @@
           </table>
         </div>
         <div id="health-empty-state" class="hidden text-center py-12">
-          <i data-lucide="activity" class="w-8 h-8 text-scholar-silver mx-auto mb-2"></i>
+          <i data-lucide="activity" class="w-8 h-8 text-scholar-silver/50 mx-auto mb-2"></i>
           <p class="text-xs text-scholar-textMuted">尚無血壓或體重紀錄，點擊上方按鈕開始記錄！</p>
         </div>
       </div>
@@ -423,7 +423,7 @@
           </table>
         </div>
         <div id="med-empty-state" class="hidden text-center py-12">
-          <i data-lucide="pill" class="w-8 h-8 text-scholar-silver mx-auto mb-2"></i>
+          <i data-lucide="pill" class="w-8 h-8 text-scholar-silver/50 mx-auto mb-2"></i>
           <p class="text-xs text-scholar-textMuted">尚無服藥紀錄，點擊上方按鈕開始記錄！</p>
         </div>
       </div>
@@ -508,7 +508,7 @@
               <span>回診前抽血 / 檢查</span>
             </span>
             <label class="flex items-center gap-1.5 text-xs text-scholar-navy font-medium cursor-pointer">
-              <input type="checkbox" id="input-cycle-blood-enable" checked class="w-4 h-4 accent-[#394867]" />
+              <input type="checkbox" id="input-cycle-blood-enable" checked class="w-4 h-4 accent-[#C06014]" />
               <span>本次需要抽血</span>
             </label>
           </div>
@@ -650,7 +650,7 @@
           <label class="block text-xs font-medium text-scholar-navy mb-1.5">藥品外觀照片 (預防吃錯)</label>
           <div class="flex items-center gap-3">
             <div id="med-photo-preview-container" class="w-14 h-14 rounded-xl bg-scholar-paper border border-dashed border-scholar-border flex items-center justify-center overflow-hidden shrink-0">
-              <i data-lucide="image" class="w-5 h-5 text-scholar-silver" id="med-photo-placeholder-icon"></i>
+              <i data-lucide="image" class="w-5 h-5 text-scholar-silver/60" id="med-photo-placeholder-icon"></i>
               <img id="med-photo-preview" src="" alt="預覽圖" class="w-full h-full object-cover hidden" />
             </div>
             <div class="flex-1 space-y-1">
@@ -880,9 +880,9 @@
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-scholar-navy mb-1.5">冷灰調風格色票</label>
+          <label class="block text-xs font-medium text-scholar-navy mb-1.5">大地陶褐色票</label>
           <div class="grid grid-cols-6 gap-2" id="category-color-palette"></div>
-          <input type="hidden" id="input-category-color" value="#394867" />
+          <input type="hidden" id="input-category-color" value="#C06014" />
         </div>
 
         <div class="pt-2 flex items-center justify-end gap-2">
@@ -926,7 +926,7 @@
 
         <div class="pt-2 border-t border-scholar-border flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-scholar-navy hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v3.2 (Navy Edition)</span>
+          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v3.2 (Terracotta & Slate)</span>
         </div>
       </div>
     </div>
@@ -971,22 +971,22 @@
       }
     }
 
-    // ==================== 現代冷調石板藍色票 ====================
+    // ==================== 大地陶褐與深岩灰色票 ====================
     const PALETTE = [
-      { color: '#394867', name: '深海軍鋼藍' },
-      { color: '#212A3E', name: '夜幕石板黑' },
-      { color: '#9BA4B5', name: '霧霾冷銀灰' },
-      { color: '#4F709C', name: '深邃湛藍' },
-      { color: '#526D82', name: '煙燻灰青' },
-      { color: '#738A9C', name: '北歐灰藍' }
+      { color: '#C06014', name: '琥珀陶褐' },
+      { color: '#424642', name: '深炭墨灰' },
+      { color: '#536162', name: '石板青灰' },
+      { color: '#8C5A3C', name: '皮革暖棕' },
+      { color: '#637A74', name: '鼠尾草綠' },
+      { color: '#A06D56', name: '陶土淺褐' }
     ];
 
     const AVAILABLE_ICONS = ['check', 'book-open', 'footprints', 'cup-soda', 'moon', 'dumbbell', 'heart', 'feather', 'sun', 'camera', 'activity', 'pill', 'calendar', 'repeat'];
 
     const INITIAL_CATEGORIES = [
-      { id: 'cat-health', name: '健康生活', color: '#394867' },
-      { id: 'cat-mind', name: '閱讀專注', color: '#212A3E' },
-      { id: 'cat-rest', name: '規律作息', color: '#526D82' }
+      { id: 'cat-health', name: '健康生活', color: '#C06014' },
+      { id: 'cat-mind', name: '閱讀專注', color: '#424642' },
+      { id: 'cat-rest', name: '規律作息', color: '#536162' }
     ];
 
     const INITIAL_HABITS = [
@@ -1049,7 +1049,7 @@
       } else if (sys <= 129 && dia < 80) {
         return { label: '正常偏高', colorClass: 'bg-scholar-paper text-scholar-navy border border-scholar-border' };
       } else if ((sys >= 130 && sys <= 139) || (dia >= 80 && dia <= 89)) {
-        return { label: '第一期高壓', colorClass: 'bg-scholar-silver/30 text-scholar-navy border border-scholar-silver' };
+        return { label: '第一期高壓', colorClass: 'bg-scholar-silver/20 text-scholar-navy border border-scholar-silver/40' };
       } else {
         return { label: '偏高留意', colorClass: 'bg-scholar-navy text-scholar-paper font-bold' };
       }
@@ -1244,7 +1244,7 @@
           particleCount: 28,
           spread: 50,
           origin: { y: 0.8 },
-          colors: ['#394867', '#212A3E', '#9BA4B5', '#F1F6F9']
+          colors: ['#C06014', '#424642', '#536162', '#F3F4ED']
         });
       }
 
@@ -1357,7 +1357,7 @@
 
         let badge = '';
         if (st.done) {
-          badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-scholar-gold/15 text-scholar-navy font-bold">✓ 已完成</span>`;
+          badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-scholar-gold/20 text-scholar-navy font-bold">✓ 已完成</span>`;
         } else if (targetForDiff) {
           const diffDays = Math.ceil((targetForDiff - todayDate) / (1000 * 60 * 60 * 24));
           if (diffDays === 0) {
@@ -1408,7 +1408,7 @@
           <button onclick="editCycleModal('${cycle.id}')" type="button" class="p-1 text-scholar-textMuted hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="編輯週期">
             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
           </button>
-          <button onclick="deleteCycle('${cycle.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-gold/20 transition" title="刪除週期">
+          <button onclick="deleteCycle('${cycle.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="刪除週期">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
         `;
@@ -1464,7 +1464,7 @@
       }
 
       if (typeof confetti === 'function') {
-        confetti({ particleCount: 22, spread: 45, origin: { y: 0.75 }, colors: ['#394867', '#212A3E'] });
+        confetti({ particleCount: 22, spread: 45, origin: { y: 0.75 }, colors: ['#C06014', '#424642'] });
       }
 
       saveState();
@@ -1610,7 +1610,7 @@
         } else {
           statusActionHtml = `
             <button onclick="quickLogSingleMed('${med.id}')" type="button" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-scholar-navy hover:bg-scholar-navy/90 text-scholar-paper text-xs font-semibold transition flex items-center gap-1 shadow-xs shrink-0 whitespace-nowrap">
-              <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-paper"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-gold"></i>
               <span>點此服用</span>
             </button>
           `;
@@ -1674,7 +1674,7 @@
       });
 
       if (typeof confetti === 'function') {
-        confetti({ particleCount: 24, spread: 45, origin: { y: 0.7 }, colors: ['#394867', '#212A3E', '#9BA4B5'] });
+        confetti({ particleCount: 24, spread: 45, origin: { y: 0.7 }, colors: ['#C06014', '#424642', '#536162'] });
       }
 
       saveState();
@@ -1769,7 +1769,7 @@
       allBtn.className = `px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap shrink-0 ${
         state.activeCategory === 'all'
           ? 'bg-scholar-navy text-scholar-paper shadow-xs'
-          : 'bg-scholar-hover text-scholar-navy hover:bg-scholar-silver/30'
+          : 'bg-scholar-hover text-scholar-navy hover:bg-scholar-silver/20'
       }`;
       allBtn.innerText = '全部習慣';
       allBtn.onclick = () => {
@@ -1816,7 +1816,7 @@
 
       filtered.forEach(habit => {
         const isDone = !!todayLogs[habit.id];
-        const category = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#394867' };
+        const category = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#C06014' };
         const streak = calculateHabitStreak(habit.id);
 
         const card = document.createElement('div');
@@ -2123,9 +2123,9 @@
 
         let bgClass = 'bg-scholar-paper border border-scholar-border/50';
         if (doneCount > 0) {
-          if (ratio <= 0.25) bgClass = 'bg-scholar-silver/30';
-          else if (ratio <= 0.5) bgClass = 'bg-scholar-silver/70';
-          else if (ratio <= 0.75) bgClass = 'bg-scholar-gold/60';
+          if (ratio <= 0.25) bgClass = 'bg-scholar-silver/25';
+          else if (ratio <= 0.5) bgClass = 'bg-scholar-gold/40';
+          else if (ratio <= 0.75) bgClass = 'bg-scholar-gold/70';
           else bgClass = 'bg-scholar-gold';
         }
 
@@ -2157,7 +2157,7 @@
           if (state.logs[date] && state.logs[date][habit.id]) count++;
         });
 
-        const cat = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#394867' };
+        const cat = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#C06014' };
 
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between text-xs py-1.5 border-b border-scholar-border/60 last:border-none';
@@ -2280,12 +2280,12 @@
           scheduleBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-scholar-gold/15 text-scholar-navy font-semibold border border-scholar-gold/30">今日排程 (週${getWeekdayLabel(dayOfWeek)})</span>`;
         } else if (!isScheduled && med.freqType === 'weekly_custom') {
           const daysStr = (med.weekdays || []).map(getWeekdayLabel).join('、');
-          scheduleBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-scholar-silver/20 text-scholar-textMuted">休止日 (排程：${daysStr})</span>`;
+          scheduleBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-scholar-silver/15 text-scholar-textMuted">休止日 (排程：${daysStr})</span>`;
         }
 
         label.innerHTML = `
           <div class="flex items-center gap-2.5 min-w-0">
-            <input type="checkbox" name="selected_med" value="${med.id}" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded text-scholar-gold focus:ring-scholar-gold/30 accent-[#394867] shrink-0" />
+            <input type="checkbox" name="selected_med" value="${med.id}" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded text-scholar-gold focus:ring-scholar-gold/30 accent-[#C06014] shrink-0" />
             ${photoHtml}
             <div class="truncate">
               <div class="flex items-center gap-1.5">

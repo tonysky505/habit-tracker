@@ -271,7 +271,7 @@
     <!-- ==================== 區塊 B: 健康與用藥專屬工作區 ==================== -->
     <div id="workspace-health" class="hidden space-y-5 sm:space-y-6">
       
-      <!-- 今日用藥進度看板 (排版最佳化，防截斷 + 支援取消反悔) -->
+      <!-- 今日用藥進度看板 -->
       <section class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs space-y-3.5">
         <div class="flex items-center justify-between border-b border-scholar-border/70 pb-2.5">
           <div class="flex items-center gap-2">
@@ -288,7 +288,7 @@
           </span>
         </div>
 
-        <!-- 藥品卡片清單 (改良 RWD 排版) -->
+        <!-- 藥品卡片清單 (RWD 自適應排版) -->
         <div id="today-med-checklist-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
       </section>
 
@@ -779,7 +779,7 @@
 
         <div class="pt-2 border-t border-scholar-border flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-scholar-navy hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v2.7 (防呆與RWD排版版)</span>
+          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v2.8 (服藥統計修正版)</span>
         </div>
       </div>
     </div>
@@ -1127,7 +1127,7 @@
       }
     }
 
-    // ==================== 今日用藥狀態檢視看板 (排版最佳化 + 支援反悔取消) ====================
+    // ==================== 今日用藥狀態檢視看板 ====================
     function renderTodayMedChecklistDashboard() {
       const container = document.getElementById('today-med-checklist-cards');
       const summaryBadge = document.getElementById('today-med-summary-badge');
@@ -1145,8 +1145,8 @@
         return false;
       });
 
-      // 2. 獲取今日已記錄的用藥記錄
-      const todayLogs = (state.medLogs || []).filter(l => l.date === todayStr);
+      // 2. 獲取今日有效服藥記錄 (藥物清單不為空)
+      const todayLogs = (state.medLogs || []).filter(l => l.date === todayStr && l.medItems && l.medItems.length > 0);
 
       if (todayScheduledMeds.length === 0) {
         summaryBadge.innerText = '今日無排定用藥';
@@ -1183,7 +1183,6 @@
         let statusActionHtml = '';
         if (isTaken) {
           const timesStr = takenLogs.map(l => l.period).join('、');
-          // 支援點擊取消反悔按鈕
           statusActionHtml = `
             <button onclick="undoSingleMedLog('${med.id}', '${med.name}')" type="button" class="w-full sm:w-auto px-3 py-1.5 rounded-xl text-xs font-semibold bg-scholar-gold/15 text-scholar-navy border border-scholar-gold/40 hover:bg-terracotta-50 hover:text-red-700 hover:border-red-300 transition flex items-center justify-center gap-1 group/btn" title="誤觸可點擊取消今日紀錄">
               <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-gold group-hover/btn:hidden"></i>
@@ -1252,7 +1251,7 @@
         date: todayStr,
         period: currentPeriod,
         medItems: [{ id: med.id, name: med.name, dosage: med.dosage }],
-        memo: `快速完成打卡 (${med.timing})`
+        memo: `快速打卡 (${med.timing})`
       });
 
       if (typeof confetti === 'function') {
@@ -1268,18 +1267,21 @@
       renderApp();
     };
 
-    // ★ 誤觸反悔功能：取消今日該顆藥物的服用紀錄
+    // 取消今日該顆藥物的服用紀錄 (徹底扣除並清理空日誌)
     window.undoSingleMedLog = function(medId, medName) {
-      if (confirm(`確定要取消今日「${medName}」的服藥紀錄嗎？（狀態將回復為待服用）`)) {
+      if (confirm(`確定要取消今日「${medName}」的服藥紀錄嗎？`)) {
         const todayStr = getStandardDateKey();
         
-        // 從今日的所有用藥日誌中移除這顆藥物
+        // 1. 從今日的所有服藥日誌中過濾移除該藥品
         state.medLogs = state.medLogs.map(log => {
           if (log.date === todayStr) {
             log.medItems = (log.medItems || []).filter(m => m.id !== medId);
           }
           return log;
-        }).filter(log => (log.medItems && log.medItems.length > 0) || log.memo); // 若該筆日誌已無藥品則清理
+        }).filter(log => {
+          // 2. 若該日誌已無任何藥品項目，直接徹底刪除整筆日誌，避免殘留幽靈紀錄
+          return log.medItems && log.medItems.length > 0;
+        });
 
         saveState();
         renderApp();
@@ -1336,11 +1338,12 @@
         document.getElementById('stat-bp-tag').innerText = '尚未記錄';
       }
 
-      const todayMedLogs = (state.medLogs || []).filter(l => l.date === today);
-      document.getElementById('stat-today-med-count').innerText = todayMedLogs.length;
+      // 今日服藥狀態統計（只統計今日真正包含藥品項目的有效日誌）
+      const todayValidMedLogs = (state.medLogs || []).filter(l => l.date === today && l.medItems && l.medItems.length > 0);
+      document.getElementById('stat-today-med-count').innerText = todayValidMedLogs.length;
       const descEl = document.getElementById('stat-today-med-desc');
-      if (todayMedLogs.length > 0) {
-        const periods = todayMedLogs.map(l => l.period).join('、');
+      if (todayValidMedLogs.length > 0) {
+        const periods = Array.from(new Set(todayValidMedLogs.map(l => l.period))).join('、');
         descEl.innerText = `今日已於「${periods}」時段完成服藥。`;
       } else {
         descEl.innerText = '按時用藥，保持身體恆定節奏。';
@@ -1572,13 +1575,16 @@
       const emptyState = document.getElementById('med-empty-state');
       tbody.innerHTML = '';
 
-      if (!state.medLogs || state.medLogs.length === 0) {
+      // 只呈現真正包含藥品項目的日誌
+      const validLogs = (state.medLogs || []).filter(l => l.medItems && l.medItems.length > 0);
+
+      if (validLogs.length === 0) {
         emptyState.classList.remove('hidden');
         return;
       }
       emptyState.classList.add('hidden');
 
-      const sorted = [...state.medLogs].sort((a, b) => {
+      const sorted = [...validLogs].sort((a, b) => {
         return (b.date + b.period).localeCompare(a.date + a.period);
       });
 
@@ -2609,7 +2615,7 @@
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '2.7',
+          routine_version: '2.8',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,

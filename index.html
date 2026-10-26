@@ -2,8 +2,9 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
+  <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>日常軌跡 · 習慣與健康追蹤器</title>
+  <title>日常軌跡 · 習慣與健康系統</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
@@ -22,7 +23,7 @@
         extend: {
           colors: {
             scholar: {
-              paper: '#F4F3EA',       /* 米白基底 */
+              paper: '#F4F3EA',       /* 米白底色 */
               navy: '#333D51',        /* 深海軍藍灰 */
               gold: '#D3AC2B',        /* 拋光古董金 */
               silver: '#CBD0D8',      /* 霧灰銀 */
@@ -71,10 +72,10 @@
 </head>
 <body class="bg-scholar-paper text-scholar-navy font-sans min-h-screen selection:bg-scholar-gold/20 selection:text-scholar-navy pb-24 antialiased">
 
-  <!-- 頂部導覽列 -->
-  <header class="sticky top-0 z-30 bg-scholar-paper/90 backdrop-blur-md border-b border-scholar-border">
+  <!-- 頂部主導覽列 -->
+  <header class="sticky top-0 z-30 bg-scholar-paper/95 backdrop-blur-md border-b border-scholar-border">
     <div class="max-w-5xl mx-auto px-3.5 sm:px-6 h-15 sm:h-16 flex items-center justify-between gap-2">
-      <!-- 品牌與日期與雲端狀態 -->
+      <!-- 品牌與雲端連線狀態 -->
       <div class="flex items-center gap-2 sm:gap-3 min-w-0">
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-scholar-navy text-scholar-paper flex items-center justify-center shadow-xs shrink-0">
           <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5 text-scholar-gold"></i>
@@ -91,159 +92,238 @@
         </div>
       </div>
 
-      <!-- 右側動作區 -->
+      <!-- 右側：依模式切換的操作按鈕組 -->
       <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <button id="btn-open-health-modal" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-scholar-gold/40 bg-scholar-gold/10 text-scholar-navy hover:bg-scholar-gold/20 transition flex items-center gap-1 text-xs font-medium whitespace-nowrap shadow-xs">
-          <i data-lucide="activity" class="w-3.5 h-3.5 text-scholar-gold shrink-0"></i>
-          <span>記血壓</span>
-        </button>
+        <!-- 習慣專用按鈕 -->
+        <div id="header-actions-habit" class="flex items-center gap-1.5 sm:gap-2">
+          <button id="btn-open-category-modal" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-navy hover:bg-scholar-hover transition flex items-center gap-1 text-xs font-medium shadow-xs" title="習慣分類管理">
+            <i data-lucide="tag" class="w-3.5 h-3.5 shrink-0 text-scholar-textMuted"></i>
+            <span class="hidden sm:inline">分類管理</span>
+          </button>
+          <button id="btn-open-habit-modal" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-scholar-navy text-scholar-paper text-xs font-medium hover:bg-scholar-navy/90 transition flex items-center gap-1 whitespace-nowrap shadow-xs">
+            <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0 text-scholar-gold"></i>
+            <span>新增習慣</span>
+          </button>
+        </div>
 
-        <button id="btn-open-category-modal" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-navy hover:bg-scholar-hover transition flex items-center gap-1.5 text-xs font-medium whitespace-nowrap shadow-xs" title="分類管理">
-          <i data-lucide="tag" class="w-3.5 h-3.5 shrink-0 text-scholar-textMuted"></i>
-          <span class="hidden sm:inline">分類管理</span>
-        </button>
+        <!-- 健康用藥專用按鈕 -->
+        <div id="header-actions-health" class="hidden items-center gap-1.5 sm:gap-2">
+          <button id="btn-open-med-manager-modal" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-navy hover:bg-scholar-hover transition flex items-center gap-1 text-xs font-medium shadow-xs" title="藥箱母檔管理">
+            <i data-lucide="archive" class="w-3.5 h-3.5 shrink-0 text-scholar-textMuted"></i>
+            <span class="hidden sm:inline">藥箱</span>
+          </button>
+          <button id="btn-open-health-modal" class="px-2 sm:px-3 py-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-navy hover:bg-scholar-hover transition flex items-center gap-1 text-xs font-medium shadow-xs">
+            <i data-lucide="activity" class="w-3.5 h-3.5 text-scholar-gold shrink-0"></i>
+            <span>記血壓</span>
+          </button>
+          <button id="btn-open-log-med-modal" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-scholar-gold/60 bg-scholar-gold/15 text-scholar-navy hover:bg-scholar-gold/25 transition flex items-center gap-1 text-xs font-semibold shadow-xs">
+            <i data-lucide="pill" class="w-3.5 h-3.5 text-scholar-gold shrink-0"></i>
+            <span>記服藥</span>
+          </button>
+        </div>
 
-        <button id="btn-open-data-modal" class="p-1.5 sm:p-2 rounded-xl border border-scholar-border bg-scholar-card text-scholar-textMuted hover:text-scholar-navy hover:bg-scholar-hover transition shadow-xs" title="備份與還原">
+        <!-- 備份按鈕 -->
+        <button id="btn-open-data-modal" class="p-1.5 sm:p-2 rounded-xl border border-scholar-border bg-scholar-card text-scholar-textMuted hover:text-scholar-navy hover:bg-scholar-hover transition shadow-xs" title="資料管理與備份">
           <i data-lucide="database" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-        </button>
-
-        <button id="btn-open-habit-modal" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-scholar-navy text-scholar-paper text-xs font-medium hover:bg-scholar-navy/90 transition flex items-center gap-1 whitespace-nowrap shadow-xs">
-          <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0 text-scholar-gold"></i>
-          <span class="hidden xs:inline sm:inline">新增習慣</span>
-          <span class="inline xs:hidden sm:hidden">習慣</span>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-3.5 sm:px-6 pt-4 sm:pt-6 space-y-6 sm:space-y-8">
+  <main class="max-w-5xl mx-auto px-3.5 sm:px-6 pt-3 sm:pt-5 space-y-5 sm:space-y-6">
 
-    <!-- 今日概況儀表板 -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-      <div class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
-        <div class="flex items-center justify-between text-scholar-textMuted mb-2">
-          <span class="text-xs font-medium tracking-wider uppercase">今日達成度</span>
+    <!-- 頂部主工作區切換器 -->
+    <section class="flex justify-center">
+      <div class="bg-scholar-hover/90 p-1.5 rounded-2xl border border-scholar-border/80 flex items-center gap-1 w-full sm:w-auto shadow-2xs">
+        <button id="main-tab-habit" class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50">
           <i data-lucide="check-circle-2" class="w-4 h-4 text-scholar-gold"></i>
-        </div>
-        <div>
-          <div class="flex items-baseline gap-2">
-            <span class="text-2xl sm:text-3xl font-bold tracking-tight text-scholar-navy" id="stat-progress-pct">0%</span>
-            <span class="text-xs text-scholar-textMuted" id="stat-completed-count">0 / 0 已完成</span>
-          </div>
-          <div class="w-full bg-scholar-paper h-2 rounded-full mt-2.5 overflow-hidden border border-scholar-border/60">
-            <div id="stat-progress-bar" class="bg-scholar-gold h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
-        <div class="flex items-center justify-between text-scholar-textMuted mb-2">
-          <span class="text-xs font-medium tracking-wider uppercase">最新健康指標</span>
+          <span>習慣實踐</span>
+        </button>
+        <button id="main-tab-health" class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 text-scholar-textMuted hover:text-scholar-navy">
           <i data-lucide="heart-pulse" class="w-4 h-4 text-scholar-gold"></i>
-        </div>
-        <div>
-          <div class="flex items-baseline gap-2">
-            <span class="text-2xl sm:text-3xl font-bold tracking-tight text-scholar-navy" id="stat-bp-val">--/--</span>
-            <span class="text-xs text-scholar-textMuted">mmHg</span>
-          </div>
-          <div class="text-xs text-scholar-textMuted mt-2 flex items-center gap-2 flex-wrap">
-            <span>體重: <strong class="text-scholar-navy" id="stat-weight-val">--</strong> kg</span>
-            <span class="text-scholar-silver">|</span>
-            <span id="stat-bp-tag" class="px-2 py-0.5 rounded text-[10px] bg-scholar-paper text-scholar-textMuted border border-scholar-border">未記錄</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-gradient-to-br from-scholar-paper to-scholar-silver/20 rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
-        <div class="flex items-center justify-between text-scholar-textMuted mb-2">
-          <span class="text-xs font-medium tracking-wider uppercase">連續節奏 (STREAK)</span>
-          <i data-lucide="flame" class="w-4 h-4 text-scholar-gold"></i>
-        </div>
-        <div>
-          <div class="flex items-baseline gap-1.5">
-            <span class="text-2xl sm:text-3xl font-bold tracking-tight text-scholar-navy" id="stat-longest-streak">0</span>
-            <span class="text-xs text-scholar-textMuted">天持續實踐</span>
-          </div>
-          <p class="text-xs text-scholar-navy/80 leading-relaxed mt-1 line-clamp-2">
-            「規律生活不是束縛，而是給身體最安心的節奏。」
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 檢視切換與分類過濾列 -->
-    <section class="space-y-3">
-      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full" id="category-filter-bar"></div>
-
-      <div class="flex items-center bg-scholar-hover/80 p-1 rounded-xl w-full sm:w-fit overflow-x-auto no-scrollbar border border-scholar-border/60">
-        <button id="view-tab-today" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center">今日打卡</button>
-        <button id="view-tab-grid" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-scholar-textMuted hover:text-scholar-navy transition whitespace-nowrap text-center">子彈網格</button>
-        <button id="view-tab-health" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-scholar-textMuted hover:text-scholar-navy transition whitespace-nowrap text-center">健康日誌</button>
-        <button id="view-tab-stats" class="flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-scholar-textMuted hover:text-scholar-navy transition whitespace-nowrap text-center">年度熱力圖</button>
-      </div>
-    </section>
-
-    <!-- 視圖 1: 今日打卡 -->
-    <section id="view-today" class="space-y-3">
-      <div id="today-habits-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-      <div id="today-empty-state" class="hidden text-center py-16 bg-scholar-card/80 rounded-2xl border border-dashed border-scholar-silver">
-        <i data-lucide="coffee" class="w-9 h-9 text-scholar-silver mx-auto mb-2.5"></i>
-        <h3 class="text-sm font-medium text-scholar-navy">目前尚無習慣項目</h3>
-        <p class="text-xs text-scholar-textMuted mt-1">點擊右上角「新增習慣」開始紀錄吧！</p>
-      </div>
-    </section>
-
-    <!-- 視圖 2: 子彈筆記網格視圖 -->
-    <section id="view-grid" class="hidden bg-scholar-card rounded-2xl border border-scholar-border p-4 sm:p-5 shadow-xs space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <h2 class="text-sm font-semibold text-scholar-navy">子彈打卡網格 (14 天)</h2>
-            <span id="grid-date-range-badge" class="text-[11px] px-2 py-0.5 rounded-md bg-scholar-paper border border-scholar-border text-scholar-navy font-mono">載入中...</span>
-          </div>
-          <p class="text-xs text-scholar-textMuted mt-0.5">點擊方塊可直接補卡或取消</p>
-        </div>
-
-        <div class="flex items-center gap-1.5 self-start sm:self-auto">
-          <button id="btn-grid-prev-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-scholar-paper hover:bg-scholar-hover border border-scholar-border text-scholar-navy rounded-lg transition flex items-center gap-1 shadow-xs">
-            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-            <span>上兩週</span>
-          </button>
-          <button id="btn-grid-today" type="button" class="px-2.5 py-1 text-xs font-medium bg-scholar-paper hover:bg-scholar-hover border border-scholar-border text-scholar-navy rounded-lg transition shadow-xs">
-            今天
-          </button>
-          <button id="btn-grid-next-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-scholar-paper hover:bg-scholar-hover border border-scholar-border text-scholar-navy rounded-lg transition flex items-center gap-1 shadow-xs">
-            <span>下兩週</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div class="min-w-[620px]" id="bullet-grid-table-container"></div>
-      </div>
-
-      <div class="flex items-center justify-end gap-3 pt-2 border-t border-scholar-border/70 text-[11px] text-scholar-textMuted flex-wrap">
-        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold"></span>已打卡</span>
-        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/40"></span>未打卡</span>
-        <span class="inline-flex items-center gap-1"><span class="text-scholar-gold font-bold">金色</span>為今日</span>
-      </div>
-    </section>
-
-    <!-- 視圖 3: 健康日誌列表 -->
-    <section id="view-health" class="hidden space-y-4">
-      <div class="flex items-center justify-between bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs">
-        <div>
-          <h2 class="text-sm font-semibold text-scholar-navy">血壓與體重歷史紀錄</h2>
-          <p class="text-xs text-scholar-textMuted mt-0.5">掌握身體關鍵指標與長期變化趨勢</p>
-        </div>
-        <button id="btn-add-health-from-view" type="button" class="px-3 py-1.5 text-xs font-medium bg-scholar-gold text-scholar-navy font-semibold rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1 shadow-xs shrink-0">
-          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-          <span>新增一筆</span>
+          <span>健康與用藥</span>
         </button>
       </div>
+    </section>
 
-      <div class="bg-scholar-card rounded-2xl border border-scholar-border shadow-xs overflow-hidden">
+    <!-- 區塊 A: 習慣實踐專屬工作區 -->
+    <div id="workspace-habit" class="space-y-5 sm:space-y-6">
+      <section class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-scholar-textMuted mb-2">
+            <span class="text-xs font-medium tracking-wider uppercase">今日習慣達成度</span>
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-scholar-gold"></i>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl sm:text-3xl font-bold tracking-tight text-scholar-navy" id="stat-progress-pct">0%</span>
+              <span class="text-xs text-scholar-textMuted" id="stat-completed-count">0 / 0 已完成</span>
+            </div>
+            <div class="w-full bg-scholar-paper h-2 rounded-full mt-2.5 overflow-hidden border border-scholar-border/60">
+              <div id="stat-progress-bar" class="bg-scholar-gold h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-scholar-paper to-scholar-silver/20 rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-scholar-textMuted mb-2">
+            <span class="text-xs font-medium tracking-wider uppercase">連續實踐節奏 (STREAK)</span>
+            <i data-lucide="flame" class="w-4 h-4 text-scholar-gold"></i>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl sm:text-3xl font-bold tracking-tight text-scholar-navy" id="stat-longest-streak">0</span>
+              <span class="text-xs text-scholar-textMuted">天不間斷</span>
+            </div>
+            <p class="text-xs text-scholar-navy/80 leading-relaxed mt-1 line-clamp-2">
+              「規律生活不是束縛，而是給身體最安心的節奏。」
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full" id="category-filter-bar"></div>
+
+        <div class="flex items-center bg-scholar-hover/80 p-1 rounded-xl w-full sm:w-fit overflow-x-auto no-scrollbar border border-scholar-border/60">
+          <button id="view-tab-today" class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center">今日打卡</button>
+          <button id="view-tab-grid" class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-medium rounded-lg text-scholar-textMuted hover:text-scholar-navy transition whitespace-nowrap text-center">子彈網格 (14天)</button>
+          <button id="view-tab-stats" class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-medium rounded-lg text-scholar-textMuted hover:text-scholar-navy transition whitespace-nowrap text-center">年度熱力圖</button>
+        </div>
+      </section>
+
+      <section id="view-today" class="space-y-3">
+        <div id="today-habits-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        <div id="today-empty-state" class="hidden text-center py-16 bg-scholar-card/80 rounded-2xl border border-dashed border-scholar-silver">
+          <i data-lucide="coffee" class="w-9 h-9 text-scholar-silver mx-auto mb-2.5"></i>
+          <h3 class="text-sm font-medium text-scholar-navy">目前尚無習慣項目</h3>
+          <p class="text-xs text-scholar-textMuted mt-1">點擊右上角「新增習慣」開始建立生活軌跡！</p>
+        </div>
+      </section>
+
+      <section id="view-grid" class="hidden bg-scholar-card rounded-2xl border border-scholar-border p-4 sm:p-5 shadow-xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="text-sm font-semibold text-scholar-navy">子彈打卡網格 (14 天)</h2>
+              <span id="grid-date-range-badge" class="text-[11px] px-2 py-0.5 rounded-md bg-scholar-paper border border-scholar-border text-scholar-navy font-mono">載入中...</span>
+            </div>
+            <p class="text-xs text-scholar-textMuted mt-0.5">點擊方塊可直接補卡或取消</p>
+          </div>
+
+          <div class="flex items-center gap-1.5 self-start sm:self-auto">
+            <button id="btn-grid-prev-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-scholar-paper hover:bg-scholar-hover border border-scholar-border text-scholar-navy rounded-lg transition flex items-center gap-1 shadow-xs">
+              <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+              <span>上兩週</span>
+            </button>
+            <button id="btn-grid-today" type="button" class="px-2.5 py-1 text-xs font-medium bg-scholar-paper hover:bg-scholar-hover border border-scholar-border text-scholar-navy rounded-lg transition shadow-xs">
+              今天
+            </button>
+            <button id="btn-grid-next-period" type="button" class="px-2.5 py-1 text-xs font-medium bg-scholar-paper hover:bg-scholar-hover border border-scholar-border text-scholar-navy rounded-lg transition flex items-center gap-1 shadow-xs">
+              <span>下兩週</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div class="min-w-[620px]" id="bullet-grid-table-container"></div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2 border-t border-scholar-border/70 text-[11px] text-scholar-textMuted flex-wrap">
+          <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold"></span>已打卡</span>
+          <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/40"></span>未打卡</span>
+          <span class="inline-flex items-center gap-1"><span class="text-scholar-gold font-bold">金色</span>為今日</span>
+        </div>
+      </section>
+
+      <section id="view-stats" class="hidden space-y-6">
+        <div class="bg-scholar-card rounded-2xl border border-scholar-border p-4 sm:p-5 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-sm font-semibold text-scholar-navy">年度習慣實踐熱力圖</h2>
+              <p class="text-xs text-scholar-textMuted">展示每日習慣完成密度</p>
+            </div>
+            <div class="text-xs text-scholar-textMuted flex items-center gap-1">
+              <span>少</span>
+              <div class="flex gap-1">
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-paper border border-scholar-border/50"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/40"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/40"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/70"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold"></span>
+              </div>
+              <span>多</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto py-2 -mx-2 px-2">
+            <div id="heatmap-container" class="flex gap-1.5 min-w-[680px]"></div>
+          </div>
+        </div>
+
+        <div class="bg-scholar-card rounded-2xl border border-scholar-border p-4 sm:p-5 shadow-xs">
+          <h2 class="text-sm font-semibold text-scholar-navy mb-4">各習慣總打卡統計</h2>
+          <div id="habit-rankings-container" class="space-y-3"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 區塊 B: 健康與用藥專屬工作區 -->
+    <div id="workspace-health" class="hidden space-y-5 sm:space-y-6">
+      <section class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-scholar-textMuted mb-2">
+            <span class="text-xs font-medium tracking-wider uppercase">最新血壓與體重指標</span>
+            <i data-lucide="heart-pulse" class="w-4 h-4 text-scholar-gold"></i>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl sm:text-3xl font-bold tracking-tight text-scholar-navy" id="stat-bp-val">--/--</span>
+              <span class="text-xs text-scholar-textMuted">mmHg</span>
+            </div>
+            <div class="text-xs text-scholar-textMuted mt-2 flex items-center gap-2 flex-wrap">
+              <span>體重: <strong class="text-scholar-navy" id="stat-weight-val">--</strong> kg</span>
+              <span class="text-scholar-silver">|</span>
+              <span id="stat-bp-tag" class="px-2 py-0.5 rounded text-[10px] bg-scholar-paper text-scholar-textMuted border border-scholar-border">未記錄</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-scholar-paper to-scholar-silver/20 rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-scholar-textMuted mb-2">
+            <span class="text-xs font-medium tracking-wider uppercase">今日服藥狀態</span>
+            <i data-lucide="pill" class="w-4 h-4 text-scholar-gold"></i>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl sm:text-3xl font-bold tracking-tight text-scholar-navy" id="stat-today-med-count">0</span>
+              <span class="text-xs text-scholar-textMuted">次完成紀錄</span>
+            </div>
+            <p class="text-xs text-scholar-navy/80 leading-relaxed mt-1 line-clamp-2" id="stat-today-med-desc">
+              按時用藥，保持身體恆定節奏。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="flex items-center justify-between gap-3 bg-scholar-card rounded-2xl p-3.5 sm:p-4 border border-scholar-border shadow-xs flex-wrap">
+        <div class="inline-flex bg-scholar-paper p-1 rounded-xl border border-scholar-border text-xs">
+          <button id="subtab-bp" class="px-3.5 py-1.5 rounded-lg bg-scholar-card text-scholar-navy font-semibold shadow-xs transition">血壓與體重歷史</button>
+          <button id="subtab-med" class="px-3.5 py-1.5 rounded-lg text-scholar-textMuted hover:text-scholar-navy transition">用藥歷史日誌</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-health-quick-log-bp" type="button" class="px-3 py-1.5 text-xs font-medium border border-scholar-border bg-scholar-paper text-scholar-navy rounded-xl hover:bg-scholar-hover transition flex items-center gap-1 shadow-xs">
+            <i data-lucide="plus" class="w-3.5 h-3.5 text-scholar-gold"></i>
+            <span>記一筆血壓</span>
+          </button>
+          <button id="btn-health-quick-log-med" type="button" class="px-3 py-1.5 text-xs font-semibold bg-scholar-gold text-scholar-navy rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1 shadow-xs">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>記一筆服藥</span>
+          </button>
+        </div>
+      </section>
+
+      <div id="subview-bp" class="bg-scholar-card rounded-2xl border border-scholar-border shadow-xs overflow-hidden">
         <div class="overflow-x-auto -mx-0">
           <table class="w-full text-left border-collapse text-xs min-w-[580px]">
             <thead>
@@ -262,48 +342,212 @@
           </table>
         </div>
         <div id="health-empty-state" class="hidden text-center py-12">
-          <i data-lucide="clipboard-pen" class="w-8 h-8 text-scholar-silver mx-auto mb-2"></i>
-          <p class="text-xs text-scholar-textMuted">尚無血壓或體重紀錄，點擊右上角「記血壓」開始！</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 視圖 4: 年度熱力圖與統計 -->
-    <section id="view-stats" class="hidden space-y-6">
-      <div class="bg-scholar-card rounded-2xl border border-scholar-border p-4 sm:p-5 shadow-xs">
-        <div class="flex items-center justify-between mb-3">
-          <div>
-            <h2 class="text-sm font-semibold text-scholar-navy">年度習慣實踐熱力圖</h2>
-            <p class="text-xs text-scholar-textMuted">展示每日習慣完成密度（即時連動）</p>
-          </div>
-          <div class="text-xs text-scholar-textMuted flex items-center gap-1">
-            <span>少</span>
-            <div class="flex gap-1">
-              <span class="w-2.5 h-2.5 rounded-xs bg-scholar-paper border border-scholar-border/50"></span>
-              <span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/40"></span>
-              <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/40"></span>
-              <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/70"></span>
-              <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold"></span>
-            </div>
-            <span>多</span>
-          </div>
-        </div>
-        <div class="overflow-x-auto py-2 -mx-2 px-2">
-          <div id="heatmap-container" class="flex gap-1.5 min-w-[680px]"></div>
+          <i data-lucide="activity" class="w-8 h-8 text-scholar-silver mx-auto mb-2"></i>
+          <p class="text-xs text-scholar-textMuted">尚無血壓或體重紀錄，點擊上方按鈕開始記錄！</p>
         </div>
       </div>
 
-      <div class="bg-scholar-card rounded-2xl border border-scholar-border p-4 sm:p-5 shadow-xs">
-        <h2 class="text-sm font-semibold text-scholar-navy mb-4">各習慣總打卡統計</h2>
-        <div id="habit-rankings-container" class="space-y-3"></div>
+      <div id="subview-med" class="hidden bg-scholar-card rounded-2xl border border-scholar-border shadow-xs overflow-hidden">
+        <div class="overflow-x-auto -mx-0">
+          <table class="w-full text-left border-collapse text-xs min-w-[580px]">
+            <thead>
+              <tr class="bg-scholar-paper border-b border-scholar-border text-scholar-textMuted font-semibold">
+                <th class="py-3 px-3 sm:px-4">日期</th>
+                <th class="py-3 px-2 sm:px-3">服藥時段</th>
+                <th class="py-3 px-3 min-w-[220px]">已服用之藥品與劑量</th>
+                <th class="py-3 px-3 sm:px-4 min-w-[150px]">備忘 / 狀況</th>
+                <th class="py-3 px-3 text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="med-logs-table-body" class="divide-y divide-scholar-border/50"></tbody>
+          </table>
+        </div>
+        <div id="med-empty-state" class="hidden text-center py-12">
+          <i data-lucide="pill" class="w-8 h-8 text-scholar-silver mx-auto mb-2"></i>
+          <p class="text-xs text-scholar-textMuted">尚無服藥紀錄，點擊上方按鈕開始記錄！</p>
+        </div>
       </div>
-    </section>
+    </div>
 
   </main>
 
-  <!-- ==================== 彈窗區 ==================== -->
+  <!-- 圖片檢視放大燈箱 -->
+  <div id="modal-image-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-scholar-navy/85 backdrop-blur-md hidden" onclick="closeImageLightbox()">
+    <div class="max-w-xs sm:max-w-md w-full bg-scholar-card p-3 rounded-2xl border border-scholar-border shadow-2xl relative" onclick="event.stopPropagation()">
+      <button onclick="closeImageLightbox()" type="button" class="absolute top-2 right-2 text-scholar-navy hover:text-scholar-gold p-1.5 rounded-lg bg-scholar-paper/80 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <img id="lightbox-img" src="" alt="藥品大圖" class="w-full max-h-[70vh] object-contain rounded-xl border border-scholar-border" />
+      <p id="lightbox-caption" class="text-xs text-center text-scholar-navy font-semibold mt-2.5"></p>
+    </div>
+  </div>
 
-  <!-- 1. 血壓與體重登記彈窗 -->
+  <!-- 1. 記錄服藥日誌彈窗 -->
+  <div id="modal-log-med" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-scholar-navy/60 backdrop-blur-sm hidden">
+    <div class="bg-scholar-card rounded-t-3xl sm:rounded-2xl border border-scholar-border shadow-2xl w-full max-w-md p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-scholar-border">
+        <div class="flex items-center gap-2">
+          <i data-lucide="pill" class="w-5 h-5 text-scholar-gold"></i>
+          <h3 id="modal-log-med-title" class="text-base font-semibold text-scholar-navy">記錄服藥</h3>
+        </div>
+        <button id="btn-close-log-med-modal" type="button" class="text-scholar-textMuted hover:text-scholar-navy p-1.5 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-log-med" class="space-y-4 pt-3.5">
+        <input type="hidden" id="input-log-med-id" />
+        <input type="hidden" id="input-log-med-period" value="晨起" />
+
+        <div>
+          <label class="block text-xs font-medium text-scholar-navy mb-1">服藥日期</label>
+          <input type="date" id="input-log-med-date" required class="w-full px-3.5 py-2.5 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-scholar-navy mb-1.5">服藥時段</label>
+          <div class="grid grid-cols-4 gap-1.5 bg-scholar-paper p-1 rounded-xl border border-scholar-border/60">
+            <button type="button" class="btn-med-period-tab py-2 text-xs font-medium rounded-lg transition-all text-center" data-period="晨起">晨起</button>
+            <button type="button" class="btn-med-period-tab py-2 text-xs font-medium rounded-lg transition-all text-center" data-period="午間">午間</button>
+            <button type="button" class="btn-med-period-tab py-2 text-xs font-medium rounded-lg transition-all text-center" data-period="晚間">晚間</button>
+            <button type="button" class="btn-med-period-tab py-2 text-xs font-medium rounded-lg transition-all text-center" data-period="睡前">睡前</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-medium text-scholar-navy">勾選服用之藥品 (依排程推薦)</label>
+            <button type="button" id="btn-quick-manage-meds" class="text-[11px] text-scholar-gold hover:text-scholar-navy font-semibold underline">
+              + 管理藥箱
+            </button>
+          </div>
+          <div id="med-checklist-container" class="space-y-2 max-h-56 overflow-y-auto p-2 bg-scholar-paper rounded-xl border border-scholar-border/80"></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-scholar-navy mb-1">MEMO 備忘 (服用感受、隨餐等)</label>
+          <textarea id="input-log-med-memo" rows="2" placeholder="例如：飯後 30 分鐘服用、胃部無不適..." class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy resize-none"></textarea>
+        </div>
+
+        <div class="pt-2 pb-1 flex items-center justify-end gap-2">
+          <button id="btn-cancel-log-med" type="button" class="px-4 py-2 text-sm text-scholar-textMuted hover:bg-scholar-hover rounded-xl transition">取消</button>
+          <button type="submit" class="px-5 py-2 text-sm font-medium bg-scholar-navy text-scholar-paper rounded-xl hover:bg-scholar-navy/90 transition shadow-sm">儲存紀錄</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. 藥箱母檔管理清單彈窗 -->
+  <div id="modal-med-manager" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-scholar-navy/60 backdrop-blur-sm hidden">
+    <div class="bg-scholar-card rounded-t-3xl sm:rounded-2xl border border-scholar-border shadow-2xl w-full max-w-lg p-5 sm:p-6 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-scholar-border">
+        <div class="flex items-center gap-2">
+          <i data-lucide="archive" class="w-5 h-5 text-scholar-gold"></i>
+          <h3 class="text-base font-semibold text-scholar-navy">我的藥箱 (藥品母檔)</h3>
+        </div>
+        <button id="btn-close-med-manager" type="button" class="text-scholar-textMuted hover:text-scholar-navy p-1.5 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-3.5 space-y-2.5" id="med-manager-list"></div>
+
+      <div class="pt-3 border-t border-scholar-border flex justify-between items-center">
+        <span class="text-xs text-scholar-textMuted">支援拍照上傳藥物外觀比對</span>
+        <button id="btn-open-create-med" type="button" class="px-3.5 py-1.5 text-xs font-semibold bg-scholar-gold text-scholar-navy rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1.5 shadow-xs">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>新增藥品</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 新增/編輯藥品彈窗 -->
+  <div id="modal-med-edit" class="fixed inset-0 z-[75] flex items-center justify-center p-4 bg-scholar-navy/70 backdrop-blur-sm hidden">
+    <div class="bg-scholar-card rounded-2xl border border-scholar-border shadow-2xl w-full max-w-sm p-5 max-h-[94vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-2 border-b border-scholar-border mb-3">
+        <h4 id="med-edit-title" class="text-sm font-semibold text-scholar-navy">新增常用藥品</h4>
+        <button id="btn-close-med-edit" type="button" class="text-scholar-textMuted hover:text-scholar-navy p-1 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="form-med-edit" class="space-y-3.5">
+        <input type="hidden" id="input-med-id" />
+        <input type="hidden" id="input-med-photo" />
+
+        <div>
+          <label class="block text-xs font-medium text-scholar-navy mb-1.5">藥品外觀照片 (預防吃錯)</label>
+          <div class="flex items-center gap-3">
+            <div id="med-photo-preview-container" class="w-14 h-14 rounded-xl bg-scholar-paper border border-dashed border-scholar-border flex items-center justify-center overflow-hidden shrink-0">
+              <i data-lucide="image" class="w-5 h-5 text-scholar-silver" id="med-photo-placeholder-icon"></i>
+              <img id="med-photo-preview" src="" alt="預覽圖" class="w-full h-full object-cover hidden" />
+            </div>
+            <div class="flex-1 space-y-1">
+              <div class="flex items-center gap-2">
+                <label class="px-2.5 py-1.5 bg-scholar-card border border-scholar-border rounded-lg text-xs font-semibold text-scholar-navy hover:bg-scholar-hover cursor-pointer transition flex items-center gap-1 shadow-2xs">
+                  <i data-lucide="camera" class="w-3.5 h-3.5 text-scholar-gold"></i>
+                  <span>拍照 / 上傳</span>
+                  <input type="file" id="input-file-med-photo" accept="image/*" class="hidden" />
+                </label>
+                <button type="button" id="btn-remove-med-photo" class="text-xs text-scholar-silver hover:text-scholar-navy hidden">移除</button>
+              </div>
+              <p class="text-[10px] text-scholar-textMuted leading-tight">建議拍攝藥丸形狀或藥袋標籤，系統將自動最佳化壓縮。</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-scholar-navy mb-1">藥品名稱</label>
+          <input type="text" id="input-med-name" required placeholder="例如：康肯、骨質調節藥" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-scholar-navy mb-1">每次劑量</label>
+            <input type="text" id="input-med-dosage" required placeholder="例如：1/2 顆、1 錠" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-scholar-navy mb-1">服藥頻率模式</label>
+            <select id="select-med-freq-type" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy">
+              <option value="daily">每日服用</option>
+              <option value="weekly_custom">自訂每週排程 (如一週三次)</option>
+              <option value="prn">需要時服用 (PRN)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="section-med-weekdays" class="hidden p-2.5 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-1.5">
+          <label class="block text-[11px] font-semibold text-scholar-navy">勾選服藥的星期 (排定日將自動打勾)</label>
+          <div class="grid grid-cols-7 gap-1" id="weekday-selector-container"></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-scholar-navy mb-1">建議時段</label>
+          <select id="select-med-timing" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy">
+            <option value="晨起">晨起空腹 / 晨起</option>
+            <option value="早飯後">早餐後</option>
+            <option value="午間">午餐後 / 午間</option>
+            <option value="晚間">晚餐後 / 晚間</option>
+            <option value="睡前">睡前</option>
+            <option value="需要時">需要時服用</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-scholar-navy mb-1">補充說明 (選填)</label>
+          <input type="text" id="input-med-notes" placeholder="例如：間隔 48 小時服用、隨餐服用" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button id="btn-cancel-med-edit" type="button" class="px-3 py-1.5 text-xs text-scholar-textMuted hover:bg-scholar-hover rounded-lg transition">取消</button>
+          <button type="submit" class="px-4 py-1.5 text-xs font-medium bg-scholar-navy text-scholar-paper rounded-lg hover:bg-scholar-navy/90 transition">確定儲存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. 血壓與體重登記彈窗 -->
   <div id="modal-health" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-scholar-navy/60 backdrop-blur-sm hidden">
     <div class="bg-scholar-card rounded-t-3xl sm:rounded-2xl border border-scholar-border shadow-2xl w-full max-w-md p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-scholar-border">
@@ -374,7 +618,7 @@
     </div>
   </div>
 
-  <!-- 2. 新增/編輯習慣彈窗 -->
+  <!-- 5. 新增/編輯習慣彈窗 -->
   <div id="modal-habit" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-scholar-navy/60 backdrop-blur-sm hidden">
     <div class="bg-scholar-card rounded-t-3xl sm:rounded-2xl border border-scholar-border shadow-2xl w-full max-w-md p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-scholar-border">
@@ -422,13 +666,13 @@
     </div>
   </div>
 
-  <!-- 3. 分類管理清單彈窗 -->
+  <!-- 6. 分類管理清單彈窗 -->
   <div id="modal-category-manager" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-scholar-navy/60 backdrop-blur-sm hidden">
     <div class="bg-scholar-card rounded-t-3xl sm:rounded-2xl border border-scholar-border shadow-2xl w-full max-w-lg p-5 sm:p-6 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-scholar-border">
         <div class="flex items-center gap-2">
           <i data-lucide="tag" class="w-5 h-5 text-scholar-gold"></i>
-          <h3 class="text-base font-semibold text-scholar-navy">分類管理</h3>
+          <h3 class="text-base font-semibold text-scholar-navy">習慣分類管理</h3>
         </div>
         <button id="btn-close-category-manager" type="button" class="text-scholar-textMuted hover:text-scholar-navy p-1.5 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -438,7 +682,7 @@
       <div class="flex-1 overflow-y-auto py-3.5 space-y-2.5" id="category-manager-list"></div>
 
       <div class="pt-3 border-t border-scholar-border flex justify-between items-center">
-        <span class="text-xs text-scholar-textMuted">管理現有分類與古典色彩</span>
+        <span class="text-xs text-scholar-textMuted">管理分類與色票</span>
         <button id="btn-open-create-category" type="button" class="px-3.5 py-1.5 text-xs font-semibold bg-scholar-gold text-scholar-navy rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1.5 shadow-xs">
           <i data-lucide="plus" class="w-3.5 h-3.5"></i>
           <span>新增分類</span>
@@ -447,7 +691,7 @@
     </div>
   </div>
 
-  <!-- 4. 新增/編輯分類小彈窗 (z-[70]) -->
+  <!-- 7. 新增/編輯分類小彈窗 -->
   <div id="modal-category-edit" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-scholar-navy/70 backdrop-blur-sm hidden">
     <div class="bg-scholar-card rounded-2xl border border-scholar-border shadow-2xl w-full max-w-sm p-5">
       <div class="flex items-center justify-between pb-2 border-b border-scholar-border mb-3">
@@ -461,7 +705,7 @@
         <input type="hidden" id="input-category-id" />
         <div>
           <label class="block text-xs font-medium text-scholar-navy mb-1">分類名稱</label>
-          <input type="text" id="input-category-name" required placeholder="例如：書房研讀、生活作息" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
+          <input type="text" id="input-category-name" required placeholder="例如：閱讀專注、規律作息" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
         </div>
 
         <div>
@@ -478,7 +722,7 @@
     </div>
   </div>
 
-  <!-- 5. 資料備份與還原彈窗 -->
+  <!-- 8. 資料備份與還原彈窗 -->
   <div id="modal-data" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-scholar-navy/60 backdrop-blur-sm hidden">
     <div class="bg-scholar-card rounded-2xl border border-scholar-border shadow-2xl w-full max-w-md p-6">
       <div class="flex items-center justify-between pb-3 border-b border-scholar-border">
@@ -489,7 +733,7 @@
       </div>
 
       <div class="space-y-4 pt-4 text-xs text-scholar-textMuted leading-relaxed">
-        <p>您的所有紀錄正透過 Google Firebase 即時同步。如需在不同裝置轉移或封存，建議下載一份 JSON 備份檔。</p>
+        <p>您的所有紀錄正透過 Google Firebase 即時同步（含習慣打卡、血壓體重、藥品照片、排程藥箱母檔與服藥紀錄）。建議定期下載 JSON 檔案備份。</p>
         
         <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border space-y-3">
           <div class="flex items-center justify-between">
@@ -511,7 +755,7 @@
 
         <div class="pt-2 border-t border-scholar-border flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-scholar-navy hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v2.1 (Scholar 配色)</span>
+          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v2.5 (照片支援版)</span>
         </div>
       </div>
     </div>
@@ -556,7 +800,7 @@
       }
     }
 
-    // ==================== 學者典雅古典色票 ====================
+    // ==================== 學者古典色票 ====================
     const PALETTE = [
       { color: '#D3AC2B', name: '拋光古金' },
       { color: '#333D51', name: '海軍深藍' },
@@ -566,7 +810,7 @@
       { color: '#8E7C93', name: '古籍紫藤' }
     ];
 
-    const AVAILABLE_ICONS = ['check', 'book-open', 'footprints', 'cup-soda', 'moon', 'dumbbell', 'heart', 'feather', 'sun', 'camera', 'activity'];
+    const AVAILABLE_ICONS = ['check', 'book-open', 'footprints', 'cup-soda', 'moon', 'dumbbell', 'heart', 'feather', 'sun', 'camera', 'activity', 'pill'];
 
     const INITIAL_CATEGORIES = [
       { id: 'cat-health', name: '健康生活', color: '#D3AC2B' },
@@ -580,13 +824,23 @@
       { id: 'h-3', title: '23:15 放下手機與放鬆備睡', desc: '遠離藍光刺激，維持規律作息', categoryId: 'cat-rest', icon: 'moon', createdAt: '2026-01-01' }
     ];
 
+    const INITIAL_MEDICATIONS = [
+      { id: 'med-1', name: '血壓常用藥', dosage: '1/2 顆', freqType: 'daily', weekdays: [1,2,3,4,5,6,7], timing: '晨起', notes: '晨起空腹溫水服用', photo: '' },
+      { id: 'med-2', name: '骨質/免疫週服藥', dosage: '1 錠', freqType: 'weekly_custom', weekdays: [1, 3, 5], timing: '早飯後', notes: '每週三次(一、三、五)隨餐', photo: '' }
+    ];
+
     let state = {
+      activeWorkspace: 'habit',
       categories: [],
       habits: [],
       logs: {},
       healthLogs: [],
+      medications: [],
+      medLogs: [],
       activeCategory: 'all',
-      gridOffsetDays: 0
+      gridOffsetDays: 0,
+      activeHealthTab: 'bp',
+      editingMedWeekdays: [1, 3, 5]
     };
 
     function getStandardDateKey(dateObj = new Date()) {
@@ -603,6 +857,18 @@
       return `${parts[0]} 年 ${parseInt(parts[1], 10)} 月 ${parseInt(parts[2], 10)} 日 (週${weekDays[d.getDay()]})`;
     }
 
+    function getIsoDayOfWeek(dateStr) {
+      const parts = dateStr.split('-');
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      const day = d.getDay();
+      return day === 0 ? 7 : day;
+    }
+
+    function getWeekdayLabel(dayNum) {
+      const map = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '日' };
+      return map[dayNum] || '';
+    }
+
     function getBloodPressureEvaluation(sys, dia) {
       if (!sys || !dia) return { label: '未評估', colorClass: 'bg-scholar-paper text-scholar-textMuted border border-scholar-border' };
       if (sys < 120 && dia < 80) {
@@ -616,23 +882,80 @@
       }
     }
 
-    // ==================== 本地與雲端雙向同步 ====================
+    function compressImageFile(file, maxWidth = 300, maxHeight = 300, quality = 0.7) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              }
+            } else {
+              if (height > maxHeight) {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedBase64);
+          };
+          img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+      });
+    }
+
+    window.showImageLightbox = function(src, caption = '') {
+      if (!src) return;
+      const modal = document.getElementById('modal-image-lightbox');
+      const img = document.getElementById('lightbox-img');
+      const cap = document.getElementById('lightbox-caption');
+      img.src = src;
+      cap.innerText = caption;
+      modal.classList.remove('hidden');
+    };
+
+    window.closeImageLightbox = function() {
+      document.getElementById('modal-image-lightbox').classList.add('hidden');
+    };
+
     function loadStateFromLocal() {
       try {
         const catData = localStorage.getItem('routine_categories');
         const habitData = localStorage.getItem('routine_habits');
         const logData = localStorage.getItem('routine_logs');
         const healthData = localStorage.getItem('routine_health_logs');
+        const medData = localStorage.getItem('routine_medications');
+        const medLogData = localStorage.getItem('routine_med_logs');
 
         state.categories = catData ? JSON.parse(catData) : INITIAL_CATEGORIES;
         state.habits = habitData ? JSON.parse(habitData) : INITIAL_HABITS;
         state.logs = logData ? JSON.parse(logData) : {};
         state.healthLogs = healthData ? JSON.parse(healthData) : [];
+        state.medications = medData ? JSON.parse(medData) : INITIAL_MEDICATIONS;
+        state.medLogs = medLogData ? JSON.parse(medLogData) : [];
       } catch (e) {
         state.categories = INITIAL_CATEGORIES;
         state.habits = INITIAL_HABITS;
         state.logs = {};
         state.healthLogs = [];
+        state.medications = INITIAL_MEDICATIONS;
+        state.medLogs = [];
       }
     }
 
@@ -641,6 +964,8 @@
       localStorage.setItem('routine_habits', JSON.stringify(state.habits));
       localStorage.setItem('routine_logs', JSON.stringify(state.logs));
       localStorage.setItem('routine_health_logs', JSON.stringify(state.healthLogs));
+      localStorage.setItem('routine_medications', JSON.stringify(state.medications));
+      localStorage.setItem('routine_med_logs', JSON.stringify(state.medLogs));
 
       if (!skipCloud && syncDocRef) {
         setSyncStatus('syncing', '正在儲存...');
@@ -649,6 +974,8 @@
           habits: state.habits,
           logs: state.logs,
           healthLogs: state.healthLogs,
+          medications: state.medications,
+          medLogs: state.medLogs,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true })
         .then(() => {
@@ -672,6 +999,8 @@
           state.habits = data.habits || INITIAL_HABITS;
           state.logs = data.logs || {};
           state.healthLogs = data.healthLogs || [];
+          state.medications = data.medications || INITIAL_MEDICATIONS;
+          state.medLogs = data.medLogs || [];
 
           saveState(true);
           renderApp();
@@ -744,15 +1073,47 @@
       renderApp();
     };
 
+    function switchWorkspace(workspace) {
+      state.activeWorkspace = workspace;
+      const tabHabit = document.getElementById('main-tab-habit');
+      const tabHealth = document.getElementById('main-tab-health');
+      const wsHabit = document.getElementById('workspace-habit');
+      const wsHealth = document.getElementById('workspace-health');
+      const headerHabit = document.getElementById('header-actions-habit');
+      const headerHealth = document.getElementById('header-actions-health');
+
+      if (workspace === 'habit') {
+        tabHabit.className = 'flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50';
+        tabHealth.className = 'flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 text-scholar-textMuted hover:text-scholar-navy';
+        wsHabit.classList.remove('hidden');
+        wsHealth.classList.add('hidden');
+        headerHabit.classList.remove('hidden');
+        headerHabit.classList.add('flex');
+        headerHealth.classList.add('hidden');
+        headerHealth.classList.remove('flex');
+      } else {
+        tabHealth.className = 'flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50';
+        tabHabit.className = 'flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 text-scholar-textMuted hover:text-scholar-navy';
+        wsHealth.classList.remove('hidden');
+        wsHabit.classList.add('hidden');
+        headerHealth.classList.remove('hidden');
+        headerHealth.classList.add('flex');
+        headerHabit.classList.add('hidden');
+        headerHabit.classList.remove('flex');
+      }
+    }
+
     function renderApp() {
       renderCategoryFilters();
       renderTodayHabits();
       renderBulletGrid();
       renderHealthLogs();
+      renderMedLogs();
       renderHeatmap();
       renderRankings();
       renderStatsOverview();
       renderCategoryManagerList();
+      renderMedManagerList();
       populateHabitCategorySelect();
 
       lucide.createIcons();
@@ -789,6 +1150,16 @@
         document.getElementById('stat-bp-val').innerText = '--/--';
         document.getElementById('stat-weight-val').innerText = '--';
         document.getElementById('stat-bp-tag').innerText = '尚未記錄';
+      }
+
+      const todayMedLogs = (state.medLogs || []).filter(l => l.date === today);
+      document.getElementById('stat-today-med-count').innerText = todayMedLogs.length;
+      const descEl = document.getElementById('stat-today-med-desc');
+      if (todayMedLogs.length > 0) {
+        const periods = todayMedLogs.map(l => l.period).join('、');
+        descEl.innerText = `今日已於「${periods}」時段完成服藥。`;
+      } else {
+        descEl.innerText = '按時用藥，保持身體恆定節奏。';
       }
     }
 
@@ -877,7 +1248,7 @@
 
           <div class="flex items-center gap-1.5 pl-2 shrink-0">
             <span class="text-[10px] sm:text-[11px] font-medium px-2 py-0.5 bg-scholar-paper border border-scholar-border text-scholar-navy rounded-lg flex items-center gap-1" title="連續天數">
-              <i data-lucide="flame" class="w-3 h-3 text-scholar-gold"></i>
+              <i data-lucide="flame" class="w-3.5 h-3.5 text-scholar-gold"></i>
               <span>${streak}天</span>
             </span>
             <button onclick="openEditHabitModal('${habit.id}')" type="button" class="p-1 text-scholar-textMuted hover:text-scholar-navy rounded-lg transition" title="編輯習慣">
@@ -1002,13 +1373,128 @@
               <button onclick="editHealthLog('${log.id}')" type="button" class="p-1 text-scholar-textMuted hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="編輯">
                 <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
               </button>
-              <button onclick="deleteHealthLog('${log.id}')" type="button" class="p-1 text-scholar-textMuted hover:text-scholar-navy rounded hover:bg-scholar-gold/20 transition" title="刪除">
+              <button onclick="deleteHealthLog('${log.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-gold/20 transition" title="刪除">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </td>
         `;
         tbody.appendChild(tr);
+      });
+    }
+
+    function renderMedLogs() {
+      const tbody = document.getElementById('med-logs-table-body');
+      const emptyState = document.getElementById('med-empty-state');
+      tbody.innerHTML = '';
+
+      if (!state.medLogs || state.medLogs.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      const sorted = [...state.medLogs].sort((a, b) => {
+        return (b.date + b.period).localeCompare(a.date + a.period);
+      });
+
+      sorted.forEach(log => {
+        const medBadges = (log.medItems || []).map(m => {
+          const medDef = state.medications.find(x => x.id === m.id);
+          const photoThumb = (medDef && medDef.photo)
+            ? `<img src="${medDef.photo}" alt="${m.name}" class="w-4 h-4 rounded-xs object-cover cursor-pointer shrink-0" onclick="showImageLightbox('${medDef.photo}', '${m.name}')" />`
+            : '';
+
+          return `
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] bg-scholar-paper border border-scholar-border text-scholar-navy font-medium">
+              ${photoThumb}
+              <span>${m.name}</span>
+              <span class="text-scholar-textMuted">(${m.dosage})</span>
+            </span>
+          `;
+        }).join(' ');
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-scholar-paper/70 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-3 sm:px-4 font-mono font-medium text-scholar-navy">${log.date}</td>
+          <td class="py-3 px-2 sm:px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-scholar-gold/15 text-scholar-navy border border-scholar-gold/30">
+              ${log.period}
+            </span>
+          </td>
+          <td class="py-3 px-3">
+            <div class="flex flex-wrap gap-1">
+              ${medBadges || '<span class="text-scholar-silver">未勾選藥品</span>'}
+            </div>
+          </td>
+          <td class="py-3 px-3 sm:px-4 text-scholar-textMuted max-w-[180px] truncate" title="${log.memo || ''}">
+            ${log.memo || '<span class="text-scholar-silver">--</span>'}
+          </td>
+          <td class="py-3 px-3 text-right">
+            <div class="inline-flex items-center gap-1">
+              <button onclick="editMedLog('${log.id}')" type="button" class="p-1 text-scholar-textMuted hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="編輯">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteMedLog('${log.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-gold/20 transition" title="刪除">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderMedManagerList() {
+      const container = document.getElementById('med-manager-list');
+      container.innerHTML = '';
+
+      if (!state.medications || state.medications.length === 0) {
+        container.innerHTML = '<p class="text-xs text-scholar-textMuted text-center py-6">藥箱空空如也，點擊下方「新增藥品」建立常用清單！</p>';
+        return;
+      }
+
+      state.medications.forEach(med => {
+        let freqText = '每日服用';
+        if (med.freqType === 'weekly_custom') {
+          const daysStr = (med.weekdays || []).map(getWeekdayLabel).join('、');
+          freqText = `每週自訂 (${daysStr || '未設'})`;
+        } else if (med.freqType === 'prn') {
+          freqText = '需要時服用 (PRN)';
+        }
+
+        const photoHtml = med.photo 
+          ? `<img src="${med.photo}" alt="${med.name}" class="w-10 h-10 rounded-lg object-cover border border-scholar-border cursor-pointer shrink-0" onclick="showImageLightbox('${med.photo}', '${med.name}')" title="點擊檢視大圖" />`
+          : `<div class="w-10 h-10 rounded-lg bg-scholar-card border border-scholar-border flex items-center justify-center text-scholar-gold shrink-0">
+               <i data-lucide="pill" class="w-5 h-5"></i>
+             </div>`;
+
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-3 rounded-xl bg-scholar-paper border border-scholar-border';
+        item.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            ${photoHtml}
+            <div class="truncate">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-scholar-navy truncate">${med.name}</span>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-scholar-card border border-scholar-border text-scholar-textMuted shrink-0">${med.dosage}</span>
+              </div>
+              <span class="text-[11px] text-scholar-textMuted block mt-0.5 truncate">
+                頻率: <strong class="text-scholar-navy font-medium">${freqText}</strong> · 時段: ${med.timing} ${med.notes ? `(${med.notes})` : ''}
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0 pl-2">
+            <button onclick="editMedication('${med.id}')" type="button" class="p-1.5 text-scholar-textMuted hover:text-scholar-navy rounded-lg hover:bg-scholar-hover transition" title="編輯藥品">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="deleteMedication('${med.id}')" type="button" class="p-1.5 text-scholar-silver hover:text-scholar-navy rounded-lg hover:bg-scholar-gold/20 transition" title="刪除藥品">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(item);
       });
     }
 
@@ -1126,6 +1612,268 @@
         select.appendChild(opt);
       });
     }
+
+    function setMedLogPeriod(period) {
+      document.getElementById('input-log-med-period').value = period;
+      document.querySelectorAll('.btn-med-period-tab').forEach(btn => {
+        if (btn.dataset.period === period) {
+          btn.className = 'btn-med-period-tab py-2 text-xs font-semibold rounded-lg transition-all text-center bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border';
+        } else {
+          btn.className = 'btn-med-period-tab py-2 text-xs font-medium rounded-lg transition-all text-center text-scholar-textMuted hover:text-scholar-navy';
+        }
+      });
+    }
+
+    function renderMedChecklist(targetDateStr, manualCheckedIds = null) {
+      const container = document.getElementById('med-checklist-container');
+      container.innerHTML = '';
+
+      if (!state.medications || state.medications.length === 0) {
+        container.innerHTML = '<p class="text-xs text-scholar-textMuted p-2 text-center">藥箱尚無藥品，請先點擊上方「+ 管理藥箱」新增！</p>';
+        return;
+      }
+
+      const dayOfWeek = getIsoDayOfWeek(targetDateStr);
+      const scheduledMeds = [];
+      const otherMeds = [];
+
+      state.medications.forEach(med => {
+        const freqType = med.freqType || 'daily';
+        if (freqType === 'daily') {
+          scheduledMeds.push(med);
+        } else if (freqType === 'weekly_custom') {
+          if (med.weekdays && med.weekdays.includes(dayOfWeek)) {
+            scheduledMeds.push(med);
+          } else {
+            otherMeds.push(med);
+          }
+        } else {
+          otherMeds.push(med);
+        }
+      });
+
+      function createMedItemEl(med, isScheduled) {
+        let isChecked = false;
+        if (manualCheckedIds !== null) {
+          isChecked = manualCheckedIds.includes(med.id);
+        } else {
+          isChecked = isScheduled;
+        }
+
+        const photoHtml = med.photo
+          ? `<img src="${med.photo}" alt="${med.name}" class="w-8 h-8 rounded-lg object-cover border border-scholar-border shrink-0 cursor-pointer" onclick="event.stopPropagation(); showImageLightbox('${med.photo}', '${med.name}')" title="點擊檢視大圖" />`
+          : `<div class="w-8 h-8 rounded-lg bg-scholar-card border border-scholar-border flex items-center justify-center text-scholar-gold shrink-0">
+               <i data-lucide="pill" class="w-4 h-4"></i>
+             </div>`;
+
+        const label = document.createElement('label');
+        label.className = `flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition ${
+          isScheduled 
+            ? 'bg-scholar-card border-scholar-gold/40 hover:border-scholar-gold shadow-2xs' 
+            : 'bg-scholar-paper/60 border-scholar-border/70 hover:bg-scholar-card text-scholar-textMuted'
+        }`;
+
+        let scheduleBadge = '';
+        if (isScheduled && med.freqType === 'weekly_custom') {
+          scheduleBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-scholar-gold/15 text-scholar-navy font-semibold border border-scholar-gold/30">今日排程 (週${getWeekdayLabel(dayOfWeek)})</span>`;
+        } else if (!isScheduled && med.freqType === 'weekly_custom') {
+          const daysStr = (med.weekdays || []).map(getWeekdayLabel).join('、');
+          scheduleBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-scholar-silver/20 text-scholar-textMuted">休止日 (排程：${daysStr})</span>`;
+        }
+
+        label.innerHTML = `
+          <div class="flex items-center gap-2.5 min-w-0">
+            <input type="checkbox" name="selected_med" value="${med.id}" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded text-scholar-gold focus:ring-scholar-gold/30 accent-[#D3AC2B] shrink-0" />
+            ${photoHtml}
+            <div class="truncate">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-scholar-navy truncate">${med.name}</span>
+                ${scheduleBadge}
+              </div>
+              <span class="text-[11px] text-scholar-textMuted block truncate">${med.dosage} · ${med.timing} ${med.notes ? `(${med.notes})` : ''}</span>
+            </div>
+          </div>
+        `;
+        return label;
+      }
+
+      if (scheduledMeds.length > 0) {
+        const header = document.createElement('div');
+        header.className = 'text-[11px] font-semibold text-scholar-navy flex items-center gap-1 pb-0.5';
+        header.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5 text-scholar-gold"></i><span>今日排定用藥 (${scheduledMeds.length})</span>`;
+        container.appendChild(header);
+
+        scheduledMeds.forEach(m => container.appendChild(createMedItemEl(m, true)));
+      }
+
+      if (otherMeds.length > 0) {
+        const header = document.createElement('div');
+        header.className = 'text-[11px] font-medium text-scholar-textMuted flex items-center gap-1 pt-2 pb-0.5';
+        header.innerHTML = `<span>非今日排定 / 備用藥 (${otherMeds.length})</span>`;
+        container.appendChild(header);
+
+        otherMeds.forEach(m => container.appendChild(createMedItemEl(m, false)));
+      }
+
+      lucide.createIcons();
+    }
+
+    function openLogMedModal(editId = null) {
+      const modal = document.getElementById('modal-log-med');
+      const title = document.getElementById('modal-log-med-title');
+      const form = document.getElementById('form-log-med');
+      form.reset();
+
+      if (editId) {
+        const log = state.medLogs.find(l => l.id === editId);
+        if (log) {
+          title.innerText = '編輯服藥紀錄';
+          document.getElementById('input-log-med-id').value = log.id;
+          document.getElementById('input-log-med-date').value = log.date;
+          setMedLogPeriod(log.period || '晨起');
+          document.getElementById('input-log-med-memo').value = log.memo || '';
+          const checkedIds = (log.medItems || []).map(m => m.id);
+          renderMedChecklist(log.date, checkedIds);
+        }
+      } else {
+        title.innerText = '記錄服藥';
+        const todayStr = getStandardDateKey();
+        document.getElementById('input-log-med-id').value = '';
+        document.getElementById('input-log-med-date').value = todayStr;
+        
+        const h = new Date().getHours();
+        let defaultPeriod = '晨起';
+        if (h >= 11 && h < 14) defaultPeriod = '午間';
+        else if (h >= 14 && h < 20) defaultPeriod = '晚間';
+        else if (h >= 20 || h < 5) defaultPeriod = '睡前';
+        setMedLogPeriod(defaultPeriod);
+
+        renderMedChecklist(todayStr, null);
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    window.editMedLog = function(id) {
+      openLogMedModal(id);
+    };
+
+    window.deleteMedLog = function(id) {
+      if (confirm('確定要刪除這筆服藥紀錄嗎？')) {
+        state.medLogs = state.medLogs.filter(l => l.id !== id);
+        saveState();
+        renderApp();
+      }
+    };
+
+    function setMedPhotoPreview(dataUrl) {
+      const imgEl = document.getElementById('med-photo-preview');
+      const iconEl = document.getElementById('med-photo-placeholder-icon');
+      const removeBtn = document.getElementById('btn-remove-med-photo');
+      const inputHidden = document.getElementById('input-med-photo');
+
+      if (dataUrl) {
+        imgEl.src = dataUrl;
+        imgEl.classList.remove('hidden');
+        iconEl.classList.add('hidden');
+        removeBtn.classList.remove('hidden');
+        inputHidden.value = dataUrl;
+      } else {
+        imgEl.src = '';
+        imgEl.classList.add('hidden');
+        iconEl.classList.remove('hidden');
+        removeBtn.classList.add('hidden');
+        inputHidden.value = '';
+      }
+    }
+
+    function renderWeekdaySelector(selectedDays = [1, 3, 5]) {
+      const container = document.getElementById('weekday-selector-container');
+      container.innerHTML = '';
+      const days = [
+        { num: 1, label: '一' },
+        { num: 2, label: '二' },
+        { num: 3, label: '三' },
+        { num: 4, label: '四' },
+        { num: 5, label: '五' },
+        { num: 6, label: '六' },
+        { num: 7, label: '日' }
+      ];
+
+      days.forEach(d => {
+        const isSelected = selectedDays.includes(d.num);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `py-1.5 text-xs font-semibold rounded-lg border transition text-center ${
+          isSelected 
+            ? 'bg-scholar-gold text-scholar-navy border-scholar-gold shadow-xs' 
+            : 'bg-scholar-card text-scholar-textMuted border-scholar-border hover:border-scholar-gold/40'
+        }`;
+        btn.innerText = d.label;
+        btn.onclick = () => {
+          if (state.editingMedWeekdays.includes(d.num)) {
+            state.editingMedWeekdays = state.editingMedWeekdays.filter(x => x !== d.num);
+          } else {
+            state.editingMedWeekdays.push(d.num);
+            state.editingMedWeekdays.sort((a, b) => a - b);
+          }
+          renderWeekdaySelector(state.editingMedWeekdays);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function openMedEditModal(medId = null) {
+      const modal = document.getElementById('modal-med-edit');
+      const title = document.getElementById('med-edit-title');
+      const form = document.getElementById('form-med-edit');
+      const sectionWeekdays = document.getElementById('section-med-weekdays');
+      form.reset();
+
+      if (medId) {
+        const med = state.medications.find(m => m.id === medId);
+        if (med) {
+          title.innerText = '編輯藥品資訊';
+          document.getElementById('input-med-id').value = med.id;
+          document.getElementById('input-med-name').value = med.name;
+          document.getElementById('input-med-dosage').value = med.dosage;
+          document.getElementById('select-med-freq-type').value = med.freqType || 'daily';
+          document.getElementById('select-med-timing').value = med.timing;
+          document.getElementById('input-med-notes').value = med.notes || '';
+          setMedPhotoPreview(med.photo || '');
+          
+          state.editingMedWeekdays = med.weekdays ? [...med.weekdays] : [1, 3, 5];
+          if (med.freqType === 'weekly_custom') {
+            sectionWeekdays.classList.remove('hidden');
+          } else {
+            sectionWeekdays.classList.add('hidden');
+          }
+        }
+      } else {
+        title.innerText = '新增常用藥品';
+        document.getElementById('input-med-id').value = '';
+        document.getElementById('select-med-freq-type').value = 'weekly_custom';
+        sectionWeekdays.classList.remove('hidden');
+        setMedPhotoPreview('');
+        state.editingMedWeekdays = [1, 3, 5];
+      }
+
+      renderWeekdaySelector(state.editingMedWeekdays);
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    window.editMedication = function(id) {
+      openMedEditModal(id);
+    };
+
+    window.deleteMedication = function(id) {
+      if (confirm('確定要從藥箱移除此藥品嗎？（不會影響過去已記下的歷史紀錄）')) {
+        state.medications = state.medications.filter(m => m.id !== id);
+        saveState();
+        renderApp();
+      }
+    };
 
     function setHealthPeriod(period) {
       document.getElementById('input-health-period').value = period;
@@ -1290,6 +2038,7 @@
       });
     }
 
+    // ==================== 初始化與事件掛載 ====================
     document.addEventListener('DOMContentLoaded', () => {
       loadStateFromLocal();
       renderApp();
@@ -1298,48 +2047,213 @@
 
       setupFirebaseListener();
 
+      const mainTabHabit = document.getElementById('main-tab-habit');
+      const mainTabHealth = document.getElementById('main-tab-health');
+      mainTabHabit.onclick = () => switchWorkspace('habit');
+      mainTabHealth.onclick = () => switchWorkspace('health');
+
       const tabToday = document.getElementById('view-tab-today');
       const tabGrid = document.getElementById('view-tab-grid');
-      const tabHealth = document.getElementById('view-tab-health');
       const tabStats = document.getElementById('view-tab-stats');
 
       const secToday = document.getElementById('view-today');
       const secGrid = document.getElementById('view-grid');
-      const secHealth = document.getElementById('view-health');
       const secStats = document.getElementById('view-stats');
 
-      function switchTab(target) {
-        [tabToday, tabGrid, tabHealth, tabStats].forEach(t => {
-          t.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg text-scholar-textMuted hover:text-scholar-navy transition whitespace-nowrap text-center';
+      function switchHabitView(target) {
+        [tabToday, tabGrid, tabStats].forEach(t => {
+          t.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-medium rounded-lg text-scholar-textMuted hover:text-scholar-navy transition whitespace-nowrap text-center';
         });
-        [secToday, secGrid, secHealth, secStats].forEach(s => s.classList.add('hidden'));
+        [secToday, secGrid, secStats].forEach(s => s.classList.add('hidden'));
 
         if (target === 'today') {
-          tabToday.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center';
+          tabToday.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center';
           secToday.classList.remove('hidden');
         } else if (target === 'grid') {
-          tabGrid.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center';
+          tabGrid.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center';
           secGrid.classList.remove('hidden');
-        } else if (target === 'health') {
-          tabHealth.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center';
-          secHealth.classList.remove('hidden');
         } else if (target === 'stats') {
-          tabStats.className = 'flex-1 sm:flex-initial px-3 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center';
+          tabStats.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-medium rounded-lg bg-scholar-card text-scholar-navy shadow-xs transition whitespace-nowrap text-center';
           secStats.classList.remove('hidden');
         }
       }
 
-      tabToday.onclick = () => switchTab('today');
-      tabGrid.onclick = () => switchTab('grid');
-      tabHealth.onclick = () => switchTab('health');
-      tabStats.onclick = () => switchTab('stats');
+      tabToday.onclick = () => switchHabitView('today');
+      tabGrid.onclick = () => switchHabitView('grid');
+      tabStats.onclick = () => switchHabitView('stats');
+
+      const subtabBp = document.getElementById('subtab-bp');
+      const subtabMed = document.getElementById('subtab-med');
+      const subviewBp = document.getElementById('subview-bp');
+      const subviewMed = document.getElementById('subview-med');
+
+      subtabBp.onclick = () => {
+        subtabBp.className = 'px-3.5 py-1.5 rounded-lg bg-scholar-card text-scholar-navy font-semibold shadow-xs transition';
+        subtabMed.className = 'px-3.5 py-1.5 rounded-lg text-scholar-textMuted hover:text-scholar-navy transition';
+        subviewBp.classList.remove('hidden');
+        subviewMed.classList.add('hidden');
+      };
+
+      subtabMed.onclick = () => {
+        subtabMed.className = 'px-3.5 py-1.5 rounded-lg bg-scholar-card text-scholar-navy font-semibold shadow-xs transition';
+        subtabBp.className = 'px-3.5 py-1.5 rounded-lg text-scholar-textMuted hover:text-scholar-navy transition';
+        subviewMed.classList.remove('hidden');
+        subviewBp.classList.add('hidden');
+      };
+
+      document.querySelectorAll('.btn-med-period-tab').forEach(btn => {
+        btn.onclick = () => setMedLogPeriod(btn.dataset.period);
+      });
+
+      document.getElementById('input-log-med-date').onchange = (e) => {
+        const val = e.target.value;
+        if (val) {
+          renderMedChecklist(val, null);
+        }
+      };
+
+      const modalLogMed = document.getElementById('modal-log-med');
+      document.getElementById('btn-open-log-med-modal').onclick = () => openLogMedModal();
+      document.getElementById('btn-health-quick-log-med').onclick = () => openLogMedModal();
+      document.getElementById('btn-close-log-med-modal').onclick = () => modalLogMed.classList.add('hidden');
+      document.getElementById('btn-cancel-log-med').onclick = () => modalLogMed.classList.add('hidden');
+
+      document.getElementById('form-log-med').onsubmit = (e) => {
+        e.preventDefault();
+        const id = document.getElementById('input-log-med-id').value;
+        const date = document.getElementById('input-log-med-date').value;
+        const period = document.getElementById('input-log-med-period').value;
+        const memo = document.getElementById('input-log-med-memo').value.trim();
+
+        const checkedCheckboxes = document.querySelectorAll('input[name="selected_med"]:checked');
+        const medItems = Array.from(checkedCheckboxes).map(cb => {
+          const med = state.medications.find(m => m.id === cb.value);
+          return med ? { id: med.id, name: med.name, dosage: med.dosage } : null;
+        }).filter(Boolean);
+
+        if (id) {
+          const item = state.medLogs.find(l => l.id === id);
+          if (item) {
+            item.date = date;
+            item.period = period;
+            item.medItems = medItems;
+            item.memo = memo;
+          }
+        } else {
+          state.medLogs.push({
+            id: 'ml-' + Date.now(),
+            date,
+            period,
+            medItems,
+            memo
+          });
+        }
+
+        saveState();
+        modalLogMed.classList.add('hidden');
+        renderApp();
+      };
+
+      const modalMedManager = document.getElementById('modal-med-manager');
+      document.getElementById('btn-open-med-manager-modal').onclick = () => {
+        renderMedManagerList();
+        modalMedManager.classList.remove('hidden');
+        lucide.createIcons();
+      };
+      document.getElementById('btn-quick-manage-meds').onclick = () => {
+        renderMedManagerList();
+        modalMedManager.classList.remove('hidden');
+        lucide.createIcons();
+      };
+      document.getElementById('btn-close-med-manager').onclick = () => modalMedManager.classList.add('hidden');
+
+      const modalMedEdit = document.getElementById('modal-med-edit');
+      const selectFreqType = document.getElementById('select-med-freq-type');
+      const sectionWeekdays = document.getElementById('section-med-weekdays');
+
+      selectFreqType.onchange = () => {
+        if (selectFreqType.value === 'weekly_custom') {
+          sectionWeekdays.classList.remove('hidden');
+        } else {
+          sectionWeekdays.classList.add('hidden');
+        }
+      };
+
+      const inputPhotoFile = document.getElementById('input-file-med-photo');
+      inputPhotoFile.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+          const compressed = await compressImageFile(file, 300, 300, 0.7);
+          setMedPhotoPreview(compressed);
+        } catch (err) {
+          alert('圖片讀取壓縮失敗，請重新嘗試選擇其他照片。');
+        }
+        inputPhotoFile.value = '';
+      };
+
+      document.getElementById('btn-remove-med-photo').onclick = () => {
+        setMedPhotoPreview('');
+      };
+
+      document.getElementById('btn-open-create-med').onclick = () => openMedEditModal();
+      document.getElementById('btn-close-med-edit').onclick = () => modalMedEdit.classList.add('hidden');
+      document.getElementById('btn-cancel-med-edit').onclick = () => modalMedEdit.classList.add('hidden');
+
+      document.getElementById('form-med-edit').onsubmit = (e) => {
+        e.preventDefault();
+        const id = document.getElementById('input-med-id').value;
+        const name = document.getElementById('input-med-name').value.trim();
+        const dosage = document.getElementById('input-med-dosage').value.trim();
+        const freqType = selectFreqType.value;
+        const timing = document.getElementById('select-med-timing').value;
+        const notes = document.getElementById('input-med-notes').value.trim();
+        const photo = document.getElementById('input-med-photo').value || '';
+
+        if (!name) return;
+
+        const weekdays = freqType === 'weekly_custom' ? [...state.editingMedWeekdays] : [1,2,3,4,5,6,7];
+
+        if (id) {
+          const item = state.medications.find(m => m.id === id);
+          if (item) {
+            item.name = name;
+            item.dosage = dosage;
+            item.freqType = freqType;
+            item.weekdays = weekdays;
+            item.timing = timing;
+            item.notes = notes;
+            item.photo = photo;
+          }
+        } else {
+          state.medications.push({
+            id: 'med-' + Date.now(),
+            name,
+            dosage,
+            freqType,
+            weekdays,
+            timing,
+            notes,
+            photo
+          });
+        }
+
+        saveState();
+        modalMedEdit.classList.add('hidden');
+        renderMedManagerList();
+        
+        const curDate = document.getElementById('input-log-med-date').value || getStandardDateKey();
+        renderMedChecklist(curDate, null);
+        lucide.createIcons();
+      };
 
       document.getElementById('btn-period-morning').onclick = () => setHealthPeriod('晨起');
       document.getElementById('btn-period-evening').onclick = () => setHealthPeriod('晚間');
 
       const modalHealth = document.getElementById('modal-health');
       document.getElementById('btn-open-health-modal').onclick = () => openHealthModal();
-      document.getElementById('btn-add-health-from-view').onclick = () => openHealthModal();
+      document.getElementById('btn-health-quick-log-bp').onclick = () => openHealthModal();
       document.getElementById('btn-close-health-modal').onclick = () => modalHealth.classList.add('hidden');
       document.getElementById('btn-cancel-health').onclick = () => modalHealth.classList.add('hidden');
 
@@ -1511,12 +2425,14 @@
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '2.1',
+          routine_version: '2.5',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,
           logs: state.logs,
-          healthLogs: state.healthLogs
+          healthLogs: state.healthLogs,
+          medications: state.medications,
+          medLogs: state.medLogs
         };
         const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -1540,6 +2456,8 @@
               state.habits = data.habits;
               state.logs = data.logs || {};
               state.healthLogs = data.healthLogs || [];
+              state.medications = data.medications || INITIAL_MEDICATIONS;
+              state.medLogs = data.medLogs || [];
               saveState();
               renderApp();
               alert('備份資料已成功匯入並同步至雲端！');
@@ -1562,12 +2480,15 @@
           state.healthLogs = [
             { id: 'hl-demo-1', date: getStandardDateKey(), period: '晨起', sys: 118, dia: 76, weight: 64.8, pulse: 68, memo: '晨起空腹測量，狀態平穩' }
           ];
+          state.medications = INITIAL_MEDICATIONS;
+          state.medLogs = [];
           saveState();
           renderApp();
           modalData.classList.add('hidden');
         }
       };
 
+      switchWorkspace('habit');
       renderApp();
     });
   </script>

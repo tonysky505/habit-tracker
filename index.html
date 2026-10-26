@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>日常軌跡 · 習慣與健康系統</title>
+  <title>日常軌跡 · 習慣、健康與超慢跑系統</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
@@ -69,6 +69,29 @@
       appearance: none;
       min-height: 2.5rem;
     }
+
+    /* 節拍律動與跑者動畫 */
+    @keyframes jogBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-14px) rotate(-1.5deg); }
+    }
+    @keyframes jogShadow {
+      0%, 100% { transform: scale(1); opacity: 0.28; }
+      50% { transform: scale(0.72); opacity: 0.12; }
+    }
+    .animate-jog-bounce {
+      animation: jogBounce var(--jog-duration, 0.333s) ease-in-out infinite;
+    }
+    .animate-jog-shadow {
+      animation: jogShadow var(--jog-duration, 0.333s) ease-in-out infinite;
+    }
+    .countdown-zoom {
+      animation: zoomInCountdown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes zoomInCountdown {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body class="bg-scholar-paper text-scholar-navy font-sans min-h-screen selection:bg-scholar-gold/20 selection:text-scholar-navy pb-24 antialiased">
@@ -125,6 +148,13 @@
           </button>
         </div>
 
+        <!-- 超慢跑模式按鈕 -->
+        <div id="header-actions-jogging" class="hidden items-center gap-1.5 sm:gap-2">
+          <span class="text-xs text-scholar-textMuted px-2 py-1 rounded-lg bg-scholar-hover font-mono hidden sm:inline">
+            180 BPM 節奏生活
+          </span>
+        </div>
+
         <button id="btn-open-data-modal" class="p-1.5 sm:p-2 rounded-xl border border-scholar-border bg-scholar-card text-scholar-textMuted hover:text-scholar-navy hover:bg-scholar-hover transition shadow-xs" title="資料管理與備份">
           <i data-lucide="database" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
         </button>
@@ -148,14 +178,18 @@
 
   <main class="max-w-5xl mx-auto px-3.5 sm:px-6 pt-3 sm:pt-5 space-y-5 sm:space-y-6">
 
-    <!-- 頂部工作區切換器 -->
+    <!-- 頂部工作區切換器 (3 欄切換) -->
     <section class="flex justify-center">
-      <div class="bg-scholar-hover/90 p-1.5 rounded-2xl border border-scholar-border/80 flex items-center gap-1 w-full sm:w-auto shadow-2xs">
-        <button id="main-tab-habit" class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50">
+      <div class="bg-scholar-hover/90 p-1.5 rounded-2xl border border-scholar-border/80 flex items-center gap-1 w-full sm:w-auto shadow-2xs overflow-x-auto no-scrollbar">
+        <button id="main-tab-habit" class="flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 sm:gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50 whitespace-nowrap">
           <i data-lucide="check-circle-2" class="w-4 h-4 text-scholar-gold"></i>
           <span>習慣實踐</span>
         </button>
-        <button id="main-tab-health" class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 text-scholar-textMuted hover:text-scholar-navy">
+        <button id="main-tab-jogging" class="flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-scholar-textMuted hover:text-scholar-navy whitespace-nowrap">
+          <i data-lucide="footprints" class="w-4 h-4 text-scholar-gold"></i>
+          <span>超慢跑計時</span>
+        </button>
+        <button id="main-tab-health" class="flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-scholar-textMuted hover:text-scholar-navy whitespace-nowrap">
           <i data-lucide="heart-pulse" class="w-4 h-4 text-scholar-gold"></i>
           <span>健康與用藥</span>
         </button>
@@ -284,7 +318,176 @@
       </section>
     </div>
 
-    <!-- ==================== 區塊 B: 健康與用藥專屬工作區 ==================== -->
+    <!-- ==================== 區塊 B: 超慢跑專屬工作區 ==================== -->
+    <div id="workspace-jogging" class="hidden space-y-5 sm:space-y-6">
+
+      <!-- 設定面板 (Setup View) -->
+      <section id="jog-setup-panel" class="bg-scholar-card rounded-2xl p-5 sm:p-7 border border-scholar-border shadow-xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-scholar-border/80 pb-4">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-scholar-navy flex items-center gap-2">
+              <i data-lucide="footprints" class="w-5 h-5 text-scholar-gold"></i>
+              <span>設定超慢跑目標與步頻</span>
+            </h2>
+            <p class="text-xs text-scholar-textMuted mt-1">
+              微笑呼吸、不喘不累，以 180 BPM 保持身體最佳有氧代謝區間。
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-scholar-textMuted bg-scholar-paper px-3 py-1 rounded-xl border border-scholar-border">
+              完成後自動打卡今天習慣
+            </span>
+          </div>
+        </div>
+
+        <!-- 選擇時間 -->
+        <div class="space-y-2.5">
+          <label class="text-xs font-bold text-scholar-navy tracking-wider uppercase flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-scholar-gold"></i>
+            <span>目標運動時間 (分鐘)</span>
+          </label>
+          <div class="grid grid-cols-5 gap-2 sm:gap-3" id="jog-time-selector">
+            <button type="button" data-val="10" class="btn-jog-time py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover">10</button>
+            <button type="button" data-val="15" class="btn-jog-time py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover">15</button>
+            <button type="button" data-val="20" class="btn-jog-time py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-gold text-white border-scholar-gold shadow-xs">20</button>
+            <button type="button" data-val="30" class="btn-jog-time py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover">30</button>
+            <button type="button" data-val="40" class="btn-jog-time py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover">40</button>
+          </div>
+        </div>
+
+        <!-- 選擇步頻 -->
+        <div class="space-y-2.5">
+          <label class="text-xs font-bold text-scholar-navy tracking-wider uppercase flex items-center gap-1.5">
+            <i data-lucide="activity" class="w-3.5 h-3.5 text-scholar-gold"></i>
+            <span>步頻節奏 (BPM / 步頻/分)</span>
+          </label>
+          <div class="grid grid-cols-4 gap-2 sm:gap-3" id="jog-bpm-selector">
+            <button type="button" data-val="150" class="btn-jog-bpm py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover">150</button>
+            <button type="button" data-val="180" class="btn-jog-bpm py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-gold text-white border-scholar-gold shadow-xs">180 (推薦)</button>
+            <button type="button" data-val="190" class="btn-jog-bpm py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover">190</button>
+            <button type="button" data-val="200" class="btn-jog-bpm py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover">200</button>
+          </div>
+        </div>
+
+        <!-- 節拍音效設定 -->
+        <div class="p-4 bg-scholar-paper rounded-2xl border border-scholar-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-scholar-card border border-scholar-border flex items-center justify-center text-scholar-gold shrink-0">
+              <i data-lucide="volume-2" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-scholar-navy">節拍器音色</h4>
+              <p class="text-[11px] text-scholar-textMuted">採用 Web Audio API 物理合成，零延遲清脆敲擊聲</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="select-jog-sound" class="px-3 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-xl text-scholar-navy focus:outline-none focus:border-scholar-gold">
+              <option value="woodblock">清脆禪意木魚 (推薦)</option>
+              <option value="beep">電子短促嗶聲</option>
+              <option value="tick">石板時鐘滴答</option>
+            </select>
+            <button id="btn-test-sound" type="button" class="px-3 py-1.5 text-xs font-semibold bg-scholar-card hover:bg-scholar-hover border border-scholar-border text-scholar-navy rounded-xl transition">
+              試聽
+            </button>
+          </div>
+        </div>
+
+        <button id="btn-start-countdown-sequence" type="button" class="w-full py-3.5 bg-scholar-navy hover:bg-scholar-navy/90 text-scholar-paper text-sm font-bold rounded-2xl transition shadow-md flex items-center justify-center gap-2">
+          <i data-lucide="play" class="w-4 h-4 text-scholar-gold"></i>
+          <span>開始超慢跑 (進入 3 秒預備)</span>
+        </button>
+      </section>
+
+      <!-- 跑步進行中面板 (Running View) -->
+      <section id="jog-running-panel" class="hidden bg-scholar-card rounded-2xl p-5 sm:p-7 border border-scholar-border shadow-xs space-y-6">
+        <div class="text-center space-y-1">
+          <span class="text-xs font-semibold text-scholar-textMuted uppercase tracking-widest">距離完成還有</span>
+          <div id="jog-time-display" class="text-5xl sm:text-6xl font-bold font-mono tracking-tight text-scholar-navy">
+            20:00
+          </div>
+          <div class="max-w-md mx-auto w-full bg-scholar-paper h-2.5 rounded-full overflow-hidden border border-scholar-border mt-3">
+            <div id="jog-progress-bar" class="bg-scholar-gold h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <p id="jog-pct-text" class="text-xs text-scholar-textMuted pt-1">0% 完成</p>
+        </div>
+
+        <!-- 跑步律動動畫區 -->
+        <div class="py-4 flex flex-col items-center justify-center relative">
+          <div id="jog-runner-avatar" class="w-32 h-36 flex items-center justify-center relative transition-transform">
+            <svg class="w-24 h-32" viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="24" r="14" fill="#E2E4DA" stroke="#424642" stroke-width="3"/>
+              <path d="M38 18 C 44 14, 56 14, 62 18" stroke="#C06014" stroke-width="4" stroke-linecap="round"/>
+              <path d="M34 42 L66 42 L58 78 L42 78 Z" fill="#536162" stroke="#424642" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M34 44 L22 62 L32 70" stroke="#424642" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M66 44 L78 58 L72 70" stroke="#424642" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M44 78 L38 106 L48 114" stroke="#424642" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M56 78 L64 102 L56 114" stroke="#C06014" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div id="jog-runner-shadow" class="w-20 h-3 rounded-full bg-scholar-navy/20 mt-1 blur-2xs transition-all"></div>
+        </div>
+
+        <!-- 即時調節步頻按鈕列 -->
+        <div class="bg-scholar-paper p-3 sm:p-4 rounded-2xl border border-scholar-border space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-scholar-navy flex items-center gap-1.5">
+              <i data-lucide="gauge" class="w-4 h-4 text-scholar-gold"></i>
+              <span>跑步中即時切換步頻</span>
+            </span>
+            <span id="jog-current-bpm-badge" class="font-bold text-scholar-navy bg-scholar-card px-2 py-0.5 rounded-md border border-scholar-border">180 BPM</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="changeJogBpmRunning(150)" class="btn-live-bpm py-2 rounded-xl text-xs font-semibold border transition bg-scholar-card text-scholar-navy border-scholar-border">150</button>
+            <button type="button" onclick="changeJogBpmRunning(180)" class="btn-live-bpm py-2 rounded-xl text-xs font-semibold border transition bg-scholar-gold text-white border-scholar-gold shadow-xs">180</button>
+            <button type="button" onclick="changeJogBpmRunning(190)" class="btn-live-bpm py-2 rounded-xl text-xs font-semibold border transition bg-scholar-card text-scholar-navy border-scholar-border">190</button>
+            <button type="button" onclick="changeJogBpmRunning(200)" class="btn-live-bpm py-2 rounded-xl text-xs font-semibold border transition bg-scholar-card text-scholar-navy border-scholar-border">200</button>
+          </div>
+        </div>
+
+        <!-- 控制按鈕區 (暫停 / 繼續 / 結束) -->
+        <div class="pt-2">
+          <div id="jog-ctrl-running" class="block">
+            <button id="btn-pause-jog" type="button" class="w-full py-3.5 bg-scholar-navy hover:bg-scholar-navy/90 text-scholar-paper text-sm font-bold rounded-2xl transition shadow-md flex items-center justify-center gap-2">
+              <i data-lucide="pause" class="w-4 h-4 text-scholar-gold"></i>
+              <span>暫停超慢跑</span>
+            </button>
+          </div>
+
+          <div id="jog-ctrl-paused" class="hidden grid grid-cols-2 gap-3">
+            <button id="btn-resume-jog" type="button" class="py-3.5 bg-scholar-gold hover:bg-scholar-gold/90 text-white text-sm font-bold rounded-2xl transition shadow-md flex items-center justify-center gap-2">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span>繼續跑步 (倒數3秒)</span>
+            </button>
+            <button id="btn-finish-jog" type="button" class="py-3.5 bg-scholar-paper hover:bg-red-50 border border-scholar-border hover:border-red-300 text-scholar-navy hover:text-red-700 text-sm font-bold rounded-2xl transition flex items-center justify-center gap-2">
+              <i data-lucide="check-square" class="w-4 h-4 text-scholar-gold"></i>
+              <span>結束並記錄</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 實踐分段與歷史紀錄 -->
+      <section class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs space-y-3.5">
+        <div class="flex items-center justify-between border-b border-scholar-border/70 pb-2.5">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-scholar-gold/15 text-scholar-navy flex items-center justify-center">
+              <i data-lucide="history" class="w-4 h-4 text-scholar-gold"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-scholar-navy">實踐分段與歷史紀錄</h3>
+              <p class="text-[11px] text-scholar-textMuted">自動上傳雲端與記錄每次累積跑量</p>
+            </div>
+          </div>
+          <button id="btn-clear-all-jog-logs" type="button" class="text-xs text-scholar-textMuted hover:text-scholar-navy transition">
+            全部清空
+          </button>
+        </div>
+
+        <div id="jog-history-list" class="space-y-2"></div>
+      </section>
+    </div>
+
+    <!-- ==================== 區塊 C: 健康與用藥專屬工作區 ==================== -->
     <div id="workspace-health" class="hidden space-y-5 sm:space-y-6">
 
       <!-- 處方箋循環進度看板 -->
@@ -310,10 +513,8 @@
           </div>
         </div>
 
-        <!-- 進行中的循環容器 -->
         <div id="active-cycles-container" class="space-y-3"></div>
 
-        <!-- 歷史歸檔抽屜 (預設收合) -->
         <div id="archived-cycles-drawer" class="hidden pt-3 border-t border-dashed border-scholar-border space-y-2.5">
           <h3 class="text-xs font-semibold text-scholar-textMuted flex items-center gap-1.5">
             <i data-lucide="archive" class="w-3.5 h-3.5"></i>
@@ -446,6 +647,59 @@
 
   </main>
 
+  <!-- 全螢幕 3 秒預備倒數覆蓋層 -->
+  <div id="modal-jog-countdown" class="fixed inset-0 z-[120] flex items-center justify-center bg-scholar-navy/85 backdrop-blur-md hidden">
+    <div class="flex flex-col items-center justify-center p-6 text-center max-w-sm w-full">
+      <p id="jog-countdown-title" class="text-scholar-gold text-sm sm:text-base font-bold text-center tracking-normal mb-6">
+        超慢跑準備出發
+      </p>
+      
+      <div class="w-40 h-40 rounded-full border-4 border-scholar-gold/60 bg-scholar-paper/10 flex items-center justify-center shadow-2xl relative p-2 overflow-hidden">
+        <span id="jog-countdown-number" class="text-6xl sm:text-7xl font-black text-white font-mono leading-none tracking-tight block text-center">
+          3
+        </span>
+      </div>
+
+      <p id="jog-countdown-tip" class="text-xs sm:text-sm text-scholar-paper/90 text-center mt-6">
+        保持挺胸、縮小腹、步伐輕巧微曲膝
+      </p>
+    </div>
+  </div>
+
+  <!-- 超慢跑結算彈窗 -->
+  <div id="modal-jog-summary" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-scholar-navy/80 backdrop-blur-sm hidden">
+    <div class="bg-scholar-card rounded-3xl border border-scholar-border shadow-2xl w-full max-w-md p-6 text-center space-y-4">
+      <div class="w-12 h-12 rounded-2xl bg-scholar-gold/15 text-scholar-gold flex items-center justify-center mx-auto">
+        <i data-lucide="award" class="w-7 h-7"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-scholar-navy">太棒了！超慢跑實踐完成</h3>
+        <p class="text-xs text-scholar-textMuted mt-0.5">「今日習慣」已自動為您勾選打卡</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 bg-scholar-paper p-3.5 rounded-2xl border border-scholar-border text-center">
+        <div>
+          <span class="text-[10px] text-scholar-textMuted block">實際跑量</span>
+          <span id="summary-run-time" class="text-sm sm:text-base font-bold text-scholar-navy font-mono">0 分 0 秒</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-scholar-textMuted block">平均步頻</span>
+          <span id="summary-run-bpm" class="text-sm sm:text-base font-bold text-scholar-navy font-mono">180 BPM</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-scholar-textMuted block">預估消耗</span>
+          <span id="summary-run-kcal" class="text-sm sm:text-base font-bold text-scholar-navy font-mono">0 kcal</span>
+        </div>
+      </div>
+
+      <div id="summary-splits-section" class="text-left text-xs text-scholar-textMuted space-y-1 bg-scholar-paper/50 p-2.5 rounded-xl border border-scholar-border/60 max-h-24 overflow-y-auto"></div>
+
+      <button id="btn-close-jog-summary" type="button" class="w-full py-2.5 bg-scholar-navy text-scholar-paper text-xs font-semibold rounded-xl hover:bg-scholar-navy/90 transition shadow-xs">
+        確認收錄紀錄
+      </button>
+    </div>
+  </div>
+
   <!-- 圖片檢視放大燈箱 -->
   <div id="modal-image-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-scholar-navy/85 backdrop-blur-md hidden" onclick="closeImageLightbox()">
     <div class="max-w-xs sm:max-w-md w-full bg-scholar-card p-3 rounded-2xl border border-scholar-border shadow-2xl relative" onclick="event.stopPropagation()">
@@ -475,7 +729,6 @@
           <input type="text" id="input-cycle-title" required placeholder="例如：2026 Q4 心血管慢箋循環" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
         </div>
 
-        <!-- 第二次領藥區間 -->
         <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-scholar-navy flex items-center gap-1.5">
@@ -495,7 +748,6 @@
           </div>
         </div>
 
-        <!-- 第三次領藥區間 -->
         <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-scholar-navy flex items-center gap-1.5">
@@ -515,7 +767,6 @@
           </div>
         </div>
 
-        <!-- 抽血檢驗 (可選) -->
         <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-scholar-navy flex items-center gap-1.5">
@@ -539,7 +790,6 @@
           </div>
         </div>
 
-        <!-- 下次醫師回診日 -->
         <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-scholar-navy flex items-center gap-1.5">
@@ -819,7 +1069,7 @@
 
         <div>
           <label class="block text-xs font-medium text-scholar-navy mb-1">習慣名稱</label>
-          <input type="text" id="input-habit-title" required placeholder="例如：每日超慢跑 20 分鐘" class="w-full px-3.5 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
+          <input type="text" id="input-habit-title" required placeholder="例如：每日超慢跑 20-30 分鐘" class="w-full px-3.5 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
         </div>
 
         <div>
@@ -941,7 +1191,7 @@
 
         <div class="pt-2 border-t border-scholar-border flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-scholar-navy hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v3.3 (Auth Edition)</span>
+          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v3.5 (Jogging Edition)</span>
         </div>
       </div>
     </div>
@@ -990,7 +1240,7 @@
       }
     }
 
-    // ==================== 大地陶褐與深岩灰色票 ====================
+    // ==================== 色票與初始定義 ====================
     const PALETTE = [
       { color: '#C06014', name: '琥珀陶褐' },
       { color: '#424642', name: '深炭墨灰' },
@@ -1028,6 +1278,7 @@
       medications: [],
       medLogs: [],
       prescriptionCycles: [],
+      jogLogs: [],          /* 超慢跑歷史紀錄 (同步入 Firestore) */
       activeCategory: 'all',
       gridOffsetDays: 0,
       activeHealthTab: 'bp',
@@ -1035,6 +1286,402 @@
       showArchivedCycles: false
     };
 
+    // ==================== WEB AUDIO 物理合成音效引擎 ====================
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playSynthesizedBeat(soundType = 'woodblock') {
+      try {
+        const ctx = getAudioContext();
+        const t = ctx.currentTime;
+
+        if (soundType === 'beep') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, t);
+          gain.gain.setValueAtTime(0.3, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.09);
+        } else if (soundType === 'tick') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(1400, t);
+          gain.gain.setValueAtTime(0.25, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.05);
+        } else {
+          // 清脆禪意木魚音效
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(740, t);
+          osc.frequency.exponentialRampToValueAtTime(420, t + 0.06);
+
+          gain.gain.setValueAtTime(0.5, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.09);
+        }
+      } catch (err) {
+        console.warn('音效播放提示：', err);
+      }
+    }
+
+    function playCountdownBeep(isHigh = false) {
+      try {
+        const ctx = getAudioContext();
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(isHigh ? 1200 : 800, t);
+        gain.gain.setValueAtTime(0.4, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + (isHigh ? 0.35 : 0.18));
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + (isHigh ? 0.36 : 0.2));
+      } catch (e) {}
+    }
+
+    // ==================== 超慢跑計時與節拍核心邏輯 ====================
+    let jogConfig = {
+      targetMinutes: 20,
+      bpm: 180,
+      sound: 'woodblock'
+    };
+
+    let jogSession = {
+      state: 'idle',       // 'idle' | 'running' | 'paused'
+      totalTargetSeconds: 20 * 60,
+      remainingSeconds: 20 * 60,
+      accumulatedSeconds: 0,
+      splits: [],
+      timerInterval: null,
+      beatInterval: null
+    };
+
+    function updateRunnerAnimationSpeed(bpm) {
+      const runner = document.getElementById('jog-runner-avatar');
+      const shadow = document.getElementById('jog-runner-shadow');
+      if (!runner || !shadow) return;
+      const duration = (60 / bpm).toFixed(3);
+      runner.style.setProperty('--jog-duration', `${duration}s`);
+      shadow.style.setProperty('--jog-duration', `${duration}s`);
+    }
+
+    function startBeatMetronome() {
+      if (jogSession.beatInterval) clearInterval(jogSession.beatInterval);
+      const intervalMs = (60 / jogConfig.bpm) * 1000;
+      playSynthesizedBeat(jogConfig.sound);
+
+      jogSession.beatInterval = setInterval(() => {
+        if (jogSession.state === 'running') {
+          playSynthesizedBeat(jogConfig.sound);
+        }
+      }, intervalMs);
+    }
+
+    function stopBeatMetronome() {
+      if (jogSession.beatInterval) {
+        clearInterval(jogSession.beatInterval);
+        jogSession.beatInterval = null;
+      }
+    }
+
+    function updateJogTimerDisplay() {
+      const display = document.getElementById('jog-time-display');
+      const pBar = document.getElementById('jog-progress-bar');
+      const pText = document.getElementById('jog-pct-text');
+      if (!display) return;
+
+      const m = Math.floor(jogSession.remainingSeconds / 60);
+      const s = jogSession.remainingSeconds % 60;
+      display.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+      const pct = Math.min(100, Math.round((jogSession.accumulatedSeconds / jogSession.totalTargetSeconds) * 100));
+      if (pBar) pBar.style.width = `${pct}%`;
+      if (pText) pText.innerText = `${pct}% 完成 · 已跑 ${formatSecondsToMinSec(jogSession.accumulatedSeconds)}`;
+    }
+
+    function formatSecondsToMinSec(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m} 分 ${s} 秒`;
+    }
+
+    function runThreeSecondCountdown(mode = 'start', onComplete) {
+      const modal = document.getElementById('modal-jog-countdown');
+      const titleEl = document.getElementById('jog-countdown-title');
+      const numEl = document.getElementById('jog-countdown-number');
+      const tipEl = document.getElementById('jog-countdown-tip');
+
+      modal.classList.remove('hidden');
+
+      if (mode === 'start') {
+        titleEl.innerText = '超慢跑準備出發';
+        tipEl.innerText = '保持挺胸、縮小腹、步伐輕巧微曲膝';
+      } else {
+        titleEl.innerText = '即將恢復超慢跑';
+        tipEl.innerText = '準備跟上節奏，步伐輕巧不重踩';
+      }
+
+      let count = 3;
+      numEl.innerText = count;
+      numEl.className = 'text-6xl sm:text-7xl font-black text-white font-mono leading-none tracking-tight block text-center countdown-zoom';
+      playCountdownBeep(false);
+
+      const countInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          numEl.innerText = count;
+          numEl.className = 'text-6xl sm:text-7xl font-black text-white font-mono leading-none tracking-tight block text-center countdown-zoom';
+          playCountdownBeep(false);
+        } else if (count === 0) {
+          numEl.innerText = mode === 'start' ? 'GO!' : 'RUN!';
+          numEl.className = 'text-3xl sm:text-4xl font-black text-scholar-gold font-mono leading-none tracking-tight block text-center whitespace-nowrap countdown-zoom';
+          playCountdownBeep(true);
+        } else {
+          clearInterval(countInterval);
+          modal.classList.add('hidden');
+          if (onComplete) onComplete();
+        }
+      }, 1000);
+    }
+
+    function handleStartJogging() {
+      getAudioContext();
+      jogSession.totalTargetSeconds = jogConfig.targetMinutes * 60;
+      jogSession.remainingSeconds = jogSession.totalTargetSeconds;
+      jogSession.accumulatedSeconds = 0;
+      jogSession.splits = [];
+
+      runThreeSecondCountdown('start', () => {
+        jogSession.state = 'running';
+        document.getElementById('jog-setup-panel').classList.add('hidden');
+        document.getElementById('jog-running-panel').classList.remove('hidden');
+
+        document.getElementById('jog-ctrl-running').classList.remove('hidden');
+        document.getElementById('jog-ctrl-paused').classList.add('hidden');
+
+        const runner = document.getElementById('jog-runner-avatar');
+        const shadow = document.getElementById('jog-runner-shadow');
+        runner.classList.add('animate-jog-bounce');
+        shadow.classList.add('animate-jog-shadow');
+
+        updateRunnerAnimationSpeed(jogConfig.bpm);
+        updateJogTimerDisplay();
+        startBeatMetronome();
+
+        jogSession.timerInterval = setInterval(() => {
+          if (jogSession.state === 'running') {
+            jogSession.accumulatedSeconds++;
+            if (jogSession.remainingSeconds > 0) {
+              jogSession.remainingSeconds--;
+            }
+            updateJogTimerDisplay();
+
+            if (jogSession.remainingSeconds <= 0) {
+              handleRunFinished(true);
+            }
+          }
+        }, 1000);
+      });
+    }
+
+    function handlePauseJogging() {
+      if (jogSession.state !== 'running') return;
+      jogSession.state = 'paused';
+      stopBeatMetronome();
+
+      const runner = document.getElementById('jog-runner-avatar');
+      const shadow = document.getElementById('jog-runner-shadow');
+      runner.classList.remove('animate-jog-bounce');
+      shadow.classList.remove('animate-jog-shadow');
+
+      document.getElementById('jog-ctrl-running').classList.add('hidden');
+      document.getElementById('jog-ctrl-paused').classList.remove('hidden');
+    }
+
+    function handleResumeJogging() {
+      if (jogSession.state !== 'paused') return;
+
+      runThreeSecondCountdown('resume', () => {
+        jogSession.splits.push(jogSession.accumulatedSeconds);
+
+        jogSession.state = 'running';
+        document.getElementById('jog-ctrl-running').classList.remove('hidden');
+        document.getElementById('jog-ctrl-paused').classList.add('hidden');
+
+        const runner = document.getElementById('jog-runner-avatar');
+        const shadow = document.getElementById('jog-runner-shadow');
+        runner.classList.add('animate-jog-bounce');
+        shadow.classList.add('animate-jog-shadow');
+
+        updateRunnerAnimationSpeed(jogConfig.bpm);
+        startBeatMetronome();
+      });
+    }
+
+    function handleRunFinished(isCompletedNaturally = false) {
+      if (jogSession.timerInterval) clearInterval(jogSession.timerInterval);
+      stopBeatMetronome();
+
+      const runner = document.getElementById('jog-runner-avatar');
+      const shadow = document.getElementById('jog-runner-shadow');
+      runner.classList.remove('animate-jog-bounce');
+      shadow.classList.remove('animate-jog-shadow');
+
+      const actualSec = jogSession.accumulatedSeconds;
+      const todayStr = getStandardDateKey();
+      const kcal = Math.round((actualSec / 60) * 6.5);
+
+      const jogHabit = state.habits.find(h => h.title.includes('超慢跑') || h.title.includes('慢跑'));
+      if (jogHabit) {
+        if (!state.logs[todayStr]) state.logs[todayStr] = {};
+        state.logs[todayStr][jogHabit.id] = true;
+      }
+
+      const newLog = {
+        id: 'jog-' + Date.now(),
+        date: todayStr,
+        actualSeconds: actualSec,
+        targetMinutes: jogConfig.targetMinutes,
+        bpm: jogConfig.bpm,
+        splitsCount: jogSession.splits.length + 1,
+        splits: [...jogSession.splits, actualSec],
+        kcal: kcal,
+        completedNaturally: isCompletedNaturally
+      };
+
+      if (!state.jogLogs) state.jogLogs = [];
+      state.jogLogs.unshift(newLog);
+      saveState();
+
+      const summaryModal = document.getElementById('modal-jog-summary');
+      document.getElementById('summary-run-time').innerText = formatSecondsToMinSec(actualSec);
+      document.getElementById('summary-run-bpm').innerText = `${jogConfig.bpm} BPM`;
+      document.getElementById('summary-run-kcal').innerText = `${kcal} kcal`;
+
+      const splitsContainer = document.getElementById('summary-splits-section');
+      splitsContainer.innerHTML = '';
+      if (jogSession.splits.length > 0) {
+        const splitText = jogSession.splits.map((s, idx) => `分段 ${idx + 1}: ${formatSecondsToMinSec(s)}`).join(' ➔ ');
+        splitsContainer.innerHTML = `<span class="font-bold text-scholar-navy block">分段歷程：</span><span>${splitText}</span>`;
+      } else {
+        splitsContainer.innerHTML = `<span>無暫停，一氣呵成！</span>`;
+      }
+
+      summaryModal.classList.remove('hidden');
+
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 50,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#C06014', '#424642', '#536162', '#F3F4ED']
+        });
+      }
+
+      jogSession.state = 'idle';
+      document.getElementById('jog-running-panel').classList.add('hidden');
+      document.getElementById('jog-setup-panel').classList.remove('hidden');
+
+      renderApp();
+    }
+
+    window.changeJogBpmRunning = function(bpm) {
+      jogConfig.bpm = bpm;
+      document.querySelectorAll('.btn-live-bpm').forEach(b => {
+        if (parseInt(b.innerText) === bpm) {
+          b.className = 'btn-live-bpm py-2 rounded-xl text-xs font-semibold border transition bg-scholar-gold text-white border-scholar-gold shadow-xs';
+        } else {
+          b.className = 'btn-live-bpm py-2 rounded-xl text-xs font-semibold border transition bg-scholar-card text-scholar-navy border-scholar-border';
+        }
+      });
+      document.getElementById('jog-current-bpm-badge').innerText = `${bpm} BPM`;
+      updateRunnerAnimationSpeed(bpm);
+      if (jogSession.state === 'running') {
+        startBeatMetronome();
+      }
+    };
+
+    function renderJogHistory() {
+      const container = document.getElementById('jog-history-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const list = state.jogLogs || [];
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="py-6 text-center text-xs text-scholar-textMuted bg-scholar-paper rounded-xl border border-dashed border-scholar-border">
+            尚無慢跑實踐紀錄，點擊上方按鈕開始今天的第一趟超慢跑！
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach(log => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-3 rounded-xl bg-scholar-paper border border-scholar-border';
+        item.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-scholar-card border border-scholar-border flex items-center justify-center text-scholar-gold shrink-0">
+              <i data-lucide="footprints" class="w-4 h-4"></i>
+            </div>
+            <div class="truncate">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-scholar-navy">${formatSecondsToMinSec(log.actualSeconds)}</span>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-scholar-card border border-scholar-border text-scholar-navy font-semibold">目標 ${log.targetMinutes} 分</span>
+                <span class="text-[10px] text-scholar-textMuted font-mono">約 ${log.kcal} kcal</span>
+              </div>
+              <span class="text-[11px] text-scholar-textMuted block mt-0.5 truncate font-mono">
+                ${log.date} · 步頻 ${log.bpm} BPM · 分段 ${log.splitsCount || 1} 次
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0 pl-2">
+            <button onclick="deleteSingleJogLog('${log.id}')" type="button" class="p-1.5 text-scholar-silver hover:text-red-600 rounded-lg transition" title="刪除單筆紀錄">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    window.deleteSingleJogLog = function(id) {
+      if (confirm('確定要刪除這筆超慢跑紀錄嗎？')) {
+        state.jogLogs = (state.jogLogs || []).filter(l => l.id !== id);
+        saveState();
+        renderJogHistory();
+      }
+    };
+
+    // ==================== 基礎狀態與資料庫保存 ====================
     function getStandardDateKey(dateObj = new Date()) {
       const year = dateObj.getFullYear();
       const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1084,7 +1731,6 @@
           img.onload = () => {
             let width = img.width;
             let height = img.height;
-
             if (width > height) {
               if (width > maxWidth) {
                 height = Math.round((height * maxWidth) / width);
@@ -1096,15 +1742,12 @@
                 height = maxHeight;
               }
             }
-
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-
-            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-            resolve(compressedBase64);
+            resolve(canvas.toDataURL('image/jpeg', quality));
           };
           img.onerror = (err) => reject(err);
         };
@@ -1135,14 +1778,16 @@
         const medData = localStorage.getItem('routine_medications');
         const medLogData = localStorage.getItem('routine_med_logs');
         const cycleData = localStorage.getItem('routine_prescription_cycles');
+        const jogData = localStorage.getItem('routine_jog_logs');
 
         state.categories = catData ? JSON.parse(catData) : INITIAL_CATEGORIES;
         state.habits = habitData ? JSON.parse(habitData) : INITIAL_HABITS;
         state.logs = logData ? JSON.parse(logData) : {};
         state.healthLogs = healthData ? JSON.parse(healthData) : [];
-        state.medications = medData ? JSON.parse(medData) : INITIAL_MEDICATIONS;
+        state.medications = medData ? JSON.parse(medMedications(medData)) : INITIAL_MEDICATIONS;
         state.medLogs = medLogData ? JSON.parse(medLogData) : [];
         state.prescriptionCycles = cycleData ? JSON.parse(cycleData) : [];
+        state.jogLogs = jogData ? JSON.parse(jogData) : [];
       } catch (e) {
         state.categories = INITIAL_CATEGORIES;
         state.habits = INITIAL_HABITS;
@@ -1151,7 +1796,12 @@
         state.medications = INITIAL_MEDICATIONS;
         state.medLogs = [];
         state.prescriptionCycles = [];
+        state.jogLogs = [];
       }
+    }
+
+    function medMedications(val) {
+      try { return JSON.parse(val); } catch(e) { return INITIAL_MEDICATIONS; }
     }
 
     function saveState(skipCloud = false) {
@@ -1162,6 +1812,7 @@
       localStorage.setItem('routine_medications', JSON.stringify(state.medications));
       localStorage.setItem('routine_med_logs', JSON.stringify(state.medLogs));
       localStorage.setItem('routine_prescription_cycles', JSON.stringify(state.prescriptionCycles));
+      localStorage.setItem('routine_jog_logs', JSON.stringify(state.jogLogs));
 
       if (!skipCloud && syncDocRef && currentUser) {
         setSyncStatus('syncing', '正在儲存...');
@@ -1173,6 +1824,7 @@
           medications: state.medications,
           medLogs: state.medLogs,
           prescriptionCycles: state.prescriptionCycles,
+          jogLogs: state.jogLogs,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true })
         .then(() => {
@@ -1207,6 +1859,7 @@
           state.medications = data.medications || INITIAL_MEDICATIONS;
           state.medLogs = data.medLogs || [];
           state.prescriptionCycles = data.prescriptionCycles || [];
+          state.jogLogs = data.jogLogs || [];
 
           saveState(true);
           renderApp();
@@ -1282,34 +1935,46 @@
     function switchWorkspace(workspace) {
       state.activeWorkspace = workspace;
       const tabHabit = document.getElementById('main-tab-habit');
+      const tabJogging = document.getElementById('main-tab-jogging');
       const tabHealth = document.getElementById('main-tab-health');
+
       const wsHabit = document.getElementById('workspace-habit');
+      const wsJogging = document.getElementById('workspace-jogging');
       const wsHealth = document.getElementById('workspace-health');
+
       const headerHabit = document.getElementById('header-actions-habit');
+      const headerJogging = document.getElementById('header-actions-jogging');
       const headerHealth = document.getElementById('header-actions-health');
 
+      [tabHabit, tabJogging, tabHealth].forEach(t => {
+        t.className = 'flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-scholar-textMuted hover:text-scholar-navy whitespace-nowrap';
+      });
+      [wsHabit, wsJogging, wsHealth].forEach(w => w.classList.add('hidden'));
+      [headerHabit, headerJogging, headerHealth].forEach(h => {
+        h.classList.add('hidden');
+        h.classList.remove('flex');
+      });
+
       if (workspace === 'habit') {
-        tabHabit.className = 'flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50';
-        tabHealth.className = 'flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 text-scholar-textMuted hover:text-scholar-navy';
+        tabHabit.className = 'flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 sm:gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50 whitespace-nowrap';
         wsHabit.classList.remove('hidden');
-        wsHealth.classList.add('hidden');
         headerHabit.classList.remove('hidden');
         headerHabit.classList.add('flex');
-        headerHealth.classList.add('hidden');
-        headerHealth.classList.remove('flex');
+      } else if (workspace === 'jogging') {
+        tabJogging.className = 'flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 sm:gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50 whitespace-nowrap';
+        wsJogging.classList.remove('hidden');
+        headerJogging.classList.remove('hidden');
+        headerJogging.classList.add('flex');
+        renderJogHistory();
       } else {
-        tabHealth.className = 'flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50';
-        tabHabit.className = 'flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 text-scholar-textMuted hover:text-scholar-navy';
+        tabHealth.className = 'flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 sm:gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50 whitespace-nowrap';
         wsHealth.classList.remove('hidden');
-        wsHabit.classList.add('hidden');
         headerHealth.classList.remove('hidden');
         headerHealth.classList.add('flex');
-        headerHabit.classList.add('hidden');
-        headerHabit.classList.remove('flex');
       }
     }
 
-    // ==================== 處方箋循環 (Cycle) 渲染與歸檔邏輯 ====================
+    // ==================== 處方循環與用藥檢查 ====================
     function renderPrescriptionCycles() {
       const activeContainer = document.getElementById('active-cycles-container');
       const archivedList = document.getElementById('archived-cycles-list');
@@ -1461,12 +2126,10 @@
             ${actionButtons}
           </div>
         </div>
-
         <div class="space-y-2">
           ${stepsHtml}
         </div>
       `;
-
       return card;
     }
 
@@ -1478,11 +2141,10 @@
       else if (stepKey === 'refill3') cycle.refill3.done = !cycle.refill3.done;
       else if (stepKey === 'blood' && cycle.blood) cycle.blood.done = !cycle.blood.done;
       else if (stepKey === 'clinic') {
-        const willBeDone = !cycle.clinic.done;
-        cycle.clinic.done = willBeDone;
-        
-        if (willBeDone) {
-          if (confirm('恭喜完成本次處方循環的所有就醫任務！是否將此週期「封存歸檔」，移出當前排程畫面？（可在歷史歸檔中隨時查閱）')) {
+        const willDone = !cycle.clinic.done;
+        cycle.clinic.done = willDone;
+        if (willDone) {
+          if (confirm('恭喜完成本次處方循環的所有就醫任務！是否將此週期「封存歸檔」，移出當前排程畫面？')) {
             cycle.isArchived = true;
           }
         } else {
@@ -1502,9 +2164,7 @@
       const cycle = state.prescriptionCycles.find(c => c.id === cycleId);
       if (cycle) {
         cycle.isArchived = false;
-        if (cycle.clinic) {
-          cycle.clinic.done = false;
-        }
+        if (cycle.clinic) cycle.clinic.done = false;
         saveState();
         renderApp();
       }
@@ -1526,18 +2186,15 @@
           document.getElementById('input-cycle-refill2-end').value = c.refill2.end;
           document.getElementById('input-cycle-refill3-start').value = c.refill3.start;
           document.getElementById('input-cycle-refill3-end').value = c.refill3.end;
-          
           document.getElementById('input-cycle-blood-enable').checked = !!c.blood?.enabled;
           document.getElementById('input-cycle-blood-date').value = c.blood?.date || '';
           document.getElementById('input-cycle-blood-notes').value = c.blood?.notes || '';
-          
           document.getElementById('input-cycle-clinic-date').value = c.clinic.date;
           document.getElementById('input-cycle-clinic-notes').value = c.clinic.notes || '';
         }
       } else {
         title.innerText = '建立處方箋循環 (從回診到下次就醫)';
         document.getElementById('input-cycle-id').value = '';
-        
         const d = new Date();
         const y = d.getFullYear();
         const m = d.getMonth() + 1;
@@ -1572,7 +2229,6 @@
       }
     };
 
-    // ==================== 今日用藥狀態檢視看板 ====================
     function renderTodayMedChecklistDashboard() {
       const container = document.getElementById('today-med-checklist-cards');
       const summaryBadge = document.getElementById('today-med-summary-badge');
@@ -1661,7 +2317,6 @@
             ${statusActionHtml}
           </div>
         `;
-
         container.appendChild(card);
       });
 
@@ -1672,7 +2327,6 @@
         summaryBadge.innerText = `待服用 ${todayScheduledMeds.length - completedCount} 項 (已服 ${completedCount}/${todayScheduledMeds.length})`;
         summaryBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-scholar-paper border border-scholar-border text-scholar-navy';
       }
-
       lucide.createIcons();
     }
 
@@ -1711,21 +2365,19 @@
     window.undoSingleMedLog = function(medId, medName) {
       if (confirm(`確定要取消今日「${medName}」的服藥紀錄嗎？`)) {
         const todayStr = getStandardDateKey();
-        
         state.medLogs = state.medLogs.map(log => {
           if (log.date === todayStr) {
             log.medItems = (log.medItems || []).filter(m => m.id !== medId);
           }
           return log;
-        }).filter(log => {
-          return log.medItems && log.medItems.length > 0;
-        });
+        }).filter(log => log.medItems && log.medItems.length > 0);
 
         saveState();
         renderApp();
       }
     };
 
+    // ==================== 主渲染流程 ====================
     function renderApp() {
       renderCategoryFilters();
       renderTodayHabits();
@@ -1845,11 +2497,22 @@
         const isDone = !!todayLogs[habit.id];
         const category = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#C06014' };
         const streak = calculateHabitStreak(habit.id);
+        const isJogHabit = habit.title.includes('超慢跑') || habit.title.includes('慢跑');
 
         const card = document.createElement('div');
         card.className = `group bg-scholar-card rounded-2xl p-3.5 sm:p-4 border transition-all duration-300 shadow-xs flex items-center justify-between ${
           isDone ? 'border-scholar-gold/40 bg-scholar-hover/30' : 'border-scholar-border hover:border-scholar-navy/30'
         }`;
+
+        let jogActionBtn = '';
+        if (isJogHabit) {
+          jogActionBtn = `
+            <button onclick="switchWorkspace('jogging')" type="button" class="p-1 px-2 text-[10px] font-semibold bg-scholar-gold/15 hover:bg-scholar-gold/25 border border-scholar-gold/30 text-scholar-navy rounded-lg transition flex items-center gap-1 shrink-0" title="進入超慢跑伴跑計時">
+              <i data-lucide="play" class="w-3 h-3 text-scholar-gold"></i>
+              <span class="hidden xs:inline">伴跑</span>
+            </button>
+          `;
+        }
 
         card.innerHTML = `
           <div class="flex items-center gap-3 min-w-0">
@@ -1872,6 +2535,7 @@
           </div>
 
           <div class="flex items-center gap-1.5 pl-2 shrink-0">
+            ${jogActionBtn}
             <span class="text-[10px] sm:text-[11px] font-medium px-2 py-0.5 bg-scholar-paper border border-scholar-border text-scholar-navy rounded-lg flex items-center gap-1" title="連續天數">
               <i data-lucide="flame" class="w-3.5 h-3.5 text-scholar-gold"></i>
               <span>${streak}天</span>
@@ -2343,7 +3007,6 @@
 
         otherMeds.forEach(m => container.appendChild(createMedItemEl(m, false)));
       }
-
       lucide.createIcons();
     }
 
@@ -2667,7 +3330,7 @@
       });
     }
 
-    // ==================== 初始化與事件掛載 ====================
+    // ==================== 初始化與 DOM 事件綁定 ====================
     document.addEventListener('DOMContentLoaded', () => {
       loadStateFromLocal();
       renderApp();
@@ -2719,7 +3382,6 @@
         });
       }
 
-      // 登入按鈕點擊觸發 Google Popup 登入
       document.getElementById('btn-login').onclick = () => {
         if (!auth) {
           alert('Firebase Auth 模組尚未準備就緒，請檢查網路連線。');
@@ -2732,22 +3394,21 @@
         });
       };
 
-      // 登出按鈕
       document.getElementById('btn-logout').onclick = () => {
         if (confirm('確定要登出此 Google 帳號嗎？（本機資料仍會完整保留）')) {
           auth.signOut();
         }
       };
 
-      const mainTabHabit = document.getElementById('main-tab-habit');
-      const mainTabHealth = document.getElementById('main-tab-health');
-      mainTabHabit.onclick = () => switchWorkspace('habit');
-      mainTabHealth.onclick = () => switchWorkspace('health');
+      // 工作區切換
+      document.getElementById('main-tab-habit').onclick = () => switchWorkspace('habit');
+      document.getElementById('main-tab-jogging').onclick = () => switchWorkspace('jogging');
+      document.getElementById('main-tab-health').onclick = () => switchWorkspace('health');
 
+      // 習慣子分頁
       const tabToday = document.getElementById('view-tab-today');
       const tabGrid = document.getElementById('view-tab-grid');
       const tabStats = document.getElementById('view-tab-stats');
-
       const secToday = document.getElementById('view-today');
       const secGrid = document.getElementById('view-grid');
       const secStats = document.getElementById('view-stats');
@@ -2774,6 +3435,53 @@
       tabGrid.onclick = () => switchHabitView('grid');
       tabStats.onclick = () => switchHabitView('stats');
 
+      // 超慢跑設定選項事件
+      document.querySelectorAll('.btn-jog-time').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('.btn-jog-time').forEach(b => {
+            b.className = 'btn-jog-time py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover';
+          });
+          btn.className = 'btn-jog-time py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-gold text-white border-scholar-gold shadow-xs';
+          jogConfig.targetMinutes = parseInt(btn.dataset.val, 10);
+        };
+      });
+
+      document.querySelectorAll('.btn-jog-bpm').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('.btn-jog-bpm').forEach(b => {
+            b.className = 'btn-jog-bpm py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-paper text-scholar-navy border-scholar-border hover:bg-scholar-hover';
+          });
+          btn.className = 'btn-jog-bpm py-3 rounded-xl border text-xs sm:text-sm font-semibold transition text-center bg-scholar-gold text-white border-scholar-gold shadow-xs';
+          jogConfig.bpm = parseInt(btn.dataset.val, 10);
+        };
+      });
+
+      document.getElementById('select-jog-sound').onchange = (e) => {
+        jogConfig.sound = e.target.value;
+      };
+
+      document.getElementById('btn-test-sound').onclick = () => {
+        playSynthesizedBeat(jogConfig.sound);
+      };
+
+      document.getElementById('btn-start-countdown-sequence').onclick = handleStartJogging;
+      document.getElementById('btn-pause-jog').onclick = handlePauseJogging;
+      document.getElementById('btn-resume-jog').onclick = handleResumeJogging;
+      document.getElementById('btn-finish-jog').onclick = () => handleRunFinished(false);
+
+      document.getElementById('btn-close-jog-summary').onclick = () => {
+        document.getElementById('modal-jog-summary').classList.add('hidden');
+      };
+
+      document.getElementById('btn-clear-all-jog-logs').onclick = () => {
+        if (confirm('確定要清空所有超慢跑的歷史紀錄嗎？')) {
+          state.jogLogs = [];
+          saveState();
+          renderJogHistory();
+        }
+      };
+
+      // 健康子分頁
       const subtabBp = document.getElementById('subtab-bp');
       const subtabMed = document.getElementById('subtab-med');
       const subviewBp = document.getElementById('subview-bp');
@@ -2799,12 +3507,10 @@
 
       document.getElementById('input-log-med-date').onchange = (e) => {
         const val = e.target.value;
-        if (val) {
-          renderMedChecklist(val, null);
-        }
+        if (val) renderMedChecklist(val, null);
       };
 
-      // 處方循環彈窗與歷史歸檔開關
+      // 處方循環相關
       const modalCycle = document.getElementById('modal-cycle-edit');
       document.getElementById('btn-open-cycle-modal').onclick = () => openCycleEditModal();
       document.getElementById('btn-add-cycle-card').onclick = () => openCycleEditModal();
@@ -2836,16 +3542,13 @@
         e.preventDefault();
         const id = document.getElementById('input-cycle-id').value;
         const title = document.getElementById('input-cycle-title').value.trim();
-
         const refill2Start = document.getElementById('input-cycle-refill2-start').value;
         const refill2End = document.getElementById('input-cycle-refill2-end').value;
         const refill3Start = document.getElementById('input-cycle-refill3-start').value;
         const refill3End = document.getElementById('input-cycle-refill3-end').value;
-
         const bloodEnabled = document.getElementById('input-cycle-blood-enable').checked;
         const bloodDate = document.getElementById('input-cycle-blood-date').value;
         const bloodNotes = document.getElementById('input-cycle-blood-notes').value.trim();
-
         const clinicDate = document.getElementById('input-cycle-clinic-date').value;
         const clinicNotes = document.getElementById('input-cycle-clinic-notes').value.trim();
 
@@ -2872,12 +3575,12 @@
             isArchived: false
           });
         }
-
         saveState();
         modalCycle.classList.add('hidden');
         renderApp();
       };
 
+      // 服藥日誌
       const modalLogMed = document.getElementById('modal-log-med');
       document.getElementById('btn-open-log-med-modal').onclick = () => openLogMedModal();
       document.getElementById('btn-health-quick-log-med').onclick = () => openLogMedModal();
@@ -2890,12 +3593,11 @@
         const date = document.getElementById('input-log-med-date').value;
         const period = document.getElementById('input-log-med-period').value;
         const memo = document.getElementById('input-log-med-memo').value.trim();
-
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-        const checkedCheckboxes = document.querySelectorAll('input[name="selected_med"]:checked');
-        const medItems = Array.from(checkedCheckboxes).map(cb => {
+        const checkedBoxes = document.querySelectorAll('input[name="selected_med"]:checked');
+        const medItems = Array.from(checkedBoxes).map(cb => {
           const med = state.medications.find(m => m.id === cb.value);
           return med ? { id: med.id, name: med.name, dosage: med.dosage } : null;
         }).filter(Boolean);
@@ -2918,12 +3620,12 @@
             memo
           });
         }
-
         saveState();
         modalLogMed.classList.add('hidden');
         renderApp();
       };
 
+      // 藥箱管理
       const modalMedManager = document.getElementById('modal-med-manager');
       document.getElementById('btn-open-med-manager-modal').onclick = () => {
         renderMedManagerList();
@@ -2953,20 +3655,16 @@
       inputPhotoFile.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         try {
           const compressed = await compressImageFile(file, 300, 300, 0.7);
           setMedPhotoPreview(compressed);
         } catch (err) {
-          alert('圖片讀取壓縮失敗，請重新嘗試選擇其他照片。');
+          alert('圖片壓縮讀取失敗，請重新嘗試選擇其他照片。');
         }
         inputPhotoFile.value = '';
       };
 
-      document.getElementById('btn-remove-med-photo').onclick = () => {
-        setMedPhotoPreview('');
-      };
-
+      document.getElementById('btn-remove-med-photo').onclick = () => setMedPhotoPreview('');
       document.getElementById('btn-open-create-med').onclick = () => openMedEditModal();
       document.getElementById('btn-close-med-edit').onclick = () => modalMedEdit.classList.add('hidden');
       document.getElementById('btn-cancel-med-edit').onclick = () => modalMedEdit.classList.add('hidden');
@@ -2982,7 +3680,6 @@
         const photo = document.getElementById('input-med-photo').value || '';
 
         if (!name) return;
-
         const weekdays = freqType === 'weekly_custom' ? [...state.editingMedWeekdays] : [1,2,3,4,5,6,7];
 
         if (id) {
@@ -3012,7 +3709,6 @@
         saveState();
         modalMedEdit.classList.add('hidden');
         renderMedManagerList();
-        
         const curDate = document.getElementById('input-log-med-date').value || getStandardDateKey();
         renderMedChecklist(curDate, null);
         lucide.createIcons();
@@ -3021,6 +3717,7 @@
       document.getElementById('btn-period-morning').onclick = () => setHealthPeriod('晨起');
       document.getElementById('btn-period-evening').onclick = () => setHealthPeriod('晚間');
 
+      // 血壓記錄
       const modalHealth = document.getElementById('modal-health');
       document.getElementById('btn-open-health-modal').onclick = () => openHealthModal();
       document.getElementById('btn-health-quick-log-bp').onclick = () => openHealthModal();
@@ -3064,12 +3761,12 @@
             memo
           });
         }
-
         saveState();
         modalHealth.classList.add('hidden');
         renderApp();
       };
 
+      // 網格週切換
       document.getElementById('btn-grid-prev-period').onclick = () => {
         state.gridOffsetDays += 14;
         renderBulletGrid();
@@ -3077,11 +3774,8 @@
       };
 
       document.getElementById('btn-grid-next-period').onclick = () => {
-        if (state.gridOffsetDays >= 14) {
-          state.gridOffsetDays -= 14;
-        } else {
-          state.gridOffsetDays = 0;
-        }
+        if (state.gridOffsetDays >= 14) state.gridOffsetDays -= 14;
+        else state.gridOffsetDays = 0;
         renderBulletGrid();
         lucide.createIcons();
       };
@@ -3092,6 +3786,7 @@
         lucide.createIcons();
       };
 
+      // 習慣管理彈窗
       const modalHabit = document.getElementById('modal-habit');
       document.getElementById('btn-open-habit-modal').onclick = () => {
         document.getElementById('modal-habit-title').innerText = '建立新習慣';
@@ -3113,17 +3808,14 @@
       };
       document.getElementById('btn-close-category-manager').onclick = () => modalCatManager.classList.add('hidden');
 
-      const btnQuickCat = document.getElementById('btn-trigger-quick-category');
-      btnQuickCat.addEventListener('click', (e) => {
+      document.getElementById('btn-trigger-quick-category').onclick = (e) => {
         e.preventDefault();
         openCategoryEditModal();
-      });
-
-      const btnOpenCreateCat = document.getElementById('btn-open-create-category');
-      btnOpenCreateCat.addEventListener('click', (e) => {
+      };
+      document.getElementById('btn-open-create-category').onclick = (e) => {
         e.preventDefault();
         openCategoryEditModal();
-      });
+      };
 
       const modalCatEdit = document.getElementById('modal-category-edit');
       document.getElementById('btn-close-category-edit').onclick = () => modalCatEdit.classList.add('hidden');
@@ -3148,7 +3840,6 @@
           targetId = 'cat-' + Date.now();
           state.categories.push({ id: targetId, name, color });
         }
-
         saveState();
         modalCatEdit.classList.add('hidden');
         populateHabitCategorySelect(targetId);
@@ -3183,19 +3874,19 @@
             createdAt: getStandardDateKey()
           });
         }
-
         saveState();
         modalHabit.classList.add('hidden');
         renderApp();
       };
 
+      // 備份與還原
       const modalData = document.getElementById('modal-data');
       document.getElementById('btn-open-data-modal').onclick = () => modalData.classList.remove('hidden');
       document.getElementById('btn-close-data-modal').onclick = () => modalData.classList.add('hidden');
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '3.3',
+          routine_version: '3.5',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,
@@ -3203,7 +3894,8 @@
           healthLogs: state.healthLogs,
           medications: state.medications,
           medLogs: state.medLogs,
-          prescriptionCycles: state.prescriptionCycles
+          prescriptionCycles: state.prescriptionCycles,
+          jogLogs: state.jogLogs
         };
         const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -3230,6 +3922,7 @@
               state.medications = data.medications || INITIAL_MEDICATIONS;
               state.medLogs = data.medLogs || [];
               state.prescriptionCycles = data.prescriptionCycles || [];
+              state.jogLogs = data.jogLogs || [];
               saveState();
               renderApp();
               alert('備份資料已成功匯入！');
@@ -3255,6 +3948,7 @@
           state.medications = INITIAL_MEDICATIONS;
           state.medLogs = [];
           state.prescriptionCycles = [];
+          state.jogLogs = [];
           saveState();
           renderApp();
           modalData.classList.add('hidden');

@@ -70,21 +70,6 @@
       min-height: 2.5rem;
     }
 
-    /* 節拍律動與跑者動畫 */
-    @keyframes jogBounce {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-14px) rotate(-1.5deg); }
-    }
-    @keyframes jogShadow {
-      0%, 100% { transform: scale(1); opacity: 0.28; }
-      50% { transform: scale(0.72); opacity: 0.12; }
-    }
-    .animate-jog-bounce {
-      animation: jogBounce var(--jog-duration, 0.333s) ease-in-out infinite;
-    }
-    .animate-jog-shadow {
-      animation: jogShadow var(--jog-duration, 0.333s) ease-in-out infinite;
-    }
     .countdown-zoom {
       animation: zoomInCountdown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -318,7 +303,7 @@
       </section>
     </div>
 
-    <!-- ==================== 區塊 B: 超慢跑專屬工作區 ==================== -->
+    <!-- ==================== 區塊 B: 超慢跑專屬工作區 (極簡儀表板) ==================== -->
     <div id="workspace-jogging" class="hidden space-y-5 sm:space-y-6">
 
       <!-- 設定面板 (Setup View) -->
@@ -398,33 +383,17 @@
         </button>
       </section>
 
-      <!-- 跑步進行中面板 (Running View) -->
-      <section id="jog-running-panel" class="hidden bg-scholar-card rounded-2xl p-5 sm:p-7 border border-scholar-border shadow-xs space-y-6">
-        <div class="text-center space-y-1">
+      <!-- 跑步進行中面板 (Running View - 已移除跑者小人) -->
+      <section id="jog-running-panel" class="hidden bg-scholar-card rounded-2xl p-6 sm:p-10 border border-scholar-border shadow-xs space-y-6">
+        <div class="text-center space-y-1.5 py-4">
           <span class="text-xs font-semibold text-scholar-textMuted uppercase tracking-widest">距離完成還有</span>
-          <div id="jog-time-display" class="text-5xl sm:text-6xl font-bold font-mono tracking-tight text-scholar-navy">
+          <div id="jog-time-display" class="text-6xl sm:text-7xl font-bold font-mono tracking-tight text-scholar-navy">
             20:00
           </div>
           <div class="max-w-md mx-auto w-full bg-scholar-paper h-2.5 rounded-full overflow-hidden border border-scholar-border mt-3">
             <div id="jog-progress-bar" class="bg-scholar-gold h-full rounded-full transition-all duration-300" style="width: 0%"></div>
           </div>
-          <p id="jog-pct-text" class="text-xs text-scholar-textMuted pt-1">0% 完成</p>
-        </div>
-
-        <!-- 跑步律動動畫區 -->
-        <div class="py-4 flex flex-col items-center justify-center relative">
-          <div id="jog-runner-avatar" class="w-32 h-36 flex items-center justify-center relative transition-transform">
-            <svg class="w-24 h-32" viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="24" r="14" fill="#E2E4DA" stroke="#424642" stroke-width="3"/>
-              <path d="M38 18 C 44 14, 56 14, 62 18" stroke="#C06014" stroke-width="4" stroke-linecap="round"/>
-              <path d="M34 42 L66 42 L58 78 L42 78 Z" fill="#536162" stroke="#424642" stroke-width="3" stroke-linejoin="round"/>
-              <path d="M34 44 L22 62 L32 70" stroke="#424642" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M66 44 L78 58 L72 70" stroke="#424642" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M44 78 L38 106 L48 114" stroke="#424642" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M56 78 L64 102 L56 114" stroke="#C06014" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div id="jog-runner-shadow" class="w-20 h-3 rounded-full bg-scholar-navy/20 mt-1 blur-2xs transition-all"></div>
+          <p id="jog-pct-text" class="text-xs text-scholar-textMuted pt-1.5 font-mono">0% 完成</p>
         </div>
 
         <!-- 即時調節步頻按鈕列 -->
@@ -1383,15 +1352,6 @@
       beatInterval: null
     };
 
-    function updateRunnerAnimationSpeed(bpm) {
-      const runner = document.getElementById('jog-runner-avatar');
-      const shadow = document.getElementById('jog-runner-shadow');
-      if (!runner || !shadow) return;
-      const duration = (60 / bpm).toFixed(3);
-      runner.style.setProperty('--jog-duration', `${duration}s`);
-      shadow.style.setProperty('--jog-duration', `${duration}s`);
-    }
-
     function startBeatMetronome() {
       if (jogSession.beatInterval) clearInterval(jogSession.beatInterval);
       const intervalMs = (60 / jogConfig.bpm) * 1000;
@@ -1486,12 +1446,6 @@
         document.getElementById('jog-ctrl-running').classList.remove('hidden');
         document.getElementById('jog-ctrl-paused').classList.add('hidden');
 
-        const runner = document.getElementById('jog-runner-avatar');
-        const shadow = document.getElementById('jog-runner-shadow');
-        runner.classList.add('animate-jog-bounce');
-        shadow.classList.add('animate-jog-shadow');
-
-        updateRunnerAnimationSpeed(jogConfig.bpm);
         updateJogTimerDisplay();
         startBeatMetronome();
 
@@ -1516,11 +1470,6 @@
       jogSession.state = 'paused';
       stopBeatMetronome();
 
-      const runner = document.getElementById('jog-runner-avatar');
-      const shadow = document.getElementById('jog-runner-shadow');
-      runner.classList.remove('animate-jog-bounce');
-      shadow.classList.remove('animate-jog-shadow');
-
       document.getElementById('jog-ctrl-running').classList.add('hidden');
       document.getElementById('jog-ctrl-paused').classList.remove('hidden');
     }
@@ -1535,12 +1484,6 @@
         document.getElementById('jog-ctrl-running').classList.remove('hidden');
         document.getElementById('jog-ctrl-paused').classList.add('hidden');
 
-        const runner = document.getElementById('jog-runner-avatar');
-        const shadow = document.getElementById('jog-runner-shadow');
-        runner.classList.add('animate-jog-bounce');
-        shadow.classList.add('animate-jog-shadow');
-
-        updateRunnerAnimationSpeed(jogConfig.bpm);
         startBeatMetronome();
       });
     }
@@ -1548,11 +1491,6 @@
     function handleRunFinished(isCompletedNaturally = false) {
       if (jogSession.timerInterval) clearInterval(jogSession.timerInterval);
       stopBeatMetronome();
-
-      const runner = document.getElementById('jog-runner-avatar');
-      const shadow = document.getElementById('jog-runner-shadow');
-      runner.classList.remove('animate-jog-bounce');
-      shadow.classList.remove('animate-jog-shadow');
 
       const actualSec = jogSession.accumulatedSeconds;
       const todayStr = getStandardDateKey();
@@ -1622,7 +1560,6 @@
         }
       });
       document.getElementById('jog-current-bpm-badge').innerText = `${bpm} BPM`;
-      updateRunnerAnimationSpeed(bpm);
       if (jogSession.state === 'running') {
         startBeatMetronome();
       }

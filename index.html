@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
   <title>日常軌跡 · 習慣與健康系統</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,10 +11,10 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <!-- 新增這行：Firebase Auth -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <!-- Firebase App & Firestore SDKs (Compat 版) -->
+
+  <!-- Firebase App, Auth & Firestore SDKs (Compat 版) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
@@ -85,7 +85,7 @@
             <h1 class="text-sm sm:text-base font-semibold tracking-wide text-scholar-navy truncate">日常軌跡</h1>
             <span id="sync-status-indicator" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] bg-scholar-silver/15 text-scholar-navy font-medium shrink-0" title="雲端同步狀態">
               <span id="sync-status-dot" class="w-1.5 h-1.5 rounded-full bg-scholar-silver"></span>
-              <span id="sync-status-text" class="hidden xs:inline">連線中</span>
+              <span id="sync-status-text" class="hidden xs:inline">離線模式</span>
             </span>
           </div>
           <p class="text-[11px] sm:text-xs text-scholar-textMuted truncate" id="current-date-display">載入中...</p>
@@ -128,6 +128,20 @@
         <button id="btn-open-data-modal" class="p-1.5 sm:p-2 rounded-xl border border-scholar-border bg-scholar-card text-scholar-textMuted hover:text-scholar-navy hover:bg-scholar-hover transition shadow-xs" title="資料管理與備份">
           <i data-lucide="database" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
         </button>
+
+        <!-- Google 登入驗證區塊 -->
+        <div id="auth-container" class="flex items-center pl-1">
+          <button id="btn-login" type="button" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-scholar-gold text-white text-xs font-semibold hover:bg-scholar-gold/90 transition flex items-center gap-1.5 shadow-xs whitespace-nowrap">
+            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+            <span class="hidden xs:inline">Google 登入</span>
+          </button>
+          <div id="user-profile" class="hidden items-center gap-1.5">
+            <img id="user-avatar" src="" alt="使用者頭像" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-scholar-border object-cover" title="已登入" />
+            <button id="btn-logout" type="button" class="p-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-textMuted hover:text-red-600 hover:bg-scholar-hover transition shadow-xs" title="登出 Google 帳號">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -905,7 +919,7 @@
       </div>
 
       <div class="space-y-4 pt-4 text-xs text-scholar-textMuted leading-relaxed">
-        <p>您的所有紀錄正透過 Google Firebase 即時同步（含習慣打卡、血壓體重、處方箋循環、藥品照片、排程藥箱母檔與服藥紀錄）。建議定期下載 JSON 檔案備份。</p>
+        <p id="data-modal-user-status">您的所有紀錄支援本機離線保存與 Google Firebase 雲端雙向即時同步。登入 Google 後將自動隔離加密個人專屬空間。</p>
         
         <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border space-y-3">
           <div class="flex items-center justify-between">
@@ -916,7 +930,7 @@
             </button>
           </div>
           <div class="border-t border-scholar-border/70 pt-3 flex items-center justify-between">
-            <span class="font-medium text-scholar-navy">匯入備份檔案 (上傳至雲端)</span>
+            <span class="font-medium text-scholar-navy">匯入備份檔案 (覆蓋並同步)</span>
             <label class="px-3 py-1.5 bg-scholar-card border border-scholar-border rounded-lg font-medium text-scholar-navy hover:bg-scholar-hover transition shadow-xs cursor-pointer flex items-center gap-1">
               <i data-lucide="upload" class="w-3.5 h-3.5"></i>
               <span>選擇檔案</span>
@@ -927,7 +941,7 @@
 
         <div class="pt-2 border-t border-scholar-border flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-scholar-navy hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v3.2 (Terracotta & Slate)</span>
+          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v3.3 (Auth Edition)</span>
         </div>
       </div>
     </div>
@@ -946,11 +960,15 @@
     };
 
     let db = null;
+    let auth = null;
+    let currentUser = null;
     let syncDocRef = null;
+    let unsubscribeFirestore = null;
+
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.firestore();
-      syncDocRef = db.collection('user_data').doc('tony_main');
+      auth = firebase.auth();
     } catch (e) {
       console.warn('Firebase 初始化提示：', e);
     }
@@ -968,7 +986,7 @@
         label.innerText = text || '同步中...';
       } else {
         dot.className = 'w-1.5 h-1.5 rounded-full bg-scholar-silver';
-        label.innerText = text || '離線模式';
+        label.innerText = text || '本機模式';
       }
     }
 
@@ -1145,7 +1163,7 @@
       localStorage.setItem('routine_med_logs', JSON.stringify(state.medLogs));
       localStorage.setItem('routine_prescription_cycles', JSON.stringify(state.prescriptionCycles));
 
-      if (!skipCloud && syncDocRef) {
+      if (!skipCloud && syncDocRef && currentUser) {
         setSyncStatus('syncing', '正在儲存...');
         syncDocRef.set({
           categories: state.categories,
@@ -1168,10 +1186,18 @@
     }
 
     function setupFirebaseListener() {
-      if (!syncDocRef) return;
-      setSyncStatus('syncing', '連線雲端中...');
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+        unsubscribeFirestore = null;
+      }
+      if (!syncDocRef || !currentUser) {
+        setSyncStatus('offline', '尚未登入 (本機模式)');
+        return;
+      }
 
-      syncDocRef.onSnapshot((doc) => {
+      setSyncStatus('syncing', '雲端連線中...');
+
+      unsubscribeFirestore = syncDocRef.onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
           state.categories = data.categories || INITIAL_CATEGORIES;
@@ -2648,7 +2674,70 @@
 
       document.getElementById('current-date-display').innerText = formatDateDisplay(getStandardDateKey());
 
-      setupFirebaseListener();
+      // 監聽 Firebase Auth 使用者登入狀態
+      if (auth) {
+        auth.onAuthStateChanged((user) => {
+          const btnLogin = document.getElementById('btn-login');
+          const userProfile = document.getElementById('user-profile');
+          const userAvatar = document.getElementById('user-avatar');
+          const dataStatusEl = document.getElementById('data-modal-user-status');
+
+          if (user) {
+            currentUser = user;
+            if (btnLogin) btnLogin.classList.add('hidden');
+            if (userProfile) {
+              userProfile.classList.remove('hidden');
+              userProfile.classList.add('flex');
+            }
+            if (userAvatar) {
+              userAvatar.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=424642&color=fff`;
+            }
+            if (dataStatusEl) {
+              dataStatusEl.innerText = `目前已由 Google 帳號 (${user.email}) 登入。所有資料已獨立綁定至專屬私有路徑並即時同步。`;
+            }
+
+            syncDocRef = db.collection('user_data').doc(user.uid);
+            setupFirebaseListener();
+          } else {
+            currentUser = null;
+            syncDocRef = null;
+            if (unsubscribeFirestore) {
+              unsubscribeFirestore();
+              unsubscribeFirestore = null;
+            }
+            if (btnLogin) btnLogin.classList.remove('hidden');
+            if (userProfile) {
+              userProfile.classList.add('hidden');
+              userProfile.classList.remove('flex');
+            }
+            if (dataStatusEl) {
+              dataStatusEl.innerText = `目前處於本機模式。建議點擊右上角「Google 登入」以啟用專屬雲端安全備份與跨裝置同步。`;
+            }
+            setSyncStatus('offline', '尚未登入 (本機模式)');
+          }
+          lucide.createIcons();
+        });
+      }
+
+      // 登入按鈕點擊觸發 Google Popup 登入
+      document.getElementById('btn-login').onclick = () => {
+        if (!auth) {
+          alert('Firebase Auth 模組尚未準備就緒，請檢查網路連線。');
+          return;
+        }
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(err => {
+          console.error('Google 登入失敗：', err);
+          alert('登入失敗：' + err.message);
+        });
+      };
+
+      // 登出按鈕
+      document.getElementById('btn-logout').onclick = () => {
+        if (confirm('確定要登出此 Google 帳號嗎？（本機資料仍會完整保留）')) {
+          auth.signOut();
+        }
+      };
 
       const mainTabHabit = document.getElementById('main-tab-habit');
       const mainTabHealth = document.getElementById('main-tab-health');
@@ -3106,7 +3195,7 @@
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '3.2',
+          routine_version: '3.3',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,
@@ -3143,7 +3232,7 @@
               state.prescriptionCycles = data.prescriptionCycles || [];
               saveState();
               renderApp();
-              alert('備份資料已成功匯入並同步至雲端！');
+              alert('備份資料已成功匯入！');
               modalData.classList.add('hidden');
             } else {
               alert('無效的備份檔案格式。');
@@ -3156,7 +3245,7 @@
       };
 
       document.getElementById('btn-reset-demo').onclick = () => {
-        if (confirm('確定要載入預設範例資料嗎？這將會覆蓋現有紀錄並同步更新至雲端。')) {
+        if (confirm('確定要載入預設範例資料嗎？這將會覆蓋現有紀錄並同步。')) {
           state.categories = INITIAL_CATEGORIES;
           state.habits = INITIAL_HABITS;
           state.logs = {};

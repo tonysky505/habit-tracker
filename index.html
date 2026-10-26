@@ -23,14 +23,14 @@
         extend: {
           colors: {
             scholar: {
-              paper: '#F4F3EA',       /* 米白底色 */
-              navy: '#333D51',        /* 深海軍藍灰 */
-              gold: '#D3AC2B',        /* 拋光古董金 */
-              silver: '#CBD0D8',      /* 霧灰銀 */
-              border: '#E3DFD2',      /* 精緻邊框色 */
-              card: '#FCFBF7',        /* 卡片白底色 */
-              textMuted: '#687182',   /* 次要文字 */
-              hover: '#EBE8DE'
+              paper: '#F1F6F9',       /* 極淡冷灰藍底色 */
+              navy: '#212A3E',        /* 深石板墨藍 */
+              gold: '#394867',        /* 海軍藍鋼（主要強調色） */
+              silver: '#9BA4B5',      /* 霧霾灰藍 */
+              border: '#E1E7EE',      /* 柔和冷灰邊框 */
+              card: '#FFFFFF',        /* 純白卡片底色 */
+              textMuted: '#64748B',   /* 次要文字色 */
+              hover: '#E5EBF2'        /* 懸浮與淺底背景 */
             }
           },
           fontFamily: {
@@ -54,14 +54,14 @@
       height: 5px;
     }
     ::-webkit-scrollbar-track {
-      background: #F4F3EA;
+      background: #F1F6F9;
     }
     ::-webkit-scrollbar-thumb {
-      background: #CBD0D8;
+      background: #9BA4B5;
       border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #333D51;
+      background: #394867;
     }
     input[type="date"] {
       -webkit-appearance: none;
@@ -75,15 +75,14 @@
   <!-- 頂部主導覽列 -->
   <header class="sticky top-0 z-30 bg-scholar-paper/95 backdrop-blur-md border-b border-scholar-border">
     <div class="max-w-5xl mx-auto px-3.5 sm:px-6 h-15 sm:h-16 flex items-center justify-between gap-2">
-      <!-- 品牌與雲端連線狀態 -->
       <div class="flex items-center gap-2 sm:gap-3 min-w-0">
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-scholar-navy text-scholar-paper flex items-center justify-center shadow-xs shrink-0">
-          <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5 text-scholar-gold"></i>
+          <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5 text-scholar-paper"></i>
         </div>
         <div class="truncate">
           <div class="flex items-center gap-1.5">
             <h1 class="text-sm sm:text-base font-semibold tracking-wide text-scholar-navy truncate">日常軌跡</h1>
-            <span id="sync-status-indicator" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] bg-scholar-silver/30 text-scholar-navy font-medium shrink-0" title="雲端同步狀態">
+            <span id="sync-status-indicator" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] bg-scholar-silver/20 text-scholar-navy font-medium shrink-0" title="雲端同步狀態">
               <span id="sync-status-dot" class="w-1.5 h-1.5 rounded-full bg-scholar-silver"></span>
               <span id="sync-status-text" class="hidden xs:inline">連線中</span>
             </span>
@@ -92,7 +91,6 @@
         </div>
       </div>
 
-      <!-- 右側動作按鈕組 -->
       <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <!-- 習慣模式按鈕 -->
         <div id="header-actions-habit" class="flex items-center gap-1.5 sm:gap-2">
@@ -101,13 +99,17 @@
             <span class="hidden sm:inline">分類管理</span>
           </button>
           <button id="btn-open-habit-modal" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-scholar-navy text-scholar-paper text-xs font-medium hover:bg-scholar-navy/90 transition flex items-center gap-1 whitespace-nowrap shadow-xs">
-            <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0 text-scholar-gold"></i>
+            <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0 text-scholar-paper"></i>
             <span>新增習慣</span>
           </button>
         </div>
 
         <!-- 健康用藥模式按鈕 -->
         <div id="header-actions-health" class="hidden items-center gap-1.5 sm:gap-2">
+          <button id="btn-open-cycle-modal" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-scholar-gold/40 bg-scholar-gold/15 text-scholar-navy hover:bg-scholar-gold/25 transition flex items-center gap-1 text-xs font-semibold shadow-xs" title="新增處方箋循環">
+            <i data-lucide="repeat" class="w-3.5 h-3.5 text-scholar-gold shrink-0"></i>
+            <span class="hidden sm:inline">新處方循環</span>
+          </button>
           <button id="btn-open-med-manager-modal" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-navy hover:bg-scholar-hover transition flex items-center gap-1 text-xs font-medium shadow-xs" title="藥箱母檔管理">
             <i data-lucide="archive" class="w-3.5 h-3.5 shrink-0 text-scholar-textMuted"></i>
             <span class="hidden sm:inline">藥箱</span>
@@ -116,13 +118,12 @@
             <i data-lucide="activity" class="w-3.5 h-3.5 text-scholar-gold shrink-0"></i>
             <span>記血壓</span>
           </button>
-          <button id="btn-open-log-med-modal" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-scholar-gold/60 bg-scholar-gold/15 text-scholar-navy hover:bg-scholar-gold/25 transition flex items-center gap-1 text-xs font-semibold shadow-xs">
+          <button id="btn-open-log-med-modal" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-navy hover:bg-scholar-hover transition flex items-center gap-1 text-xs font-medium shadow-xs">
             <i data-lucide="pill" class="w-3.5 h-3.5 text-scholar-gold shrink-0"></i>
             <span>完整服藥</span>
           </button>
         </div>
 
-        <!-- 通用備份按鈕 -->
         <button id="btn-open-data-modal" class="p-1.5 sm:p-2 rounded-xl border border-scholar-border bg-scholar-card text-scholar-textMuted hover:text-scholar-navy hover:bg-scholar-hover transition shadow-xs" title="資料管理與備份">
           <i data-lucide="database" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
         </button>
@@ -140,7 +141,7 @@
           <span>習慣實踐</span>
         </button>
         <button id="main-tab-health" class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 text-scholar-textMuted hover:text-scholar-navy">
-          <i data-lucide="heart-pulse" class="w-4 h-4 text-scholar-gold"></i>
+          <i data-lucide="heart-pulse" class="w-4 h-4 text-scholar-silver"></i>
           <span>健康與用藥</span>
         </button>
       </div>
@@ -165,7 +166,7 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-scholar-paper to-scholar-silver/20 rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
+        <div class="bg-gradient-to-br from-scholar-paper to-scholar-hover rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between text-scholar-textMuted mb-2">
             <span class="text-xs font-medium tracking-wider uppercase">連續實踐節奏 (STREAK)</span>
             <i data-lucide="flame" class="w-4 h-4 text-scholar-gold"></i>
@@ -233,7 +234,7 @@
         <div class="flex items-center justify-end gap-3 pt-2 border-t border-scholar-border/70 text-[11px] text-scholar-textMuted flex-wrap">
           <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold"></span>已打卡</span>
           <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/40"></span>未打卡</span>
-          <span class="inline-flex items-center gap-1"><span class="text-scholar-gold font-bold">金色</span>為今日</span>
+          <span class="inline-flex items-center gap-1"><span class="text-scholar-navy font-bold">海軍藍標籤</span>為今日</span>
         </div>
       </section>
 
@@ -248,9 +249,9 @@
               <span>少</span>
               <div class="flex gap-1">
                 <span class="w-2.5 h-2.5 rounded-xs bg-scholar-paper border border-scholar-border/50"></span>
-                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/40"></span>
-                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/40"></span>
-                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/70"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/30"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-silver/70"></span>
+                <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold/60"></span>
                 <span class="w-2.5 h-2.5 rounded-xs bg-scholar-gold"></span>
               </div>
               <span>多</span>
@@ -270,6 +271,42 @@
 
     <!-- ==================== 區塊 B: 健康與用藥專屬工作區 ==================== -->
     <div id="workspace-health" class="hidden space-y-5 sm:space-y-6">
+
+      <!-- 處方箋循環進度看板 -->
+      <section class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs space-y-3.5">
+        <div class="flex items-center justify-between border-b border-scholar-border/70 pb-2.5">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-scholar-gold/15 text-scholar-navy flex items-center justify-center">
+              <i data-lucide="repeat" class="w-4 h-4 text-scholar-gold"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-scholar-navy">處方箋循環進度</h2>
+              <p class="text-[11px] text-scholar-textMuted">從本次看診至下次看診的領藥與檢查旅程</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="btn-toggle-archived-cycles" type="button" class="px-2.5 py-1 text-xs font-medium text-scholar-textMuted hover:text-scholar-navy transition">
+              歷史歸檔 (<span id="archived-cycles-count">0</span>)
+            </button>
+            <button id="btn-add-cycle-card" type="button" class="px-3 py-1.5 text-xs font-semibold bg-scholar-gold text-white rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1 shadow-2xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>建立新週期</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 進行中的循環容器 -->
+        <div id="active-cycles-container" class="space-y-3"></div>
+
+        <!-- 歷史歸檔抽屜 (預設收合) -->
+        <div id="archived-cycles-drawer" class="hidden pt-3 border-t border-dashed border-scholar-border space-y-2.5">
+          <h3 class="text-xs font-semibold text-scholar-textMuted flex items-center gap-1.5">
+            <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+            <span>已完成歸檔的處方週期</span>
+          </h3>
+          <div id="archived-cycles-list" class="space-y-2"></div>
+        </div>
+      </section>
       
       <!-- 今日用藥進度看板 -->
       <section class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs space-y-3.5">
@@ -288,8 +325,7 @@
           </span>
         </div>
 
-        <!-- 藥品卡片清單 (RWD 自適應排版) -->
-        <div id="today-med-checklist-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        <div id="today-med-checklist-cards" class="grid grid-cols-1 gap-2.5"></div>
       </section>
 
       <!-- 健康指標雙欄摘要 -->
@@ -312,7 +348,7 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-scholar-paper to-scholar-silver/20 rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
+        <div class="bg-gradient-to-br from-scholar-paper to-scholar-hover rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs flex flex-col justify-between">
           <div class="flex items-center justify-between text-scholar-textMuted mb-2">
             <span class="text-xs font-medium tracking-wider uppercase">今日服藥總次數</span>
             <i data-lucide="check-check" class="w-4 h-4 text-scholar-gold"></i>
@@ -340,7 +376,7 @@
             <i data-lucide="plus" class="w-3.5 h-3.5 text-scholar-gold"></i>
             <span>記一筆血壓</span>
           </button>
-          <button id="btn-health-quick-log-med" type="button" class="px-3 py-1.5 text-xs font-semibold bg-scholar-gold text-scholar-navy rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1 shadow-xs">
+          <button id="btn-health-quick-log-med" type="button" class="px-3 py-1.5 text-xs font-semibold bg-scholar-gold text-white rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1 shadow-xs">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
             <span>完整記錄服藥</span>
           </button>
@@ -403,6 +439,116 @@
       </button>
       <img id="lightbox-img" src="" alt="藥品大圖" class="w-full max-h-[70vh] object-contain rounded-xl border border-scholar-border" />
       <p id="lightbox-caption" class="text-xs text-center text-scholar-navy font-semibold mt-2.5"></p>
+    </div>
+  </div>
+
+  <!-- 處方箋循環 (Cycle) 編輯彈窗 -->
+  <div id="modal-cycle-edit" class="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-scholar-navy/70 backdrop-blur-sm hidden">
+    <div class="bg-scholar-card rounded-2xl border border-scholar-border shadow-2xl w-full max-w-md p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-2 border-b border-scholar-border mb-3">
+        <h4 id="cycle-edit-title" class="text-base font-bold text-scholar-navy">建立處方箋循環 (從回診到下次就醫)</h4>
+        <button id="btn-close-cycle-edit" type="button" class="text-scholar-textMuted hover:text-scholar-navy p-1 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="form-cycle-edit" class="space-y-4">
+        <input type="hidden" id="input-cycle-id" />
+
+        <div>
+          <label class="block text-xs font-semibold text-scholar-navy mb-1">處方循環名稱</label>
+          <input type="text" id="input-cycle-title" required placeholder="例如：2026 Q4 心血管慢箋循環" class="w-full px-3 py-2 text-sm bg-scholar-paper border border-scholar-border rounded-xl focus:outline-none focus:ring-2 focus:ring-scholar-gold/30 focus:border-scholar-gold transition text-scholar-navy" />
+        </div>
+
+        <!-- 第二次領藥區間 -->
+        <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-scholar-navy flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-scholar-navy text-scholar-paper text-[10px] flex items-center justify-center font-bold">1</span>
+              <span>第二次領藥區間</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] text-scholar-textMuted block mb-0.5">起始日 (可領日)</label>
+              <input type="date" id="input-cycle-refill2-start" required class="w-full px-2.5 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-lg text-scholar-navy" />
+            </div>
+            <div>
+              <label class="text-[10px] text-scholar-textMuted block mb-0.5">截止日</label>
+              <input type="date" id="input-cycle-refill2-end" required class="w-full px-2.5 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-lg text-scholar-navy" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 第三次領藥區間 -->
+        <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-scholar-navy flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-scholar-navy text-scholar-paper text-[10px] flex items-center justify-center font-bold">2</span>
+              <span>第三次領藥區間</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] text-scholar-textMuted block mb-0.5">起始日 (可領日)</label>
+              <input type="date" id="input-cycle-refill3-start" required class="w-full px-2.5 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-lg text-scholar-navy" />
+            </div>
+            <div>
+              <label class="text-[10px] text-scholar-textMuted block mb-0.5">截止日</label>
+              <input type="date" id="input-cycle-refill3-end" required class="w-full px-2.5 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-lg text-scholar-navy" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 抽血檢驗 (可選) -->
+        <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-scholar-navy flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-scholar-navy text-scholar-paper text-[10px] flex items-center justify-center font-bold">3</span>
+              <span>回診前抽血 / 檢查</span>
+            </span>
+            <label class="flex items-center gap-1.5 text-xs text-scholar-navy font-medium cursor-pointer">
+              <input type="checkbox" id="input-cycle-blood-enable" checked class="w-4 h-4 accent-[#394867]" />
+              <span>本次需要抽血</span>
+            </label>
+          </div>
+          <div id="section-cycle-blood-date" class="grid grid-cols-2 gap-2 pt-1">
+            <div class="col-span-2 sm:col-span-1">
+              <label class="text-[10px] text-scholar-textMuted block mb-0.5">預定抽血日期</label>
+              <input type="date" id="input-cycle-blood-date" class="w-full px-2.5 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-lg text-scholar-navy" />
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="text-[10px] text-scholar-textMuted block mb-0.5">抽血備註 (例如：空腹8小時)</label>
+              <input type="text" id="input-cycle-blood-notes" placeholder="空腹8小時" class="w-full px-2.5 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-lg text-scholar-navy" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 下次醫師回診日 -->
+        <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-scholar-navy flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-scholar-gold text-white text-[10px] flex items-center justify-center font-bold">4</span>
+              <span>下次醫師回診日 (循環終點)</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] text-scholar-textMuted block mb-0.5">回診日期</label>
+              <input type="date" id="input-cycle-clinic-date" required class="w-full px-2.5 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-lg text-scholar-navy" />
+            </div>
+            <div>
+              <label class="text-[10px] text-scholar-textMuted block mb-0.5">科別/診別備忘</label>
+              <input type="text" id="input-cycle-clinic-notes" placeholder="例如：早上診 23號" class="w-full px-2.5 py-1.5 text-xs bg-scholar-card border border-scholar-border rounded-lg text-scholar-navy" />
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button id="btn-cancel-cycle-edit" type="button" class="px-3 py-1.5 text-xs text-scholar-textMuted hover:bg-scholar-hover rounded-lg transition">取消</button>
+          <button type="submit" class="px-4 py-1.5 text-xs font-medium bg-scholar-navy text-scholar-paper rounded-lg hover:bg-scholar-navy/90 transition">確定儲存週期</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -478,7 +624,7 @@
 
       <div class="pt-3 border-t border-scholar-border flex justify-between items-center">
         <span class="text-xs text-scholar-textMuted">支援拍照上傳藥物外觀比對</span>
-        <button id="btn-open-create-med" type="button" class="px-3.5 py-1.5 text-xs font-semibold bg-scholar-gold text-scholar-navy rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1.5 shadow-xs">
+        <button id="btn-open-create-med" type="button" class="px-3.5 py-1.5 text-xs font-semibold bg-scholar-gold text-white rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1.5 shadow-xs">
           <i data-lucide="plus" class="w-3.5 h-3.5"></i>
           <span>新增藥品</span>
         </button>
@@ -554,7 +700,8 @@
             <option value="午間">午餐後 / 午間</option>
             <option value="晚間">晚餐後 / 晚間</option>
             <option value="睡前">睡前</option>
-            <option value="需要時">需要時服用</option>
+            <option value="一日內皆可">一日內皆可</option>
+            <option value="需要時">需要時服用 (PRN)</option>
           </select>
         </div>
 
@@ -707,7 +854,7 @@
 
       <div class="pt-3 border-t border-scholar-border flex justify-between items-center">
         <span class="text-xs text-scholar-textMuted">管理分類與色票</span>
-        <button id="btn-open-create-category" type="button" class="px-3.5 py-1.5 text-xs font-semibold bg-scholar-gold text-scholar-navy rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1.5 shadow-xs">
+        <button id="btn-open-create-category" type="button" class="px-3.5 py-1.5 text-xs font-semibold bg-scholar-gold text-white rounded-xl hover:bg-scholar-gold/90 transition flex items-center gap-1.5 shadow-xs">
           <i data-lucide="plus" class="w-3.5 h-3.5"></i>
           <span>新增分類</span>
         </button>
@@ -733,9 +880,9 @@
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-scholar-navy mb-1.5">學者古典色票</label>
+          <label class="block text-xs font-medium text-scholar-navy mb-1.5">冷灰調風格色票</label>
           <div class="grid grid-cols-6 gap-2" id="category-color-palette"></div>
-          <input type="hidden" id="input-category-color" value="#D3AC2B" />
+          <input type="hidden" id="input-category-color" value="#394867" />
         </div>
 
         <div class="pt-2 flex items-center justify-end gap-2">
@@ -757,7 +904,7 @@
       </div>
 
       <div class="space-y-4 pt-4 text-xs text-scholar-textMuted leading-relaxed">
-        <p>您的所有紀錄正透過 Google Firebase 即時同步（含習慣打卡、血壓體重、藥品照片、排程藥箱母檔與服藥紀錄）。建議定期下載 JSON 檔案備份。</p>
+        <p>您的所有紀錄正透過 Google Firebase 即時同步（含習慣打卡、血壓體重、處方箋循環、藥品照片、排程藥箱母檔與服藥紀錄）。建議定期下載 JSON 檔案備份。</p>
         
         <div class="p-3 bg-scholar-paper rounded-xl border border-scholar-border space-y-3">
           <div class="flex items-center justify-between">
@@ -779,7 +926,7 @@
 
         <div class="pt-2 border-t border-scholar-border flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-scholar-navy hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v2.8 (服藥統計修正版)</span>
+          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v3.2 (Navy Edition)</span>
         </div>
       </div>
     </div>
@@ -824,22 +971,22 @@
       }
     }
 
-    // ==================== 學者古典色票 ====================
+    // ==================== 現代冷調石板藍色票 ====================
     const PALETTE = [
-      { color: '#D3AC2B', name: '拋光古金' },
-      { color: '#333D51', name: '海軍深藍' },
-      { color: '#7E9A7B', name: '古典草綠' },
-      { color: '#A95E46', name: '皮革磚褐' },
-      { color: '#6A89A7', name: '古墨灰藍' },
-      { color: '#8E7C93', name: '古籍紫藤' }
+      { color: '#394867', name: '深海軍鋼藍' },
+      { color: '#212A3E', name: '夜幕石板黑' },
+      { color: '#9BA4B5', name: '霧霾冷銀灰' },
+      { color: '#4F709C', name: '深邃湛藍' },
+      { color: '#526D82', name: '煙燻灰青' },
+      { color: '#738A9C', name: '北歐灰藍' }
     ];
 
-    const AVAILABLE_ICONS = ['check', 'book-open', 'footprints', 'cup-soda', 'moon', 'dumbbell', 'heart', 'feather', 'sun', 'camera', 'activity', 'pill'];
+    const AVAILABLE_ICONS = ['check', 'book-open', 'footprints', 'cup-soda', 'moon', 'dumbbell', 'heart', 'feather', 'sun', 'camera', 'activity', 'pill', 'calendar', 'repeat'];
 
     const INITIAL_CATEGORIES = [
-      { id: 'cat-health', name: '健康生活', color: '#D3AC2B' },
-      { id: 'cat-mind', name: '閱讀專注', color: '#333D51' },
-      { id: 'cat-rest', name: '規律作息', color: '#6A89A7' }
+      { id: 'cat-health', name: '健康生活', color: '#394867' },
+      { id: 'cat-mind', name: '閱讀專注', color: '#212A3E' },
+      { id: 'cat-rest', name: '規律作息', color: '#526D82' }
     ];
 
     const INITIAL_HABITS = [
@@ -861,10 +1008,12 @@
       healthLogs: [],
       medications: [],
       medLogs: [],
+      prescriptionCycles: [],
       activeCategory: 'all',
       gridOffsetDays: 0,
       activeHealthTab: 'bp',
-      editingMedWeekdays: [1, 3, 5]
+      editingMedWeekdays: [1, 3, 5],
+      showArchivedCycles: false
     };
 
     function getStandardDateKey(dateObj = new Date()) {
@@ -900,7 +1049,7 @@
       } else if (sys <= 129 && dia < 80) {
         return { label: '正常偏高', colorClass: 'bg-scholar-paper text-scholar-navy border border-scholar-border' };
       } else if ((sys >= 130 && sys <= 139) || (dia >= 80 && dia <= 89)) {
-        return { label: '第一期高壓', colorClass: 'bg-scholar-silver/40 text-scholar-navy border border-scholar-silver' };
+        return { label: '第一期高壓', colorClass: 'bg-scholar-silver/30 text-scholar-navy border border-scholar-silver' };
       } else {
         return { label: '偏高留意', colorClass: 'bg-scholar-navy text-scholar-paper font-bold' };
       }
@@ -966,6 +1115,7 @@
         const healthData = localStorage.getItem('routine_health_logs');
         const medData = localStorage.getItem('routine_medications');
         const medLogData = localStorage.getItem('routine_med_logs');
+        const cycleData = localStorage.getItem('routine_prescription_cycles');
 
         state.categories = catData ? JSON.parse(catData) : INITIAL_CATEGORIES;
         state.habits = habitData ? JSON.parse(habitData) : INITIAL_HABITS;
@@ -973,6 +1123,7 @@
         state.healthLogs = healthData ? JSON.parse(healthData) : [];
         state.medications = medData ? JSON.parse(medData) : INITIAL_MEDICATIONS;
         state.medLogs = medLogData ? JSON.parse(medLogData) : [];
+        state.prescriptionCycles = cycleData ? JSON.parse(cycleData) : [];
       } catch (e) {
         state.categories = INITIAL_CATEGORIES;
         state.habits = INITIAL_HABITS;
@@ -980,6 +1131,7 @@
         state.healthLogs = [];
         state.medications = INITIAL_MEDICATIONS;
         state.medLogs = [];
+        state.prescriptionCycles = [];
       }
     }
 
@@ -990,6 +1142,7 @@
       localStorage.setItem('routine_health_logs', JSON.stringify(state.healthLogs));
       localStorage.setItem('routine_medications', JSON.stringify(state.medications));
       localStorage.setItem('routine_med_logs', JSON.stringify(state.medLogs));
+      localStorage.setItem('routine_prescription_cycles', JSON.stringify(state.prescriptionCycles));
 
       if (!skipCloud && syncDocRef) {
         setSyncStatus('syncing', '正在儲存...');
@@ -1000,6 +1153,7 @@
           healthLogs: state.healthLogs,
           medications: state.medications,
           medLogs: state.medLogs,
+          prescriptionCycles: state.prescriptionCycles,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true })
         .then(() => {
@@ -1025,6 +1179,7 @@
           state.healthLogs = data.healthLogs || [];
           state.medications = data.medications || INITIAL_MEDICATIONS;
           state.medLogs = data.medLogs || [];
+          state.prescriptionCycles = data.prescriptionCycles || [];
 
           saveState(true);
           renderApp();
@@ -1089,7 +1244,7 @@
           particleCount: 28,
           spread: 50,
           origin: { y: 0.8 },
-          colors: ['#D3AC2B', '#333D51', '#CBD0D8', '#F4F3EA']
+          colors: ['#394867', '#212A3E', '#9BA4B5', '#F1F6F9']
         });
       }
 
@@ -1127,6 +1282,269 @@
       }
     }
 
+    // ==================== 處方箋循環 (Cycle) 渲染與歸檔邏輯 ====================
+    function renderPrescriptionCycles() {
+      const activeContainer = document.getElementById('active-cycles-container');
+      const archivedList = document.getElementById('archived-cycles-list');
+      const archivedCountEl = document.getElementById('archived-cycles-count');
+      if (!activeContainer || !archivedList) return;
+
+      activeContainer.innerHTML = '';
+      archivedList.innerHTML = '';
+
+      const cycles = state.prescriptionCycles || [];
+      const activeCycles = cycles.filter(c => !c.isArchived);
+      const archivedCycles = cycles.filter(c => c.isArchived);
+
+      archivedCountEl.innerText = archivedCycles.length;
+
+      const todayStr = getStandardDateKey();
+      const todayDate = new Date(todayStr);
+
+      if (activeCycles.length === 0) {
+        activeContainer.innerHTML = `
+          <div class="py-6 text-center text-xs text-scholar-textMuted bg-scholar-paper rounded-2xl border border-dashed border-scholar-border space-y-1">
+            <i data-lucide="repeat" class="w-6 h-6 text-scholar-silver mx-auto mb-1"></i>
+            <p class="font-medium text-scholar-navy">目前沒有進行中的處方箋循環</p>
+            <p>點擊右上角「建立新週期」設定下次就醫前的重要里程碑！</p>
+          </div>
+        `;
+      } else {
+        activeCycles.forEach(cycle => {
+          activeContainer.appendChild(createCycleCardElement(cycle, todayDate, false));
+        });
+      }
+
+      if (archivedCycles.length === 0) {
+        archivedList.innerHTML = '<p class="text-[11px] text-scholar-textMuted py-2 text-center">尚無歸檔的歷史週期</p>';
+      } else {
+        archivedCycles.forEach(cycle => {
+          archivedList.appendChild(createCycleCardElement(cycle, todayDate, true));
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    function createCycleCardElement(cycle, todayDate, isArchivedView) {
+      const card = document.createElement('div');
+      card.className = `bg-scholar-paper rounded-2xl p-4 border transition-all ${
+        isArchivedView 
+          ? 'border-scholar-border/60 opacity-80' 
+          : 'border-scholar-border shadow-2xs hover:border-scholar-navy/30'
+      }`;
+
+      const steps = [
+        { key: 'refill2', label: '第二次領藥', start: cycle.refill2.start, end: cycle.refill2.end, done: !!cycle.refill2.done, icon: 'pill' },
+        { key: 'refill3', label: '第三次領藥', start: cycle.refill3.start, end: cycle.refill3.end, done: !!cycle.refill3.done, icon: 'pill' },
+        { key: 'blood', label: '抽血檢驗', enabled: cycle.blood?.enabled, date: cycle.blood?.date, notes: cycle.blood?.notes, done: !!cycle.blood?.done, icon: 'activity' },
+        { key: 'clinic', label: '醫師回診', date: cycle.clinic.date, notes: cycle.clinic.notes, done: !!cycle.clinic.done, icon: 'stethoscope', isFinal: true }
+      ];
+
+      let stepsHtml = '';
+      steps.forEach((st) => {
+        if (st.key === 'blood' && !st.enabled) return;
+
+        let dateDisplay = '';
+        let targetForDiff = null;
+        if (st.start && st.end) {
+          dateDisplay = `${st.start.slice(5)} ~ ${st.end.slice(5)}`;
+          targetForDiff = new Date(st.start);
+        } else if (st.date) {
+          dateDisplay = st.date.slice(5);
+          targetForDiff = new Date(st.date);
+        }
+
+        let badge = '';
+        if (st.done) {
+          badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-scholar-gold/15 text-scholar-navy font-bold">✓ 已完成</span>`;
+        } else if (targetForDiff) {
+          const diffDays = Math.ceil((targetForDiff - todayDate) / (1000 * 60 * 60 * 24));
+          if (diffDays === 0) {
+            badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-scholar-gold text-white font-bold animate-pulse">就是今天</span>`;
+          } else if (diffDays > 0) {
+            badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-scholar-card border border-scholar-border text-scholar-navy font-medium">剩 ${diffDays} 天</span>`;
+          } else {
+            badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-red-100 text-red-700 font-bold border border-red-200">逾期 ${Math.abs(diffDays)} 天</span>`;
+          }
+        }
+
+        stepsHtml += `
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-scholar-card border border-scholar-border/70 ${st.done ? 'opacity-65' : ''}">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <button onclick="toggleCycleStepDone('${cycle.id}', '${st.key}')" type="button" class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border transition ${
+                st.done 
+                  ? 'bg-scholar-gold text-white border-scholar-gold' 
+                  : 'bg-scholar-paper text-scholar-silver border-scholar-border hover:border-scholar-gold'
+              }" title="${st.done ? '點擊標記為未完成' : '點擊標記為完成'}">
+                <i data-lucide="${st.done ? 'check' : st.icon}" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="truncate">
+                <div class="flex items-center gap-1.5 flex-wrap truncate">
+                  <span class="text-xs font-bold text-scholar-navy truncate ${st.done ? 'line-through text-scholar-textMuted' : ''}">${st.label}</span>
+                  ${badge}
+                </div>
+                <span class="text-[10px] text-scholar-textMuted block font-mono mt-0.5 truncate">
+                  ${dateDisplay} ${st.notes ? `(${st.notes})` : ''}
+                </span>
+              </div>
+            </div>
+            <div>
+              <button onclick="toggleCycleStepDone('${cycle.id}', '${st.key}')" type="button" class="text-xs px-2.5 py-1 rounded-lg border transition ${
+                st.done 
+                  ? 'bg-scholar-paper text-scholar-textMuted border-scholar-border hover:text-red-700 hover:border-red-300' 
+                  : 'bg-scholar-navy text-scholar-paper hover:bg-scholar-navy/90 font-medium'
+              }">
+                ${st.done ? '取消' : '完成'}
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      let actionButtons = '';
+      if (!isArchivedView) {
+        actionButtons = `
+          <button onclick="editCycleModal('${cycle.id}')" type="button" class="p-1 text-scholar-textMuted hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="編輯週期">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+          </button>
+          <button onclick="deleteCycle('${cycle.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-gold/20 transition" title="刪除週期">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        `;
+      } else {
+        actionButtons = `
+          <button onclick="unarchiveCycle('${cycle.id}')" type="button" class="text-xs text-scholar-gold hover:underline font-semibold" title="放回進行中">
+            復原至排程
+          </button>
+          <button onclick="deleteCycle('${cycle.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded transition ml-1" title="永久刪除">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-scholar-border/50">
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-2.5 h-2.5 rounded-full bg-scholar-gold shrink-0"></span>
+            <h3 class="text-xs sm:text-sm font-bold text-scholar-navy truncate">${cycle.title}</h3>
+            ${isArchivedView ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-scholar-silver/20 text-scholar-textMuted">已歸檔</span>' : ''}
+          </div>
+          <div class="flex items-center gap-1 shrink-0">
+            ${actionButtons}
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          ${stepsHtml}
+        </div>
+      `;
+
+      return card;
+    }
+
+    window.toggleCycleStepDone = function(cycleId, stepKey) {
+      const cycle = state.prescriptionCycles.find(c => c.id === cycleId);
+      if (!cycle) return;
+
+      if (stepKey === 'refill2') cycle.refill2.done = !cycle.refill2.done;
+      else if (stepKey === 'refill3') cycle.refill3.done = !cycle.refill3.done;
+      else if (stepKey === 'blood' && cycle.blood) cycle.blood.done = !cycle.blood.done;
+      else if (stepKey === 'clinic') {
+        const willBeDone = !cycle.clinic.done;
+        cycle.clinic.done = willBeDone;
+        
+        if (willBeDone) {
+          if (confirm('恭喜完成本次處方循環的所有就醫任務！是否將此週期「封存歸檔」，移出當前排程畫面？（可在歷史歸檔中隨時查閱）')) {
+            cycle.isArchived = true;
+          }
+        } else {
+          cycle.isArchived = false;
+        }
+      }
+
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 22, spread: 45, origin: { y: 0.75 }, colors: ['#394867', '#212A3E'] });
+      }
+
+      saveState();
+      renderApp();
+    };
+
+    window.unarchiveCycle = function(cycleId) {
+      const cycle = state.prescriptionCycles.find(c => c.id === cycleId);
+      if (cycle) {
+        cycle.isArchived = false;
+        if (cycle.clinic) {
+          cycle.clinic.done = false;
+        }
+        saveState();
+        renderApp();
+      }
+    };
+
+    function openCycleEditModal(cycleId = null) {
+      const modal = document.getElementById('modal-cycle-edit');
+      const title = document.getElementById('cycle-edit-title');
+      const form = document.getElementById('form-cycle-edit');
+      form.reset();
+
+      if (cycleId) {
+        const c = state.prescriptionCycles.find(x => x.id === cycleId);
+        if (c) {
+          title.innerText = '編輯處方循環';
+          document.getElementById('input-cycle-id').value = c.id;
+          document.getElementById('input-cycle-title').value = c.title;
+          document.getElementById('input-cycle-refill2-start').value = c.refill2.start;
+          document.getElementById('input-cycle-refill2-end').value = c.refill2.end;
+          document.getElementById('input-cycle-refill3-start').value = c.refill3.start;
+          document.getElementById('input-cycle-refill3-end').value = c.refill3.end;
+          
+          document.getElementById('input-cycle-blood-enable').checked = !!c.blood?.enabled;
+          document.getElementById('input-cycle-blood-date').value = c.blood?.date || '';
+          document.getElementById('input-cycle-blood-notes').value = c.blood?.notes || '';
+          
+          document.getElementById('input-cycle-clinic-date').value = c.clinic.date;
+          document.getElementById('input-cycle-clinic-notes').value = c.clinic.notes || '';
+        }
+      } else {
+        title.innerText = '建立處方箋循環 (從回診到下次就醫)';
+        document.getElementById('input-cycle-id').value = '';
+        
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = d.getMonth() + 1;
+        document.getElementById('input-cycle-title').value = `${y} 年第 ${Math.ceil(m / 3)} 季慢箋週期`;
+
+        function addDaysStr(baseDate, days) {
+          const res = new Date(baseDate);
+          res.setDate(res.getDate() + days);
+          return getStandardDateKey(res);
+        }
+
+        document.getElementById('input-cycle-refill2-start').value = addDaysStr(d, 28);
+        document.getElementById('input-cycle-refill2-end').value = addDaysStr(d, 38);
+        document.getElementById('input-cycle-refill3-start').value = addDaysStr(d, 56);
+        document.getElementById('input-cycle-refill3-end').value = addDaysStr(d, 66);
+        document.getElementById('input-cycle-blood-date').value = addDaysStr(d, 77);
+        document.getElementById('input-cycle-clinic-date').value = addDaysStr(d, 84);
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    window.editCycleModal = function(id) {
+      openCycleEditModal(id);
+    };
+
+    window.deleteCycle = function(id) {
+      if (confirm('確定要刪除這個處方循環嗎？')) {
+        state.prescriptionCycles = state.prescriptionCycles.filter(c => c.id !== id);
+        saveState();
+        renderApp();
+      }
+    };
+
     // ==================== 今日用藥狀態檢視看板 ====================
     function renderTodayMedChecklistDashboard() {
       const container = document.getElementById('today-med-checklist-cards');
@@ -1135,9 +1553,8 @@
       container.innerHTML = '';
 
       const todayStr = getStandardDateKey();
-      const dayOfWeek = getIsoDayOfWeek(todayStr); // 1~7
+      const dayOfWeek = getIsoDayOfWeek(todayStr);
 
-      // 1. 篩選今日排程應服藥物
       const todayScheduledMeds = state.medications.filter(med => {
         const freq = med.freqType || 'daily';
         if (freq === 'daily') return true;
@@ -1145,7 +1562,6 @@
         return false;
       });
 
-      // 2. 獲取今日有效服藥記錄 (藥物清單不為空)
       const todayLogs = (state.medLogs || []).filter(l => l.date === todayStr && l.medItems && l.medItems.length > 0);
 
       if (todayScheduledMeds.length === 0) {
@@ -1153,7 +1569,7 @@
         summaryBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-scholar-paper border border-scholar-border text-scholar-textMuted';
         container.innerHTML = `
           <div class="col-span-full py-4 text-center text-xs text-scholar-textMuted bg-scholar-paper rounded-xl border border-scholar-border/70">
-            今天沒有排定的固定服藥項目。如需臨時服藥，可點擊「完整記錄服藥」手動記錄。
+            今天沒有排定的固定服藥項目。如需臨時服藥，可點擊「完整服藥」手動記錄。
           </div>
         `;
         return;
@@ -1168,13 +1584,13 @@
         if (isTaken) completedCount++;
 
         const photoHtml = med.photo
-          ? `<img src="${med.photo}" alt="${med.name}" class="w-12 h-12 rounded-xl object-cover border border-scholar-border shrink-0 cursor-pointer shadow-2xs" onclick="showImageLightbox('${med.photo}', '${med.name}')" title="點擊檢視大圖" />`
-          : `<div class="w-12 h-12 rounded-xl bg-scholar-paper border border-scholar-border flex items-center justify-center text-scholar-gold shrink-0">
-               <i data-lucide="pill" class="w-6 h-6"></i>
+          ? `<img src="${med.photo}" alt="${med.name}" class="w-11 h-11 rounded-xl object-cover border border-scholar-border shrink-0 cursor-pointer shadow-2xs" onclick="showImageLightbox('${med.photo}', '${med.name}')" title="點擊檢視大圖" />`
+          : `<div class="w-11 h-11 rounded-xl bg-scholar-paper border border-scholar-border flex items-center justify-center text-scholar-gold shrink-0">
+               <i data-lucide="pill" class="w-5 h-5"></i>
              </div>`;
 
         const card = document.createElement('div');
-        card.className = `p-3.5 rounded-2xl border transition-all duration-200 flex flex-col justify-between gap-2.5 ${
+        card.className = `p-3 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-3 ${
           isTaken
             ? 'bg-scholar-card/90 border-scholar-gold/40 shadow-2xs'
             : 'bg-scholar-card border-scholar-border hover:border-scholar-navy/30'
@@ -1182,40 +1598,39 @@
 
         let statusActionHtml = '';
         if (isTaken) {
-          const timesStr = takenLogs.map(l => l.period).join('、');
+          const detailsStr = takenLogs.map(l => `${l.period}${l.time ? ` (${l.time})` : ''}`).join('、');
           statusActionHtml = `
-            <button onclick="undoSingleMedLog('${med.id}', '${med.name}')" type="button" class="w-full sm:w-auto px-3 py-1.5 rounded-xl text-xs font-semibold bg-scholar-gold/15 text-scholar-navy border border-scholar-gold/40 hover:bg-terracotta-50 hover:text-red-700 hover:border-red-300 transition flex items-center justify-center gap-1 group/btn" title="誤觸可點擊取消今日紀錄">
+            <button onclick="undoSingleMedLog('${med.id}', '${med.name}')" type="button" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold bg-scholar-gold/15 text-scholar-navy border border-scholar-gold/40 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition flex items-center gap-1 group/btn shrink-0" title="誤觸可點擊取消今日紀錄">
               <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-gold group-hover/btn:hidden"></i>
               <i data-lucide="x" class="w-3.5 h-3.5 text-red-600 hidden group-hover/btn:inline"></i>
-              <span class="group-hover/btn:hidden">已於 ${timesStr} 服用</span>
-              <span class="hidden group-hover/btn:inline font-bold">點擊取消紀錄</span>
+              <span class="group-hover/btn:hidden whitespace-nowrap">已服 (${detailsStr})</span>
+              <span class="hidden group-hover/btn:inline whitespace-nowrap font-bold">取消</span>
             </button>
           `;
         } else {
           statusActionHtml = `
-            <button onclick="quickLogSingleMed('${med.id}')" type="button" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-scholar-navy hover:bg-scholar-navy/90 text-scholar-paper text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-xs shrink-0">
-              <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-gold"></i>
+            <button onclick="quickLogSingleMed('${med.id}')" type="button" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-scholar-navy hover:bg-scholar-navy/90 text-scholar-paper text-xs font-semibold transition flex items-center gap-1 shadow-xs shrink-0 whitespace-nowrap">
+              <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-paper"></i>
               <span>點此服用</span>
             </button>
           `;
         }
 
         card.innerHTML = `
-          <div class="flex items-start gap-3 min-w-0">
+          <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
             ${photoHtml}
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <h4 class="text-sm font-bold text-scholar-navy leading-snug">${med.name}</h4>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-scholar-paper border border-scholar-border text-scholar-navy font-semibold shrink-0">${med.dosage}</span>
+            <div class="min-w-0 truncate">
+              <div class="flex items-center gap-1.5 flex-wrap truncate">
+                <h4 class="text-xs sm:text-sm font-bold text-scholar-navy truncate">${med.name}</h4>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-scholar-paper border border-scholar-border text-scholar-navy font-semibold shrink-0">${med.dosage}</span>
               </div>
-              <p class="text-[11px] text-scholar-textMuted mt-1 leading-relaxed">
-                建議時段: <strong class="text-scholar-navy font-medium">${med.timing}</strong>
-                ${med.notes ? `<span class="block sm:inline text-scholar-textMuted/90">(${med.notes})</span>` : ''}
+              <p class="text-[11px] text-scholar-textMuted mt-0.5 truncate">
+                建議: <strong class="text-scholar-navy font-medium">${med.timing}</strong>
+                ${med.notes ? `<span class="text-scholar-textMuted/90">(${med.notes})</span>` : ''}
               </p>
             </div>
           </div>
-
-          <div class="flex items-center justify-end pt-2 border-t border-scholar-border/40">
+          <div class="shrink-0">
             ${statusActionHtml}
           </div>
         `;
@@ -1234,13 +1649,16 @@
       lucide.createIcons();
     }
 
-    // 快捷單鍵記錄單顆藥物
     window.quickLogSingleMed = function(medId) {
       const med = state.medications.find(m => m.id === medId);
       if (!med) return;
 
-      const todayStr = getStandardDateKey();
-      const currentH = new Date().getHours();
+      const now = new Date();
+      const todayStr = getStandardDateKey(now);
+      const currentH = now.getHours();
+      const currentM = String(now.getMinutes()).padStart(2, '0');
+      const timeStr = `${String(currentH).padStart(2, '0')}:${currentM}`;
+
       let currentPeriod = '晨起';
       if (currentH >= 11 && currentH < 14) currentPeriod = '午間';
       else if (currentH >= 14 && currentH < 20) currentPeriod = '晚間';
@@ -1249,37 +1667,30 @@
       state.medLogs.push({
         id: 'ml-' + Date.now(),
         date: todayStr,
+        time: timeStr,
         period: currentPeriod,
         medItems: [{ id: med.id, name: med.name, dosage: med.dosage }],
-        memo: `快速打卡 (${med.timing})`
+        memo: `快速打卡 (${med.timing} · ${timeStr})`
       });
 
       if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 24,
-          spread: 45,
-          origin: { y: 0.7 },
-          colors: ['#D3AC2B', '#333D51', '#CBD0D8']
-        });
+        confetti({ particleCount: 24, spread: 45, origin: { y: 0.7 }, colors: ['#394867', '#212A3E', '#9BA4B5'] });
       }
 
       saveState();
       renderApp();
     };
 
-    // 取消今日該顆藥物的服用紀錄 (徹底扣除並清理空日誌)
     window.undoSingleMedLog = function(medId, medName) {
       if (confirm(`確定要取消今日「${medName}」的服藥紀錄嗎？`)) {
         const todayStr = getStandardDateKey();
         
-        // 1. 從今日的所有服藥日誌中過濾移除該藥品
         state.medLogs = state.medLogs.map(log => {
           if (log.date === todayStr) {
             log.medItems = (log.medItems || []).filter(m => m.id !== medId);
           }
           return log;
         }).filter(log => {
-          // 2. 若該日誌已無任何藥品項目，直接徹底刪除整筆日誌，避免殘留幽靈紀錄
           return log.medItems && log.medItems.length > 0;
         });
 
@@ -1292,6 +1703,7 @@
       renderCategoryFilters();
       renderTodayHabits();
       renderBulletGrid();
+      renderPrescriptionCycles();
       renderTodayMedChecklistDashboard();
       renderHealthLogs();
       renderMedLogs();
@@ -1338,13 +1750,12 @@
         document.getElementById('stat-bp-tag').innerText = '尚未記錄';
       }
 
-      // 今日服藥狀態統計（只統計今日真正包含藥品項目的有效日誌）
       const todayValidMedLogs = (state.medLogs || []).filter(l => l.date === today && l.medItems && l.medItems.length > 0);
       document.getElementById('stat-today-med-count').innerText = todayValidMedLogs.length;
       const descEl = document.getElementById('stat-today-med-desc');
       if (todayValidMedLogs.length > 0) {
-        const periods = Array.from(new Set(todayValidMedLogs.map(l => l.period))).join('、');
-        descEl.innerText = `今日已於「${periods}」時段完成服藥。`;
+        const details = todayValidMedLogs.map(l => `${l.period}${l.time ? `(${l.time})` : ''}`).join('、');
+        descEl.innerText = `今日已於「${details}」完成服藥。`;
       } else {
         descEl.innerText = '按時用藥，保持身體恆定節奏。';
       }
@@ -1358,7 +1769,7 @@
       allBtn.className = `px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap shrink-0 ${
         state.activeCategory === 'all'
           ? 'bg-scholar-navy text-scholar-paper shadow-xs'
-          : 'bg-scholar-hover text-scholar-navy hover:bg-scholar-silver/40'
+          : 'bg-scholar-hover text-scholar-navy hover:bg-scholar-silver/30'
       }`;
       allBtn.innerText = '全部習慣';
       allBtn.onclick = () => {
@@ -1405,19 +1816,19 @@
 
       filtered.forEach(habit => {
         const isDone = !!todayLogs[habit.id];
-        const category = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#D3AC2B' };
+        const category = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#394867' };
         const streak = calculateHabitStreak(habit.id);
 
         const card = document.createElement('div');
         card.className = `group bg-scholar-card rounded-2xl p-3.5 sm:p-4 border transition-all duration-300 shadow-xs flex items-center justify-between ${
-          isDone ? 'border-scholar-gold/50 bg-scholar-gold/5' : 'border-scholar-border hover:border-scholar-navy/30'
+          isDone ? 'border-scholar-gold/40 bg-scholar-hover/30' : 'border-scholar-border hover:border-scholar-navy/30'
         }`;
 
         card.innerHTML = `
           <div class="flex items-center gap-3 min-w-0">
             <button type="button" class="btn-check-habit w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all shrink-0 ${
               isDone
-                ? 'bg-scholar-gold text-scholar-navy font-bold shadow-xs'
+                ? 'bg-scholar-gold text-white font-bold shadow-xs'
                 : 'bg-scholar-paper border border-scholar-border text-scholar-silver hover:border-scholar-navy/40 hover:text-scholar-navy'
             }" data-id="${habit.id}">
               <i data-lucide="${isDone ? 'check' : habit.icon || 'circle'}" class="w-4 h-4 sm:w-5 sm:h-5 pointer-events-none"></i>
@@ -1486,7 +1897,7 @@
       `;
       dates.forEach(d => {
         theadHtml += `<th class="py-2 px-1 text-center text-[11px] font-medium ${
-          d.isToday ? 'text-scholar-navy font-bold bg-scholar-gold/20 rounded-t' : 'text-scholar-textMuted'
+          d.isToday ? 'text-scholar-navy font-bold bg-scholar-hover rounded-t border-b-2 border-scholar-gold' : 'text-scholar-textMuted'
         }">${d.label}</th>`;
       });
       theadHtml += `</tr></thead>`;
@@ -1501,9 +1912,9 @@
         dates.forEach(d => {
           const isDone = !!(state.logs[d.key] && state.logs[d.key][habit.id]);
           tbodyHtml += `
-            <td class="py-2 px-1 text-center ${d.isToday ? 'bg-scholar-gold/10' : ''}">
+            <td class="py-2 px-1 text-center ${d.isToday ? 'bg-scholar-hover/40' : ''}">
               <button onclick="toggleHabitLog('${habit.id}', '${d.key}')" type="button" class="w-5 h-5 rounded-xs inline-flex items-center justify-center transition border ${
-                isDone ? 'bg-scholar-gold text-scholar-navy border-scholar-gold font-bold' : 'bg-scholar-paper hover:bg-scholar-hover border-scholar-border text-transparent'
+                isDone ? 'bg-scholar-gold text-white border-scholar-gold font-bold' : 'bg-scholar-paper hover:bg-scholar-hover border-scholar-border text-transparent'
               }">
                 <i data-lucide="check" class="w-3.5 h-3.5 pointer-events-none"></i>
               </button>
@@ -1560,7 +1971,7 @@
               <button onclick="editHealthLog('${log.id}')" type="button" class="p-1 text-scholar-textMuted hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="編輯">
                 <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
               </button>
-              <button onclick="deleteHealthLog('${log.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-gold/20 transition" title="刪除">
+              <button onclick="deleteHealthLog('${log.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="刪除">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
               </button>
             </div>
@@ -1575,7 +1986,6 @@
       const emptyState = document.getElementById('med-empty-state');
       tbody.innerHTML = '';
 
-      // 只呈現真正包含藥品項目的日誌
       const validLogs = (state.medLogs || []).filter(l => l.medItems && l.medItems.length > 0);
 
       if (validLogs.length === 0) {
@@ -1585,7 +1995,7 @@
       emptyState.classList.add('hidden');
 
       const sorted = [...validLogs].sort((a, b) => {
-        return (b.date + b.period).localeCompare(a.date + a.period);
+        return (b.date + (b.time || '')).localeCompare(a.date + (a.time || ''));
       });
 
       sorted.forEach(log => {
@@ -1604,13 +2014,15 @@
           `;
         }).join(' ');
 
+        const timeDisplay = log.time ? `<span class="text-scholar-textMuted font-mono">(${log.time})</span>` : '';
+
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-scholar-paper/70 transition';
         tr.innerHTML = `
           <td class="py-3 px-3 sm:px-4 font-mono font-medium text-scholar-navy">${log.date}</td>
           <td class="py-3 px-2 sm:px-3">
             <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-scholar-gold/15 text-scholar-navy border border-scholar-gold/30">
-              ${log.period}
+              ${log.period} ${timeDisplay}
             </span>
           </td>
           <td class="py-3 px-3">
@@ -1626,7 +2038,7 @@
               <button onclick="editMedLog('${log.id}')" type="button" class="p-1 text-scholar-textMuted hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="編輯">
                 <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
               </button>
-              <button onclick="deleteMedLog('${log.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-gold/20 transition" title="刪除">
+              <button onclick="deleteMedLog('${log.id}')" type="button" class="p-1 text-scholar-silver hover:text-scholar-navy rounded hover:bg-scholar-hover transition" title="刪除">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
               </button>
             </div>
@@ -1679,7 +2091,7 @@
             <button onclick="editMedication('${med.id}')" type="button" class="p-1.5 text-scholar-textMuted hover:text-scholar-navy rounded-lg hover:bg-scholar-hover transition" title="編輯藥品">
               <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="deleteMedication('${med.id}')" type="button" class="p-1.5 text-scholar-silver hover:text-scholar-navy rounded-lg hover:bg-scholar-gold/20 transition" title="刪除藥品">
+            <button onclick="deleteMedication('${med.id}')" type="button" class="p-1.5 text-scholar-silver hover:text-scholar-navy rounded-lg hover:bg-scholar-hover transition" title="刪除藥品">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -1711,9 +2123,9 @@
 
         let bgClass = 'bg-scholar-paper border border-scholar-border/50';
         if (doneCount > 0) {
-          if (ratio <= 0.25) bgClass = 'bg-scholar-silver/40';
-          else if (ratio <= 0.5) bgClass = 'bg-scholar-gold/40';
-          else if (ratio <= 0.75) bgClass = 'bg-scholar-gold/70';
+          if (ratio <= 0.25) bgClass = 'bg-scholar-silver/30';
+          else if (ratio <= 0.5) bgClass = 'bg-scholar-silver/70';
+          else if (ratio <= 0.75) bgClass = 'bg-scholar-gold/60';
           else bgClass = 'bg-scholar-gold';
         }
 
@@ -1745,7 +2157,7 @@
           if (state.logs[date] && state.logs[date][habit.id]) count++;
         });
 
-        const cat = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#D3AC2B' };
+        const cat = state.categories.find(c => c.id === habit.categoryId) || { name: '日常', color: '#394867' };
 
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between text-xs py-1.5 border-b border-scholar-border/60 last:border-none';
@@ -1780,7 +2192,7 @@
             <button onclick="editCategoryModal('${cat.id}')" type="button" class="p-1.5 text-scholar-textMuted hover:text-scholar-navy rounded-lg hover:bg-scholar-hover transition" title="編輯分類">
               <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="deleteCategory('${cat.id}')" type="button" class="p-1.5 text-scholar-silver hover:text-scholar-navy rounded-lg hover:bg-scholar-gold/20 transition" title="刪除分類">
+            <button onclick="deleteCategory('${cat.id}')" type="button" class="p-1.5 text-scholar-silver hover:text-scholar-navy rounded-lg hover:bg-scholar-hover transition" title="刪除分類">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -1873,7 +2285,7 @@
 
         label.innerHTML = `
           <div class="flex items-center gap-2.5 min-w-0">
-            <input type="checkbox" name="selected_med" value="${med.id}" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded text-scholar-gold focus:ring-scholar-gold/30 accent-[#D3AC2B] shrink-0" />
+            <input type="checkbox" name="selected_med" value="${med.id}" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded text-scholar-gold focus:ring-scholar-gold/30 accent-[#394867] shrink-0" />
             ${photoHtml}
             <div class="truncate">
               <div class="flex items-center gap-1.5">
@@ -1996,7 +2408,7 @@
         btn.type = 'button';
         btn.className = `py-1.5 text-xs font-semibold rounded-lg border transition text-center ${
           isSelected 
-            ? 'bg-scholar-gold text-scholar-navy border-scholar-gold shadow-xs' 
+            ? 'bg-scholar-gold text-white border-scholar-gold shadow-xs' 
             : 'bg-scholar-card text-scholar-textMuted border-scholar-border hover:border-scholar-gold/40'
         }`;
         btn.innerText = d.label;
@@ -2302,6 +2714,80 @@
         }
       };
 
+      // 處方循環彈窗與歷史歸檔開關
+      const modalCycle = document.getElementById('modal-cycle-edit');
+      document.getElementById('btn-open-cycle-modal').onclick = () => openCycleEditModal();
+      document.getElementById('btn-add-cycle-card').onclick = () => openCycleEditModal();
+      document.getElementById('btn-close-cycle-edit').onclick = () => modalCycle.classList.add('hidden');
+      document.getElementById('btn-cancel-cycle-edit').onclick = () => modalCycle.classList.add('hidden');
+
+      const drawer = document.getElementById('archived-cycles-drawer');
+      const btnToggleArchived = document.getElementById('btn-toggle-archived-cycles');
+      btnToggleArchived.onclick = () => {
+        state.showArchivedCycles = !state.showArchivedCycles;
+        if (state.showArchivedCycles) {
+          drawer.classList.remove('hidden');
+          btnToggleArchived.innerText = '隱藏歸檔';
+        } else {
+          drawer.classList.add('hidden');
+          btnToggleArchived.innerText = `歷史歸檔 (${(state.prescriptionCycles || []).filter(c => c.isArchived).length})`;
+        }
+        lucide.createIcons();
+      };
+
+      const bloodEnableCb = document.getElementById('input-cycle-blood-enable');
+      bloodEnableCb.onchange = () => {
+        const section = document.getElementById('section-cycle-blood-date');
+        if (bloodEnableCb.checked) section.classList.remove('hidden');
+        else section.classList.add('hidden');
+      };
+
+      document.getElementById('form-cycle-edit').onsubmit = (e) => {
+        e.preventDefault();
+        const id = document.getElementById('input-cycle-id').value;
+        const title = document.getElementById('input-cycle-title').value.trim();
+
+        const refill2Start = document.getElementById('input-cycle-refill2-start').value;
+        const refill2End = document.getElementById('input-cycle-refill2-end').value;
+        const refill3Start = document.getElementById('input-cycle-refill3-start').value;
+        const refill3End = document.getElementById('input-cycle-refill3-end').value;
+
+        const bloodEnabled = document.getElementById('input-cycle-blood-enable').checked;
+        const bloodDate = document.getElementById('input-cycle-blood-date').value;
+        const bloodNotes = document.getElementById('input-cycle-blood-notes').value.trim();
+
+        const clinicDate = document.getElementById('input-cycle-clinic-date').value;
+        const clinicNotes = document.getElementById('input-cycle-clinic-notes').value.trim();
+
+        if (id) {
+          const c = state.prescriptionCycles.find(x => x.id === id);
+          if (c) {
+            c.title = title;
+            c.refill2.start = refill2Start;
+            c.refill2.end = refill2End;
+            c.refill3.start = refill3Start;
+            c.refill3.end = refill3End;
+            c.blood = { enabled: bloodEnabled, date: bloodDate, notes: bloodNotes, done: c.blood?.done || false };
+            c.clinic.date = clinicDate;
+            c.clinic.notes = clinicNotes;
+          }
+        } else {
+          state.prescriptionCycles.push({
+            id: 'cycle-' + Date.now(),
+            title,
+            refill2: { start: refill2Start, end: refill2End, done: false },
+            refill3: { start: refill3Start, end: refill3End, done: false },
+            blood: { enabled: bloodEnabled, date: bloodDate, notes: bloodNotes, done: false },
+            clinic: { date: clinicDate, notes: clinicNotes, done: false },
+            isArchived: false
+          });
+        }
+
+        saveState();
+        modalCycle.classList.add('hidden');
+        renderApp();
+      };
+
       const modalLogMed = document.getElementById('modal-log-med');
       document.getElementById('btn-open-log-med-modal').onclick = () => openLogMedModal();
       document.getElementById('btn-health-quick-log-med').onclick = () => openLogMedModal();
@@ -2314,6 +2800,9 @@
         const date = document.getElementById('input-log-med-date').value;
         const period = document.getElementById('input-log-med-period').value;
         const memo = document.getElementById('input-log-med-memo').value.trim();
+
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
         const checkedCheckboxes = document.querySelectorAll('input[name="selected_med"]:checked');
         const medItems = Array.from(checkedCheckboxes).map(cb => {
@@ -2333,6 +2822,7 @@
           state.medLogs.push({
             id: 'ml-' + Date.now(),
             date,
+            time: timeStr,
             period,
             medItems,
             memo
@@ -2615,14 +3105,15 @@
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '2.8',
+          routine_version: '3.2',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,
           logs: state.logs,
           healthLogs: state.healthLogs,
           medications: state.medications,
-          medLogs: state.medLogs
+          medLogs: state.medLogs,
+          prescriptionCycles: state.prescriptionCycles
         };
         const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -2648,6 +3139,7 @@
               state.healthLogs = data.healthLogs || [];
               state.medications = data.medications || INITIAL_MEDICATIONS;
               state.medLogs = data.medLogs || [];
+              state.prescriptionCycles = data.prescriptionCycles || [];
               saveState();
               renderApp();
               alert('備份資料已成功匯入並同步至雲端！');
@@ -2672,6 +3164,7 @@
           ];
           state.medications = INITIAL_MEDICATIONS;
           state.medLogs = [];
+          state.prescriptionCycles = [];
           saveState();
           renderApp();
           modalData.classList.add('hidden');

@@ -92,9 +92,9 @@
         </div>
       </div>
 
-      <!-- 右側：依模式切換的操作按鈕組 -->
+      <!-- 右側動作按鈕組 -->
       <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <!-- 習慣專用按鈕 -->
+        <!-- 習慣模式按鈕 -->
         <div id="header-actions-habit" class="flex items-center gap-1.5 sm:gap-2">
           <button id="btn-open-category-modal" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-navy hover:bg-scholar-hover transition flex items-center gap-1 text-xs font-medium shadow-xs" title="習慣分類管理">
             <i data-lucide="tag" class="w-3.5 h-3.5 shrink-0 text-scholar-textMuted"></i>
@@ -106,7 +106,7 @@
           </button>
         </div>
 
-        <!-- 健康用藥專用按鈕 -->
+        <!-- 健康用藥模式按鈕 -->
         <div id="header-actions-health" class="hidden items-center gap-1.5 sm:gap-2">
           <button id="btn-open-med-manager-modal" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-scholar-border bg-scholar-card text-scholar-navy hover:bg-scholar-hover transition flex items-center gap-1 text-xs font-medium shadow-xs" title="藥箱母檔管理">
             <i data-lucide="archive" class="w-3.5 h-3.5 shrink-0 text-scholar-textMuted"></i>
@@ -122,7 +122,7 @@
           </button>
         </div>
 
-        <!-- 備份按鈕 -->
+        <!-- 通用備份按鈕 -->
         <button id="btn-open-data-modal" class="p-1.5 sm:p-2 rounded-xl border border-scholar-border bg-scholar-card text-scholar-textMuted hover:text-scholar-navy hover:bg-scholar-hover transition shadow-xs" title="資料管理與備份">
           <i data-lucide="database" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
         </button>
@@ -132,7 +132,7 @@
 
   <main class="max-w-5xl mx-auto px-3.5 sm:px-6 pt-3 sm:pt-5 space-y-5 sm:space-y-6">
 
-    <!-- 頂部主工作區切換器 -->
+    <!-- 頂部工作區切換器 -->
     <section class="flex justify-center">
       <div class="bg-scholar-hover/90 p-1.5 rounded-2xl border border-scholar-border/80 flex items-center gap-1 w-full sm:w-auto shadow-2xs">
         <button id="main-tab-habit" class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 bg-scholar-card text-scholar-navy shadow-xs border border-scholar-border/50">
@@ -271,7 +271,7 @@
     <!-- ==================== 區塊 B: 健康與用藥專屬工作區 ==================== -->
     <div id="workspace-health" class="hidden space-y-5 sm:space-y-6">
       
-      <!-- ★ 新增：今日用藥進度看板 (一眼確認用藥狀態) -->
+      <!-- 今日用藥進度看板 (排版最佳化，防截斷 + 支援取消反悔) -->
       <section class="bg-scholar-card rounded-2xl p-4 sm:p-5 border border-scholar-border shadow-xs space-y-3.5">
         <div class="flex items-center justify-between border-b border-scholar-border/70 pb-2.5">
           <div class="flex items-center gap-2">
@@ -288,8 +288,8 @@
           </span>
         </div>
 
-        <!-- 今日藥盒卡片清單 (動態渲染) -->
-        <div id="today-med-checklist-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+        <!-- 藥品卡片清單 (改良 RWD 排版) -->
+        <div id="today-med-checklist-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
       </section>
 
       <!-- 健康指標雙欄摘要 -->
@@ -779,7 +779,7 @@
 
         <div class="pt-2 border-t border-scholar-border flex justify-between items-center">
           <button id="btn-reset-demo" type="button" class="text-[11px] text-scholar-navy hover:underline">載入範例生活習慣</button>
-          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v2.6 (今日藥盒看板版)</span>
+          <span class="text-[11px] text-scholar-textMuted">日常軌跡 v2.7 (防呆與RWD排版版)</span>
         </div>
       </div>
     </div>
@@ -1127,7 +1127,7 @@
       }
     }
 
-    // ==================== ★ 新增：今日用藥進度看板渲染與單鍵打卡 ====================
+    // ==================== 今日用藥狀態檢視看板 (排版最佳化 + 支援反悔取消) ====================
     function renderTodayMedChecklistDashboard() {
       const container = document.getElementById('today-med-checklist-cards');
       const summaryBadge = document.getElementById('today-med-summary-badge');
@@ -1162,39 +1162,39 @@
       let completedCount = 0;
 
       todayScheduledMeds.forEach(med => {
-        // 檢查該藥物今天是否已經被記錄過
         const takenLogs = todayLogs.filter(log => (log.medItems || []).some(m => m.id === med.id));
         const isTaken = takenLogs.length > 0;
 
         if (isTaken) completedCount++;
 
         const photoHtml = med.photo
-          ? `<img src="${med.photo}" alt="${med.name}" class="w-11 h-11 rounded-xl object-cover border border-scholar-border shrink-0 cursor-pointer" onclick="showImageLightbox('${med.photo}', '${med.name}')" title="點擊檢視大圖" />`
-          : `<div class="w-11 h-11 rounded-xl bg-scholar-paper border border-scholar-border flex items-center justify-center text-scholar-gold shrink-0">
-               <i data-lucide="pill" class="w-5 h-5"></i>
+          ? `<img src="${med.photo}" alt="${med.name}" class="w-12 h-12 rounded-xl object-cover border border-scholar-border shrink-0 cursor-pointer shadow-2xs" onclick="showImageLightbox('${med.photo}', '${med.name}')" title="點擊檢視大圖" />`
+          : `<div class="w-12 h-12 rounded-xl bg-scholar-paper border border-scholar-border flex items-center justify-center text-scholar-gold shrink-0">
+               <i data-lucide="pill" class="w-6 h-6"></i>
              </div>`;
 
         const card = document.createElement('div');
-        card.className = `p-3 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 ${
+        card.className = `p-3.5 rounded-2xl border transition-all duration-200 flex flex-col justify-between gap-2.5 ${
           isTaken
             ? 'bg-scholar-card/90 border-scholar-gold/40 shadow-2xs'
             : 'bg-scholar-card border-scholar-border hover:border-scholar-navy/30'
         }`;
 
-        let statusBadgeHtml = '';
+        let statusActionHtml = '';
         if (isTaken) {
           const timesStr = takenLogs.map(l => l.period).join('、');
-          statusBadgeHtml = `
-            <div class="flex items-center gap-1.5 shrink-0">
-              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-scholar-gold/15 text-scholar-navy border border-scholar-gold/40">
-                <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-gold"></i>
-                <span>已於 ${timesStr} 服用</span>
-              </span>
-            </div>
+          // 支援點擊取消反悔按鈕
+          statusActionHtml = `
+            <button onclick="undoSingleMedLog('${med.id}', '${med.name}')" type="button" class="w-full sm:w-auto px-3 py-1.5 rounded-xl text-xs font-semibold bg-scholar-gold/15 text-scholar-navy border border-scholar-gold/40 hover:bg-terracotta-50 hover:text-red-700 hover:border-red-300 transition flex items-center justify-center gap-1 group/btn" title="誤觸可點擊取消今日紀錄">
+              <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-gold group-hover/btn:hidden"></i>
+              <i data-lucide="x" class="w-3.5 h-3.5 text-red-600 hidden group-hover/btn:inline"></i>
+              <span class="group-hover/btn:hidden">已於 ${timesStr} 服用</span>
+              <span class="hidden group-hover/btn:inline font-bold">點擊取消紀錄</span>
+            </button>
           `;
         } else {
-          statusBadgeHtml = `
-            <button onclick="quickLogSingleMed('${med.id}')" type="button" class="px-3 py-1.5 rounded-xl bg-scholar-navy hover:bg-scholar-navy/90 text-scholar-paper text-xs font-semibold transition flex items-center gap-1 shadow-xs shrink-0">
+          statusActionHtml = `
+            <button onclick="quickLogSingleMed('${med.id}')" type="button" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-scholar-navy hover:bg-scholar-navy/90 text-scholar-paper text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-xs shrink-0">
               <i data-lucide="check" class="w-3.5 h-3.5 text-scholar-gold"></i>
               <span>點此服用</span>
             </button>
@@ -1202,25 +1202,28 @@
         }
 
         card.innerHTML = `
-          <div class="flex items-center gap-3 min-w-0">
+          <div class="flex items-start gap-3 min-w-0">
             ${photoHtml}
-            <div class="truncate">
-              <div class="flex items-center gap-1.5">
-                <h4 class="text-xs sm:text-sm font-bold truncate text-scholar-navy">${med.name}</h4>
-                <span class="text-[10px] px-1.5 py-0.2 rounded bg-scholar-paper border border-scholar-border text-scholar-textMuted shrink-0">${med.dosage}</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h4 class="text-sm font-bold text-scholar-navy leading-snug">${med.name}</h4>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-scholar-paper border border-scholar-border text-scholar-navy font-semibold shrink-0">${med.dosage}</span>
               </div>
-              <p class="text-[11px] text-scholar-textMuted mt-0.5 truncate">
-                建議時段: <strong class="text-scholar-navy font-medium">${med.timing}</strong> ${med.notes ? `(${med.notes})` : ''}
+              <p class="text-[11px] text-scholar-textMuted mt-1 leading-relaxed">
+                建議時段: <strong class="text-scholar-navy font-medium">${med.timing}</strong>
+                ${med.notes ? `<span class="block sm:inline text-scholar-textMuted/90">(${med.notes})</span>` : ''}
               </p>
             </div>
           </div>
-          ${statusBadgeHtml}
+
+          <div class="flex items-center justify-end pt-2 border-t border-scholar-border/40">
+            ${statusActionHtml}
+          </div>
         `;
 
         container.appendChild(card);
       });
 
-      // 更新頂部看板小標籤
       if (completedCount === todayScheduledMeds.length) {
         summaryBadge.innerText = `全部完成 (${completedCount}/${todayScheduledMeds.length})`;
         summaryBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-scholar-gold/20 text-scholar-navy border border-scholar-gold/40';
@@ -1232,7 +1235,7 @@
       lucide.createIcons();
     }
 
-    // 快捷單鍵記錄單顆藥物 (免開彈窗秒記)
+    // 快捷單鍵記錄單顆藥物
     window.quickLogSingleMed = function(medId) {
       const med = state.medications.find(m => m.id === medId);
       if (!med) return;
@@ -1265,11 +1268,29 @@
       renderApp();
     };
 
+    // ★ 誤觸反悔功能：取消今日該顆藥物的服用紀錄
+    window.undoSingleMedLog = function(medId, medName) {
+      if (confirm(`確定要取消今日「${medName}」的服藥紀錄嗎？（狀態將回復為待服用）`)) {
+        const todayStr = getStandardDateKey();
+        
+        // 從今日的所有用藥日誌中移除這顆藥物
+        state.medLogs = state.medLogs.map(log => {
+          if (log.date === todayStr) {
+            log.medItems = (log.medItems || []).filter(m => m.id !== medId);
+          }
+          return log;
+        }).filter(log => (log.medItems && log.medItems.length > 0) || log.memo); // 若該筆日誌已無藥品則清理
+
+        saveState();
+        renderApp();
+      }
+    };
+
     function renderApp() {
       renderCategoryFilters();
       renderTodayHabits();
       renderBulletGrid();
-      renderTodayMedChecklistDashboard(); // 渲染今日用藥看板
+      renderTodayMedChecklistDashboard();
       renderHealthLogs();
       renderMedLogs();
       renderHeatmap();
@@ -1481,7 +1502,7 @@
               <button onclick="toggleHabitLog('${habit.id}', '${d.key}')" type="button" class="w-5 h-5 rounded-xs inline-flex items-center justify-center transition border ${
                 isDone ? 'bg-scholar-gold text-scholar-navy border-scholar-gold font-bold' : 'bg-scholar-paper hover:bg-scholar-hover border-scholar-border text-transparent'
               }">
-                <i data-lucide="check" class="w-3 h-3 pointer-events-none"></i>
+                <i data-lucide="check" class="w-3.5 h-3.5 pointer-events-none"></i>
               </button>
             </td>
           `;
@@ -2588,7 +2609,7 @@
 
       document.getElementById('btn-export-json').onclick = () => {
         const exportObj = {
-          routine_version: '2.6',
+          routine_version: '2.7',
           export_date: new Date().toISOString(),
           categories: state.categories,
           habits: state.habits,
